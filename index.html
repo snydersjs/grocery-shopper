@@ -1345,6 +1345,7 @@ function defaultState() {
     // key = catId (for category Other) | "catId_itemId" (for named freeform / freeformOnly)
     // value = [{ id, text, qty, updatedAt }]
     freeform:   {},
+    freeformAt: 0,    // timestamp of last freeform mutation
 
     // Shopping cart state: key → true (checked off)
     cart:       {},
@@ -1582,19 +1583,19 @@ function mergeStates(local, cloud) {
     }
   });
 
-  // Merge freeform: union by entry id
-  const allFfKeys = new Set([
-    ...Object.keys(local.freeform  || {}),
-    ...Object.keys(cloud.freeform  || {}),
-  ]);
-  allFfKeys.forEach(k => {
-    const le = (local.freeform  || {})[k] || [];
-    const ce = (cloud.freeform  || {})[k] || [];
-    const byId = {};
-    // Cloud entries first, then local overrides (local is fresher for active session)
-    [...ce, ...le].forEach(e => { byId[e.id] = e; });
-    merged.freeform[k] = Object.values(byId);
-  });
+  // Merge freeform: local wins if mutated this session (prevents deleted entries restoring)
+  const localFreeformAt = local.freeformAt || 0;
+  const cloudFreeformAt = cloud.freeformAt || 0;
+  if (localFreeformAt > 0) {
+    // Local has been mutated — use whichever is newer per-key
+    // Since we can't do per-entry tombstones cheaply, take the whole local freeform
+    // when local is newer (local always is on an immediate save)
+    merged.freeform   = localFreeformAt >= cloudFreeformAt ? (local.freeform || {}) : (cloud.freeform || {});
+  } else {
+    // No local mutations — use cloud
+    merged.freeform = cloud.freeform || local.freeform || {};
+  }
+  merged.freeformAt = Math.max(localFreeformAt, cloudFreeformAt);
 
   // Merge cart: local wins — cart changes are always immediate saves,
   // so local state is always at least as fresh as cloud. Union would
@@ -1802,6 +1803,7 @@ function doneShopping() {
   // Reset grocery list state — thisWeek (dinners) is intentionally preserved
   state.items        = {};
   state.freeform     = {};
+  state.freeformAt   = Date.now();
   state.cart         = {};
   state.cartAt       = Date.now();
   state.notes        = {};
@@ -1883,11 +1885,13 @@ function setFreeformEntry(ffKey, id, text, qty) {
   } else {
     state.freeform[ffKey].push({ id, text, qty, updatedAt: Date.now() });
   }
+  state.freeformAt = Date.now();
 }
 
 function deleteFreeformEntry(ffKey, id) {
   if (!state.freeform[ffKey]) return;
   state.freeform[ffKey] = state.freeform[ffKey].filter(e => e.id !== id);
+  state.freeformAt = Date.now();
 }
 
 function upsertCustomItem(text, sourceKey, sourceType, parentItemId = null) {
@@ -2324,8 +2328,9 @@ function adjustFreeformQty(ffKey, entryId, delta) {
     renderRequest();
     return;
   }
-  e.qty       = newQty;
-  e.updatedAt = Date.now();
+  e.qty         = newQty;
+  e.updatedAt   = Date.now();
+  state.freeformAt = Date.now();
   scheduleSave();
   renderRequest();
 }
