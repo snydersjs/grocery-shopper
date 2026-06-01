@@ -1,0 +1,3097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grocery Shopper</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* ─── Reset & Variables ──────────────────────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:           #f0f7f0;
+    --bg2:          #e6f2e6;
+    --surface:      #ffffff;
+    --surface2:     #f4faf4;
+    --border:       #c8dfc8;
+    --border-light: #ddeedd;
+    --text:         #1a2e1a;
+    --text-mid:     #4a6b4a;
+    --text-dim:     #7a9b7a;
+    --accent:       #2e7d32;
+    --accent-light: #e8f5e9;
+    --accent-border:#81c784;
+    --danger:       #c62828;
+    --warn-bg:      #fff8e1;
+    --warn-border:  #f9a825;
+    --cart-text:    #9ab89a;
+    --shadow:       0 1px 4px rgba(46,125,50,0.08);
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+
+  /* ─── Sync status pill ───────────────────────────────── */
+  #sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+    white-space: nowrap;
+    margin-left: auto;
+    order: 99;
+  }
+  #sync-status.saving  { background: rgba(255,255,255,0.25); color: #fff; }
+  #sync-status.saved   { background: rgba(100,200,100,0.35); color: #fff; }
+  #sync-status.error   { background: rgba(198,40,40,0.6);   color: #fff; }
+  #sync-status.offline { background: rgba(0,0,0,0.3);       color: rgba(255,255,255,0.7); }
+
+  /* ─── Header ─────────────────────────────────────────── */
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 16px 8px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(46,125,50,0.25);
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .header-left { min-width: 0; flex: 1; }
+  .header-title-row { display: flex; align-items: baseline; gap: 8px; }
+  .header-title { font-size: 17px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+  .header-date  {
+    font-size: 11px; opacity: 0.8; cursor: pointer; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    border-bottom: 1px dashed rgba(255,255,255,0.5);
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .header-icon-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 6px;
+    color: rgba(255,255,255,0.9);
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .header-icon-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* ─── Tabs ───────────────────────────────────────────── */
+  .tab-bar {
+    display: flex;
+    background: var(--accent);
+    padding: 0 16px 10px;
+    gap: 6px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 7px 4px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.75);
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab-btn.active {
+    background: #fff;
+    color: var(--accent);
+  }
+  /* Locked pill in header */
+  .header-locked-pill {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #7a5f00;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .header-locked-pill.visible { display: flex; }
+  .header-locked-pill .pill-label { font-weight: 700; }
+  .header-locked-pill .pill-btn {
+    background: none;
+    border: 1px solid var(--warn-border);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-family: 'Lato', sans-serif;
+    color: #7a5f00;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .header-locked-pill .pill-btn:hover { background: rgba(249,168,37,0.2); }
+  .header-locked-pill .pill-btn.done {
+    background: #f9a825;
+    color: #fff;
+    font-weight: 700;
+    border-color: #f9a825;
+  }
+  .header-locked-pill .pill-btn.done:hover { background: #e65100; border-color: #e65100; }
+  .spacer { flex: 1; }
+
+  /* ─── Tab panels ─────────────────────────────────────── */
+  .tab-panel { display: none; padding: 12px 16px 80px; }
+  .tab-panel.active { display: block; }
+
+  /* locked-banner removed — lock state shown in header pill */
+
+  /* ─── Request toolbar (sticky below tabs) ───────────────── */
+  .request-toolbar {
+    position: sticky;
+    top: 96px; /* height of header+tabs — adjust if needed */
+    z-index: 90;
+    background: var(--bg);
+    padding: 8px 16px 6px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .request-toolbar .search-wrap {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+  }
+  .request-toolbar .search-wrap input { font-size: 13px; padding: 6px 28px 6px 30px; }
+  .toolbar-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-family: 'Lato', sans-serif;
+    color: var(--text-mid);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .toolbar-btn:hover { background: var(--surface); }
+  .toolbar-btn.lock {
+    border-color: var(--accent-border);
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .toolbar-btn.lock:hover { background: var(--accent-light); }
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    display: none;
+  }
+  .search-clear.visible { display: block; }
+
+  /* ─── Search bar ─────────────────────────────────────── */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--accent-border); }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 15px;
+    pointer-events: none;
+  }
+
+  /* ─── Category cards ─────────────────────────────────── */
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--accent);
+  }
+  .cat-header:hover { background: #256427; }
+  .cat-title {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+  }
+  .cat-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cat-count {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 10px;
+    padding: 1px 8px;
+  }
+  .cat-count.zero { display: none; }
+  .cat-chevron {
+    color: rgba(255,255,255,0.75);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+  .cat-card.open .cat-chevron { transform: rotate(180deg); }
+  .cat-body { display: none; padding: 8px 14px 12px; }
+  .cat-card.open .cat-body { display: block; }
+
+  /* ─── Item rows ──────────────────────────────────────── */
+  .item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+    gap: 8px;
+  }
+  .item-row:last-child { border-bottom: none; }
+  .item-name { font-size: 14px; flex: 1; min-width: 0; }
+  .item-row.selected .item-name { font-weight: 700; color: var(--accent); }
+
+  /* ─── Qty selector ───────────────────────────────────── */
+  .qty-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+    flex-shrink: 0;
+  }
+  .qty-btn:active { background: var(--accent-light); }
+  .qty-display {
+    min-width: 28px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-mid);
+  }
+  .qty-display.zero { color: var(--text-dim); font-weight: 400; }
+
+  /* ─── MultiAdd rows ──────────────────────────────────── */
+  .multiadd-row {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .multiadd-row:last-child { border-bottom: none; }
+  .multiadd-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .multiadd-name { font-size: 14px; min-width: 90px; flex-shrink: 0; font-weight: 600; }
+  .multiadd-adder {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+  .multiadd-select {
+    flex: 1;
+    min-width: 0;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+  }
+  .multiadd-select:focus { border-color: var(--accent-border); }
+  .multiadd-btn {
+    padding: 5px 12px;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .multiadd-added-variants { padding-left: 98px; margin-top: 4px; }
+  .variant-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  }
+  .variant-label { font-size: 13px; flex: 1; color: var(--text-mid); }
+  .variant-label.custom-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .variant-label.custom-input:focus { border-color: var(--accent-border); }
+
+  /* ─── Freeform section ───────────────────────────────── */
+  .freeform-section { margin-top: 4px; }
+  .freeform-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 10px 0 4px;
+  }
+  .freeform-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  }
+  .freeform-input-wrap { position: relative; flex: 1; min-width: 0; }
+  .freeform-input {
+    width: 100%;
+    padding: 6px 28px 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .freeform-input:focus { border-color: var(--accent-border); }
+  .freeform-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+  .freeform-qty { visibility: hidden; }
+  .freeform-qty.visible { visibility: visible; }
+
+  /* ─── Shopping tab ───────────────────────────────────── */
+  .shop-group-header {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+    background: var(--accent);
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin: 14px 0 4px;
+  }
+  .shop-group-header:first-child { margin-top: 0; }
+  .shop-item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .shop-item-row:last-child { border-bottom: none; }
+  .shop-check-btn {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    font-size: 17px;
+    transition: all 0.15s;
+    margin-top: 1px;
+  }
+  .shop-check-btn.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .shop-item-body { flex: 1; min-width: 0; }
+  .shop-item-main { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .shop-item-name { font-size: 14px; flex: 1; min-width: 0; }
+  .shop-item-name.checked { color: var(--cart-text); text-decoration: line-through; }
+
+  .shop-item-qty {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 1px 7px;
+    white-space: nowrap;
+  }
+  .shop-note-tag {
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: 1px solid var(--accent-border);
+    border-radius: 10px;
+    padding: 1px 7px;
+    cursor: pointer;
+    white-space: nowrap;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .shop-add-note-btn {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 1px 7px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .shop-add-note-btn:hover { border-color: var(--accent-border); color: var(--accent); }
+  .shop-note-input {
+    display: none;
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    margin-top: 6px;
+  }
+  .shop-note-input.open { display: block; }
+  .shop-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-top: 2px; }
+  .shop-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .shop-delete-btn:hover { color: var(--danger); }
+  .in-cart-section { margin-top: 16px; }
+  .in-cart-header {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cart-text);
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .shop-return-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: var(--text-mid);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .shop-return-btn:hover { background: var(--surface2); }
+
+  /* ─── Dinner tab ─────────────────────────────────────── */
+  .dinner-subtab-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .dinner-subtab-btn {
+    flex: 1;
+    padding: 7px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-mid);
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .dinner-subtab-btn.active {
+    background: var(--accent-light);
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+  .dinner-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .dinner-check-btn {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    font-size: 15px;
+    transition: all 0.15s;
+  }
+  .dinner-check-btn.done {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .dinner-name { flex: 1; font-size: 14px; }
+  .dinner-name.done { color: var(--text-dim); text-decoration: line-through; }
+  .dinner-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .dinner-delete-btn:hover { color: var(--danger); }
+  .dinner-done-section { margin-top: 12px; }
+  .dinner-done-header {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dinner-add-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .dinner-add-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .dinner-add-input:focus { border-color: var(--accent-border); }
+  .dinner-add-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .dinner-footer {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  /* ─── Menu sub-tab ───────────────────────────────────── */
+  .menu-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .menu-cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .menu-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    background: var(--accent);
+  }
+  .menu-cat-header:hover { background: #256427; }
+  .menu-cat-title {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+  }
+  .menu-cat-chevron { color: rgba(255,255,255,0.75); font-size: 12px; transition: transform 0.2s; }
+  .menu-cat-card.open .menu-cat-chevron { transform: rotate(180deg); }
+  .menu-cat-body { display: none; padding: 4px 14px 10px; }
+  .menu-cat-card.open .menu-cat-body { display: block; }
+  .menu-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .menu-item-row:last-child { border-bottom: none; }
+  .menu-add-week-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    transition: all 0.15s;
+  }
+  .menu-add-week-btn.on-list {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .menu-item-name { flex: 1; font-size: 14px; min-width: 0; }
+  .menu-item-name input {
+    width: 100%;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    outline: none;
+    background: var(--surface);
+  }
+  .menu-cat-select {
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    flex-shrink: 0;
+  }
+  .menu-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .menu-delete-btn:hover { color: var(--danger); }
+  .menu-edit-btn {
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-mid);
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .menu-edit-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  /* ─── History tab ────────────────────────────────────── */
+  .history-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .history-back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+    color: var(--text-mid);
+    cursor: pointer;
+  }
+  .history-back-btn:hover { background: var(--surface2); }
+  .history-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .history-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .history-item-row:last-child { border-bottom: none; }
+  .history-item-body { flex: 1; min-width: 0; }
+  .history-name-input {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    background: transparent;
+    color: var(--text);
+    outline: none;
+  }
+  .history-name-input:focus {
+    border-color: var(--accent-border);
+    background: var(--surface);
+  }
+  .history-source {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 1px;
+    padding-left: 6px;
+  }
+  .history-promote-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    title: 'Add to catalog';
+  }
+  .history-promote-btn:hover { background: var(--accent); color: #fff; }
+  .history-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .history-delete-btn:hover { color: var(--danger); }
+
+  /* ─── Modal / Dialog ─────────────────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 22px 20px;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .modal-body {
+    font-size: 14px;
+    color: var(--text-mid);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .modal-cancel {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .modal-confirm {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .modal-confirm.danger { background: var(--danger); }
+  .modal-select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 14px;
+  }
+
+  /* ─── Utility ────────────────────────────────────────── */
+  .hidden { display: none !important; }
+  .empty-msg {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 24px 0;
+  }
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--danger);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+<header>
+  <div class="header-row">
+    <div class="header-left">
+      <div class="header-title-row">
+        <div class="header-title">Grocery List</div>
+        <div class="header-date" id="shopping-date-display" onclick="promptSetDate()">Tap to set date</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-locked-pill" id="locked-pill">
+        <span class="pill-label">🔒 Locked</span>
+        <button class="pill-btn" onclick="unlockList()">Unlock</button>
+        <button class="pill-btn done" id="done-shopping-btn" onclick="confirmDoneShopping()">✓ Done</button>
+      </div>
+      <span id="sync-status">●&nbsp;Ready</span>
+      <button class="header-icon-btn" onclick="showHistory()">History</button>
+      <button class="header-icon-btn" onclick="backupState()">Backup</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ TAB BAR ══════════════════════════════════════════════════════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="request" onclick="switchTab('request')">Request</button>
+  <button class="tab-btn" data-tab="shopping" onclick="switchTab('shopping')">Shopping</button>
+  <button class="tab-btn" data-tab="dinners" onclick="switchTab('dinners')">Dinners</button>
+</div>
+
+<!-- ═══ LOCKED PILL (injected into header when locked) ══════════════════ -->
+<!-- rendered by renderHeader() -->
+
+<!-- ═══ REQUEST TOOLBAR (sticky) ════════════════════════════════════════ -->
+<div class="request-toolbar" id="request-toolbar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="request-search" placeholder="Search…" oninput="onRequestSearch(this.value)">
+    <button class="search-clear" id="search-clear-btn" onclick="clearSearch()">×</button>
+  </div>
+  <button class="toolbar-btn" onclick="expandAll()">Expand</button>
+  <button class="toolbar-btn" onclick="collapseAll()">Collapse</button>
+  <button class="toolbar-btn lock" id="lock-btn" onclick="confirmLockList()">Lock</button>
+</div>
+
+<!-- ═══ REQUEST TAB ═══════════════════════════════════════════════════════ -->
+<div id="tab-request" class="tab-panel active">
+  <div id="request-catalog"></div>
+</div>
+
+<!-- ═══ SHOPPING TAB ══════════════════════════════════════════════════════ -->
+<div id="tab-shopping" class="tab-panel">
+  <div id="shopping-list"></div>
+</div>
+
+<!-- ═══ DINNERS TAB ═══════════════════════════════════════════════════════ -->
+<div id="tab-dinners" class="tab-panel">
+  <div class="dinner-subtab-bar">
+    <button class="dinner-subtab-btn active" data-sub="this-week" onclick="switchDinnerSub('this-week')">This Week</button>
+    <button class="dinner-subtab-btn" data-sub="menu" onclick="switchDinnerSub('menu')">Menu</button>
+  </div>
+  <div id="dinner-this-week"></div>
+  <div id="dinner-menu" class="hidden"></div>
+</div>
+
+<!-- ═══ HISTORY PANEL (shown as overlay / separate panel) ════════════════ -->
+<div id="tab-history" class="tab-panel">
+  <div class="history-header">
+    <button class="history-back-btn" onclick="backFromHistory()">← Back</button>
+    <span class="history-title">Custom Items</span>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ═══ MODALS ════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-lock">
+  <div class="modal-box">
+    <div class="modal-title">Lock List for Shopping?</div>
+    <div class="modal-body">Once locked, the list is ready for shopping. You can still unlock it if needed.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('modal-lock')">Cancel</button>
+      <button class="modal-confirm" onclick="lockList()">Lock</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-done-shopping">
+  <div class="modal-box">
+    <div class="modal-title">Done Shopping?</div>
+    <div class="modal-body">This will save the trip to history and clear the list for next week.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('modal-done-shopping')">Cancel</button>
+      <button class="modal-confirm" onclick="doneShopping()">Done Shopping</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-set-date">
+  <div class="modal-box">
+    <div class="modal-title">Set Shopping Date</div>
+    <div class="modal-body">
+      <input type="date" id="date-input" class="modal-select" style="margin-bottom:0;">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('modal-set-date')">Cancel</button>
+      <button class="modal-confirm" onclick="saveDate()">Set Date</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-promote">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-promote-title">Add to Catalog</div>
+    <div class="modal-body" id="modal-promote-body"></div>
+    <div id="modal-promote-cat-row">
+      <select class="modal-select" id="modal-promote-cat"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('modal-promote')">Cancel</button>
+      <button class="modal-confirm" onclick="confirmPromote()">Add to Catalog</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-clear-dinners">
+  <div class="modal-box">
+    <div class="modal-title">Clear This Week's Dinners?</div>
+    <div class="modal-body">All dinners for this week will be removed.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('modal-clear-dinners')">Cancel</button>
+      <button class="modal-confirm danger" onclick="clearDinners()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+// ─────────────────────────────────────────────────────────────────────────────
+// FIREBASE INIT
+// ─────────────────────────────────────────────────────────────────────────────
+import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyAeGdpHwhJs_0qkqtLMf4Z1LCSEodlcKok",
+  authDomain:        "ztevez-apps.firebaseapp.com",
+  projectId:         "ztevez-apps",
+  storageBucket:     "ztevez-apps.firebasestorage.app",
+  messagingSenderId: "609437870016",
+  appId:             "1:609437870016:web:29aed98b4b1d5e7bab0a25"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getFirestore(fbApp);
+const STATE_REF = doc(db, 'grocery', 'state');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CATALOG  (source of truth: request_catalog.csv)
+// ─────────────────────────────────────────────────────────────────────────────
+const CATALOG = [
+  { id:'fruit', label:'Fruit', items:[
+    { id:'apples',              name:'Apples',              type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'bananas',             name:'Bananas',             type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'blackberries',        name:'Blackberries',        type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'blueberries',         name:'Blueberries',         type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'cherries',            name:'Cherries',            type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'ruby_red_grapefruit', name:'Grapefruit - Ruby Red',type:'simple',     shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'lemon',               name:'Lemon',               type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'lime',                name:'Lime',                type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'pears',               name:'Pears',               type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'strawberries',        name:'Strawberries',        type:'simple',      shopGroup:'Fruit & Vegetables', shopOrder:20 },
+  ]},
+  { id:'vegetables', label:'Vegetables', items:[
+    { id:'avocados',    name:'Avocados',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'bell_peppers',name:'Bell Pepper',type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Green','Orange','Red','Yellow','Other'] },
+    { id:'bok_choy',    name:'Bok Choy',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'broccoli',    name:'Broccoli',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'carrots',     name:'Carrots',    type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'celery',      name:'Celery',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'cucumber',    name:'Cucumber',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'garlic',      name:'Garlic',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'greens',      name:'Lettuce',    type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Micro Greens','Protein Greens','Super Greens','Other'] },
+    { id:'onion',       name:'Onion',      type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Red','Shallot','Yellow','Other'] },
+    { id:'potatoes',    name:'Potatoes',   type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Baby','Baking','Fingerling','Sweet','Other'] },
+    { id:'tomatoes',    name:'Tomatoes',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'veggie_tray', name:'Veggie Tray',type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'zucchini',    name:'Zucchini',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+  ]},
+  { id:'bakery', label:'Bakery', items:[
+    { id:'bagels',         name:'Bagels',         type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
+    { id:'baguette',       name:'Baguette',        type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
+    { id:'hamburger_buns', name:'Hamburger Buns',  type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
+    { id:'hotdog_buns',    name:'Hotdog Buns',     type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
+    { id:'pita',           name:'Pita',            type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
+    { id:'sandwich_bread', name:'Sandwich Bread',  type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Multigrain','Sourdough','White','Other'] },
+    { id:'tortillas',      name:'Tortillas',       type:'simple',   shopGroup:'Refrigerated & Frozen',shopOrder:31 },
+  ]},
+  { id:'pantry', label:'Canned & Pantry', items:[
+    { id:'beans',            name:'Beans',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Baked','Black','Cannellini','Garbanzo','Navy','Pinto','Other'] },
+    { id:'bread_crumbs',     name:'Bread Crumbs',      type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Italian','Original','Panko','Other'] },
+    { id:'broth',            name:'Broth',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Beef','Chicken','Vegetable','Other'] },
+    { id:'condiments',       name:'Condiments',        type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Cholula','Ketchup','Mayo','Salsa - Green','Salsa - Red','Other'] },
+    { id:'diced_tomatoes',   name:'Diced Tomatoes',    type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'flour',            name:'Flour',             type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'granola',          name:'Granola',           type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'juice',            name:'Juice',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Apple','Lemon','Lime','Orange','Other'] },
+    { id:'mac_cheese',       name:'Mac & Cheese',      type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'minced_ginger',    name:'Minced Ginger',     type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'oatmeal',          name:'Oatmeal',           type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'oil',              name:'Oil',               type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Avocado','Canola','Olive','Other'] },
+    { id:'pasta',            name:'Pasta',             type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'peanut_butter',    name:'Peanut Butter',     type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'quinoa',           name:'Quinoa',            type:'simple',   shopGroup:'Pantry', shopOrder:10 },
+    { id:'rice',             name:'Rice',              type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Basmati','Sushi','Other'] },
+    { id:'salad_dressing',   name:'Salad Dressing',    type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Balsamic','Oil & Vinegar','Other'] },
+    { id:'spices',           name:'Spices',            type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Basil','Cinnamon','Cumin','Oregano','Pepper','Salt','Other'] },
+    { id:'sun_dried_tomatoes',name:'Sun-Dried Tomatoes',type:'simple',  shopGroup:'Pantry', shopOrder:10 },
+  ]},
+  { id:'snacks', label:'Snacks & Beverages', items:[
+    { id:'potato_chips',    name:'Chips',           type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Cheddar','Salt & Pepper','Sea Salt','Sour Cream & Onion','Tortilla','Other'] },
+    { id:'chocolate',       name:'Chocolate',       type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['55% Bar','70%+ Bar','Chips','Other'] },
+    { id:'crackers',        name:'Crackers',        type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Multigrain','Water','Other'] },
+    { id:'koia_shake',      name:'Koia Shake',      type:'simple',   shopGroup:'Refrigerated & Frozen',shopOrder:31 },
+    { id:'nuts',            name:'Nuts',            type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Mixed','Pecans','Pistachios','Walnuts','Other'] },
+    { id:'popcorn',         name:'Popcorn',         type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Bag','Microwave','Other'] },
+    { id:'pretzels',        name:'Pretzels',        type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
+    { id:'sparkling_water', name:'Sparkling Water', type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Sanzo','Spindrift','Waterloo','Other'] },
+    { id:'tea',             name:'Tea',             type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Blackberry','Detox','Lemon Ginger','Mandarin','Other'] },
+  ]},
+  { id:'meat', label:'Raw Meat & Seafood Counter', items:[
+    { id:'bacon',    name:'Bacon',   type:'simple',   shopGroup:'Raw Meat & Seafood Counter', shopOrder:30 },
+    { id:'chicken',  name:'Chicken', type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Breast','Ground','Thighs','Wings','Other'] },
+    { id:'meat_cut', name:'Meat',    type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Ground Beef','Hotdogs','Steak','Other'] },
+    { id:'pork',     name:'Pork',    type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Chops','Ground','Loin','Other'] },
+    { id:'sausage',  name:'Sausage', type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Breakfast Bulk','Chorizo','Mild Italian','Other'] },
+    { id:'seafood',  name:'Seafood', type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Tilapia','Crab Cakes','Other'] },
+    { id:'turkey',   name:'Turkey',  type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Ground','Other'] },
+  ]},
+  { id:'refrigerated', label:'Refrigerated & Frozen', items:[
+    { id:'butter',                  name:'Butter',                   type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'cheese',                  name:'Cheese',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Cheddar','Mexican Blend','Monterey Jack','Mozzarella','Parmesan','Premium','Provolone','Other'] },
+    { id:'deli_meat',               name:'Deli Meat',                type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Ham','Prosciutto','Roast Beef','Salami','Turkey','Other'] },
+    { id:'eggs',                    name:'Eggs',                     type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'frozen_breakfast_sausage',name:'Frozen Breakfast Sausage', type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'frozen_fruit',            name:'Frozen Fruit',             type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'frozen_tots',             name:'Frozen Tots',              type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'frozen_vegetables',       name:'Frozen Vegetables',        type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Corn','Peas','Other'] },
+    { id:'frozen_waffles',          name:'Frozen Waffles',           type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'hummus',                  name:'Hummus',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Plain','Green Chili','Tahini','Red Pepper','Other'] },
+    { id:'oat_milk',                name:'Oat Milk',                 type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'pizza',                   name:'Pizza',                    type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Frozen','Refrigerated','Dough','Other'] },
+    { id:'salami_stick',            name:'Salami Stick',             type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'tofu',                    name:'Tofu',                     type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'yogurt',                  name:'Yogurt',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Greek','Regular','Other'] },
+    { id:'lunches',                 name:'Lunches',                  type:'freeformOnly',shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+  ]},
+  { id:'misc', label:'Misc', items:[
+    { id:'dish_soap',           name:'Dish Soap',           type:'simple',  shopGroup:'Misc', shopOrder:5 },
+    { id:'dishwasher_detergent',name:'Dishwasher Detergent',type:'simple',  shopGroup:'Misc', shopOrder:5 },
+    { id:'hand_soap',           name:'Hand Soap',           type:'simple',  shopGroup:'Misc', shopOrder:5 },
+    { id:'sunscreen',           name:'Sunscreen',           type:'simple',  shopGroup:'Misc', shopOrder:5 },
+    { id:'vitamins',            name:'Vitamins',            type:'freeform',shopGroup:'Misc', shopOrder:5 },
+  ]},
+];
+
+// Dinner menu seed data (pre-populates if Firestore dinnerMenu is empty)
+const DINNER_MENU_SEED = [
+  {name:'Fish Tacos',category:'Fish'},
+  {name:'Tuna and Sundried Tomato Pasta',category:'Fish'},
+  {name:'Birria Tacos',category:'Meat'},
+  {name:'Grilled Steak',category:'Meat'},
+  {name:'Gyros',category:'Meat'},
+  {name:'Hamburgers',category:'Meat'},
+  {name:'Hot dogs',category:'Meat'},
+  {name:'Korean Beef Rice Bowls',category:'Meat'},
+  {name:'Pasta Bolognese',category:'Meat'},
+  {name:'Patty Melts',category:'Meat'},
+  {name:'Steak Salad',category:'Meat'},
+  {name:'BBQ Pork Nachos',category:'Pork'},
+  {name:'Breakfast for Dinner',category:'Pork'},
+  {name:'Escarole, White Bean and Sausage Soup',category:'Pork'},
+  {name:'Gnocchi with Pancetta',category:'Pork'},
+  {name:'Pork chops',category:'Pork'},
+  {name:'Pulled Pork Sandwiches',category:'Pork'},
+  {name:'BBQ Chicken Flatbread',category:'Poultry'},
+  {name:'Chicken Piccata',category:'Poultry'},
+  {name:'Chicken Schnitzel with Warm Potato and Pea Salad',category:'Poultry'},
+  {name:'Chicken Strips',category:'Poultry'},
+  {name:'Chicken Wings',category:'Poultry'},
+  {name:'Grilled Chicken',category:'Poultry'},
+  {name:'Turkey Kofta',category:'Poultry'},
+  {name:'Thai Coconut Curry Noodles',category:'Uncategorized'},
+  {name:'Creamy Vegetable Soup',category:'Vegetarian'},
+  {name:'Fried Halloumi',category:'Vegetarian'},
+  {name:'Grilled Cheese',category:'Vegetarian'},
+  {name:'Minestrone',category:'Vegetarian'},
+  {name:'Southwest Falafel',category:'Vegetarian'},
+  {name:'Tuscan White Bean Soup',category:'Vegetarian'},
+];
+
+const DINNER_CATEGORIES = ['Fish','Meat','Pork','Poultry','Vegetarian','Uncategorized'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+// Default / empty state shape. Never mutate this directly.
+function defaultState() {
+  return {
+    shoppingDate:  '',       // display string e.g. "Saturday, June 7"
+    locked:        false,
+    lockedAt:      0,    // timestamp of last lock/unlock
+
+    // catalog items: key → { qty, updatedAt }
+    // Simple:      key = item_id
+    // MultiAdd:    key = "itemId:Variant"
+    // MultiAdd/Other custom: key = "itemId:Other:uuid"
+    items:      {},
+
+    // Freeform text entries
+    // key = catId (for category Other) | "catId_itemId" (for named freeform / freeformOnly)
+    // value = [{ id, text, qty, updatedAt }]
+    freeform:   {},
+
+    // Shopping cart state: key → true (checked off)
+    cart:       {},
+    cartAt:     0,   // timestamp of last cart mutation — used to arbitrate merges
+
+    // Per-item shopping notes: key → string
+    notes:      {},
+    notesAt:    0,   // timestamp of last notes mutation
+
+    // Deletion tombstones: key → timestamp (ms). Pruned >30d on each save.
+    deletedAt:  {},
+
+    // This week's dinners: [{ id, name, done }]
+    thisWeek:     [],
+    thisWeekAt:   0,   // timestamp of last thisWeek mutation
+
+    // Permanent dinner menu: name → { category }
+    dinnerMenu:   {},
+    dinnerMenuAt: 0,   // timestamp of last dinnerMenu mutation
+
+    // Trip history (capped at 52): [{ id, date, completedAt, items:[{name,qty}], dinners:[] }]
+    tripHistory: [],
+
+    // Custom freeform items for History tab: [{ id, text, sourceKey, sourceType, parentItemId }]
+    customItems:   [],
+    customItemsAt: 0,
+  };
+}
+
+// Live in-memory state — loaded from Firestore on init
+let state = defaultState();
+
+// Track which request categories are open
+let openCats = new Set();
+
+// Active tab
+let activeTab = 'request';
+let activeDinnerSub = 'this-week';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
+function uuid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function escAttr(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatDate(iso) {
+  if (!iso) return 'Tap to set shopping date';
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+}
+
+function setSyncStatus(status, msg) {
+  const el = document.getElementById('sync-status');
+  el.className = status || '';   // matches #sync-status.saving / .saved / .error
+  el.textContent = msg || '● Ready';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SYNC ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+const TOMBSTONE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+
+/**
+ * Load state from Firestore and merge into local state.
+ * Called on app open and on visibilitychange (foregrounded).
+ */
+/**
+ * Migrate old app's array-format dinnerMenu to the new object format.
+ * Old: [ {name, category}, ... ]
+ * New: { "name": {category}, ... }
+ * Safe to call repeatedly — no-ops if already in new format.
+ */
+function migrateDinnerMenu(data) {
+  if (!data) return {};
+  // Already an object (new format)
+  if (!Array.isArray(data)) return data;
+  // Convert array to object
+  const obj = {};
+  data.forEach(entry => {
+    if (entry && entry.name) obj[entry.name] = { category: entry.category || 'Uncategorized' };
+  });
+  return obj;
+}
+
+async function loadFromCloud() {
+  setSyncStatus('saving', '● Loading…');
+  try {
+    const snap = await getDoc(STATE_REF);
+    if (snap.exists()) {
+      const cloud = snap.data();
+
+      // Migrate old array-format dinnerMenu → object format
+      cloud.dinnerMenu = migrateDinnerMenu(cloud.dinnerMenu);
+
+      // Seed if still empty after migration
+      if (!cloud.dinnerMenu || Object.keys(cloud.dinnerMenu).length === 0) {
+        cloud.dinnerMenu = {};
+        DINNER_MENU_SEED.forEach(d => { cloud.dinnerMenu[d.name] = { category: d.category }; });
+      }
+
+      state = mergeStates(state, cloud);
+
+      // Seed any missing dinners from DINNER_MENU_SEED (additive only — never overwrites)
+      let seeded = false;
+      DINNER_MENU_SEED.forEach(d => {
+        if (!state.dinnerMenu[d.name]) {
+          state.dinnerMenu[d.name] = { category: d.category };
+          seeded = true;
+        }
+      });
+      if (seeded) {
+        state.dinnerMenuAt = Date.now();
+        saveResetToCloud();
+      }
+    } else {
+      // First-ever load: seed dinner menu into local state, then save
+      state.dinnerMenu   = {};
+      state.dinnerMenuAt = Date.now();
+      DINNER_MENU_SEED.forEach(d => { state.dinnerMenu[d.name] = { category: d.category }; });
+      await saveResetToCloud();
+    }
+    setSyncStatus('', '● Ready');
+    renderAll();
+  } catch(e) {
+    console.error('Load error:', e);
+    setSyncStatus('error', '● Error');
+  }
+}
+
+/**
+ * Merge cloud state into local state.
+ * Rules:
+ *   - items: take higher qty UNLESS local has a newer deletedAt tombstone
+ *   - freeform: union by entry id; deleted entries are simply absent
+ *   - cart, notes: cloud wins for keys we don't have locally
+ *   - deletedAt: union, keep larger timestamp
+ *   - thisWeek, tripHistory, customItems: cloud wins (last-write-wins on these)
+ *   - shoppingDate, locked, dinnerMenu: cloud wins
+ */
+function mergeStates(local, cloud) {
+  const merged = defaultState();
+
+  // Simple scalar fields: cloud wins
+  merged.shoppingDate = cloud.shoppingDate ?? local.shoppingDate ?? '';
+  // locked: local wins if newer (same pattern as cart/thisWeek)
+  const localLockedAt = local.lockedAt || 0;
+  const cloudLockedAt = cloud.lockedAt || 0;
+  merged.locked   = localLockedAt >= cloudLockedAt ? (local.locked ?? false) : (cloud.locked ?? false);
+  merged.lockedAt = Math.max(localLockedAt, cloudLockedAt);
+  merged.tripHistory  = cloud.tripHistory  ?? local.tripHistory  ?? [];
+
+  // customItems: local wins if newer (edits/deletes must not be overwritten by cloud)
+  const localCustomAt = local.customItemsAt || 0;
+  const cloudCustomAt = cloud.customItemsAt || 0;
+  if (localCustomAt > 0) {
+    merged.customItems = localCustomAt >= cloudCustomAt ? (local.customItems || []) : (cloud.customItems || []);
+  } else {
+    merged.customItems = cloud.customItems || local.customItems || [];
+  }
+  merged.customItemsAt = Math.max(localCustomAt, cloudCustomAt);
+
+  // thisWeek: local wins only if it has been mutated this session (thisWeekAt > 0 locally)
+  // Otherwise cloud wins — this prevents an empty local session from overwriting cloud data.
+  const localThisWeekAt = local.thisWeekAt || 0;
+  const cloudThisWeekAt = cloud.thisWeekAt || 0;
+  if (localThisWeekAt > 0) {
+    // Local has been mutated — use whichever is newer
+    merged.thisWeek = localThisWeekAt >= cloudThisWeekAt ? (local.thisWeek || []) : (cloud.thisWeek || []);
+  } else {
+    // No local mutations this session — always use cloud
+    merged.thisWeek = cloud.thisWeek || local.thisWeek || [];
+  }
+  merged.thisWeekAt = Math.max(localThisWeekAt, cloudThisWeekAt);
+
+  // dinnerMenu: same logic
+  const localMenuAt = local.dinnerMenuAt || 0;
+  const cloudMenuAt = cloud.dinnerMenuAt || 0;
+  if (localMenuAt > 0) {
+    merged.dinnerMenu = localMenuAt >= cloudMenuAt ? (local.dinnerMenu || {}) : (cloud.dinnerMenu || {});
+  } else {
+    merged.dinnerMenu = cloud.dinnerMenu || local.dinnerMenu || {};
+  }
+  merged.dinnerMenuAt = Math.max(localMenuAt, cloudMenuAt);
+
+  // If cloud has no dinnerMenuAt but has dinnerMenu data, seed it with a timestamp
+  // so future merges treat it as real data (one-time migration)
+  if (!merged.dinnerMenuAt && Object.keys(merged.dinnerMenu).length > 0) {
+    merged.dinnerMenuAt = 1;  // non-zero sentinel — will be overwritten on first real mutation
+  }
+
+  // Merge deletedAt: union, keep largest timestamp per key
+  const allTombstoneKeys = new Set([
+    ...Object.keys(local.deletedAt  || {}),
+    ...Object.keys(cloud.deletedAt  || {}),
+  ]);
+  allTombstoneKeys.forEach(k => {
+    const lt = (local.deletedAt  || {})[k] || 0;
+    const ct = (cloud.deletedAt  || {})[k] || 0;
+    merged.deletedAt[k] = Math.max(lt, ct);
+  });
+
+  // Merge items: union, deletion wins
+  const allItemKeys = new Set([
+    ...Object.keys(local.items  || {}),
+    ...Object.keys(cloud.items  || {}),
+  ]);
+  allItemKeys.forEach(k => {
+    const li  = (local.items  || {})[k];
+    const ci  = (cloud.items  || {})[k];
+    const del = merged.deletedAt[k] || 0;
+
+    if (li && ci) {
+      const winner = li.updatedAt >= ci.updatedAt ? li : ci;
+      if (del > winner.updatedAt) {
+        // Tombstone wins — deletion wins, do not add to merged.items
+      } else {
+        merged.items[k] = { qty: Math.max(li.qty, ci.qty), updatedAt: winner.updatedAt };
+      }
+    } else if (li || ci) {
+      const item = li || ci;
+      if (del > item.updatedAt) {
+        // Deletion wins
+      } else {
+        merged.items[k] = item;
+      }
+    }
+  });
+
+  // Merge freeform: union by entry id
+  const allFfKeys = new Set([
+    ...Object.keys(local.freeform  || {}),
+    ...Object.keys(cloud.freeform  || {}),
+  ]);
+  allFfKeys.forEach(k => {
+    const le = (local.freeform  || {})[k] || [];
+    const ce = (cloud.freeform  || {})[k] || [];
+    const byId = {};
+    // Cloud entries first, then local overrides (local is fresher for active session)
+    [...ce, ...le].forEach(e => { byId[e.id] = e; });
+    merged.freeform[k] = Object.values(byId);
+  });
+
+  // Merge cart: local wins — cart changes are always immediate saves,
+  // so local state is always at least as fresh as cloud. Union would
+  // restore items the user just unchecked/returned.
+  // For multi-device: whichever device saved last wins (last-write-wins via cartAt).
+  const localCartAt = local.cartAt || 0;
+  const cloudCartAt = cloud.cartAt || 0;
+  merged.cart   = localCartAt >= cloudCartAt ? (local.cart || {}) : (cloud.cart || {});
+  merged.cartAt = Math.max(localCartAt, cloudCartAt);
+
+  // Merge notes: local wins (same rationale)
+  const localNotesAt = local.notesAt || 0;
+  const cloudNotesAt = cloud.notesAt || 0;
+  merged.notes   = localNotesAt >= cloudNotesAt ? (local.notes || {}) : (cloud.notes || {});
+  merged.notesAt = Math.max(localNotesAt, cloudNotesAt);
+
+  return merged;
+}
+
+/**
+ * Prune tombstones older than 30 days.
+ */
+function pruneTombstones() {
+  const cutoff = Date.now() - TOMBSTONE_MAX_AGE;
+  Object.keys(state.deletedAt).forEach(k => {
+    if (state.deletedAt[k] < cutoff) delete state.deletedAt[k];
+  });
+}
+
+/**
+ * Debounced save — used for frequent interactions (qty, text entry).
+ */
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => saveToCloud(), 2500);
+}
+
+/**
+ * Immediate save — used for intentional actions (lock, delete, cart toggle, done shopping).
+ */
+async function saveToCloud() {
+  clearTimeout(saveTimer);
+  setSyncStatus('saving', '● Saving…');
+  try {
+    // Read-merge-write
+    const snap = await getDoc(STATE_REF);
+    if (snap.exists()) {
+      state = mergeStates(state, snap.data());
+    }
+    reconcileCustomItems();
+    pruneTombstones();
+    await setDoc(STATE_REF, state);
+    setSyncStatus('saved', '● Saved');
+    setTimeout(() => setSyncStatus('', '● Ready'), 1500);
+  } catch(e) {
+    console.error('Save error:', e);
+    setSyncStatus('error', '● Error');
+  }
+}
+
+/**
+ * Direct overwrite — used ONLY after Done Shopping reset.
+ * Bypasses merge entirely.
+ */
+async function saveResetToCloud() {
+  setSyncStatus('saving', '● Saving…');
+  try {
+    reconcileCustomItems();
+    pruneTombstones();
+    await setDoc(STATE_REF, state);
+    setSyncStatus('saved', '● Saved');
+    setTimeout(() => setSyncStatus('', '● Ready'), 1500);
+  } catch(e) {
+    console.error('Reset save error:', e);
+    setSyncStatus('error', '● Error');
+  }
+}
+
+/**
+ * Manual backup — saves current state with a timestamp logged to console.
+ */
+async function backupState() {
+  const ts = new Date().toISOString();
+  console.log(`[Backup] ${ts}`, JSON.stringify(state));
+  await saveToCloud();
+  alert(`Backup saved at ${ts}`);
+}
+window.backupState = backupState;
+
+// Reload on app foregrounded
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadFromCloud();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  const leaving = activeTab;
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  // Collapse all categories when returning to the Request tab
+  if (tab === 'request') openCats.clear();
+  renderAll();
+}
+window.switchTab = switchTab;
+
+function switchDinnerSub(sub) {
+  activeDinnerSub = sub;
+  document.querySelectorAll('.dinner-subtab-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === sub));
+  document.getElementById('dinner-this-week').classList.toggle('hidden', sub !== 'this-week');
+  document.getElementById('dinner-menu').classList.toggle('hidden', sub !== 'menu');
+  renderDinners();
+}
+window.switchDinnerSub = switchDinnerSub;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DATE
+// ─────────────────────────────────────────────────────────────────────────────
+function promptSetDate() {
+  document.getElementById('date-input').value = state.shoppingDate || '';
+  openModal('modal-set-date');
+}
+window.promptSetDate = promptSetDate;
+
+function saveDate() {
+  const v = document.getElementById('date-input').value;
+  state.shoppingDate = v;
+  document.getElementById('shopping-date-display').textContent = formatDate(v);
+  closeModal('modal-set-date');
+  saveToCloud();
+}
+window.saveDate = saveDate;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOCK / UNLOCK
+// ─────────────────────────────────────────────────────────────────────────────
+function confirmLockList() { openModal('modal-lock'); }
+window.confirmLockList = confirmLockList;
+
+function lockList() {
+  state.locked   = true;
+  state.lockedAt = Date.now();
+  closeModal('modal-lock');
+  saveToCloud();
+  renderAll();
+}
+window.lockList = lockList;
+
+function unlockList() {
+  state.locked   = false;
+  state.lockedAt = Date.now();
+  saveToCloud();
+  renderAll();
+}
+window.unlockList = unlockList;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DONE SHOPPING
+// ─────────────────────────────────────────────────────────────────────────────
+function confirmDoneShopping() { openModal('modal-done-shopping'); }
+window.confirmDoneShopping = confirmDoneShopping;
+
+function doneShopping() {
+  closeModal('modal-done-shopping');
+
+  // Build trip snapshot
+  const tripItems = [];
+
+  // Catalog items
+  Object.entries(state.items).forEach(([key, val]) => {
+    if (val.qty > 0) {
+      // key is itemId, "itemId:Variant", or "itemId:Other:uuid"
+      const parts = key.split(':');
+      const itemId = parts[0];
+      const catItem = CATALOG.flatMap(c => c.items).find(i => i.id === itemId);
+      let name = catItem?.name || itemId;
+      if (parts.length > 1 && parts[1] !== 'Other') name += ' - ' + parts[1];
+      else if (parts.length > 2) name += ' - ' + parts[2]; // custom text
+      tripItems.push({ name, qty: val.qty });
+    }
+  });
+
+  // Freeform items
+  Object.values(state.freeform).forEach(entries => {
+    (entries || []).forEach(e => {
+      if (e.text) tripItems.push({ name: e.text, qty: e.qty || 1 });
+    });
+  });
+
+  const trip = {
+    id:          uuid(),
+    date:        state.shoppingDate || new Date().toISOString().slice(0,10),
+    completedAt: Date.now(),
+    items:       tripItems,
+    dinners:     state.thisWeek.map(d => d.name),
+  };
+
+  // Prepend and cap at 52
+  state.tripHistory = [trip, ...(state.tripHistory || [])].slice(0, 52);
+
+  // Reset grocery list state — thisWeek (dinners) is intentionally preserved
+  state.items        = {};
+  state.freeform     = {};
+  state.cart         = {};
+  state.cartAt       = Date.now();
+  state.notes        = {};
+  state.notesAt      = Date.now();
+  state.deletedAt    = {};
+  state.locked       = false;
+  state.lockedAt     = Date.now();
+  state.shoppingDate = '';
+
+  // Switch to Request tab and collapse all categories
+  activeTab = 'request';
+  openCats.clear();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'request'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-request')?.classList.add('active');
+
+  saveResetToCloud();
+  renderAll();
+}
+window.doneShopping = doneShopping;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE HELPERS — items
+// ─────────────────────────────────────────────────────────────────────────────
+function getQty(key) {
+  return state.items[key]?.qty || 0;
+}
+
+function setQty(key, qty) {
+  if (qty <= 0) {
+    deleteItem(key);
+    return;
+  }
+  state.items[key] = { qty, updatedAt: Date.now() };
+  // Remove any tombstone for this key (it's being re-added)
+  delete state.deletedAt[key];
+}
+
+function deleteItem(key) {
+  if (state.items[key]) {
+    state.deletedAt[key] = Date.now();
+    delete state.items[key];
+  }
+  delete state.cart[key];
+  delete state.notes[key];
+}
+
+function adjustQty(key, delta) {
+  const newQty = getQty(key) + delta;
+  setQty(key, newQty);
+  scheduleSave();
+  // Simple items: partial DOM update. MultiAdd variants (key contains ':'): full re-render
+  if (key.includes(':')) {
+    renderRequest();
+  } else {
+    updateItemRowUI(key);
+  }
+  updateCatCount(getCatIdForKey(key));
+}
+window.adjustQty = adjustQty;
+
+function getCatIdForKey(key) {
+  const itemId = key.split(':')[0];
+  return CATALOG.find(c => c.items.some(i => i.id === itemId))?.id;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE HELPERS — freeform
+// ─────────────────────────────────────────────────────────────────────────────
+function getFreeformEntries(ffKey) {
+  return state.freeform[ffKey] || [];
+}
+
+function setFreeformEntry(ffKey, id, text, qty) {
+  if (!state.freeform[ffKey]) state.freeform[ffKey] = [];
+  const idx = state.freeform[ffKey].findIndex(e => e.id === id);
+  if (idx >= 0) {
+    state.freeform[ffKey][idx] = { id, text, qty, updatedAt: Date.now() };
+  } else {
+    state.freeform[ffKey].push({ id, text, qty, updatedAt: Date.now() });
+  }
+}
+
+function deleteFreeformEntry(ffKey, id) {
+  if (!state.freeform[ffKey]) return;
+  state.freeform[ffKey] = state.freeform[ffKey].filter(e => e.id !== id);
+}
+
+function upsertCustomItem(text, sourceKey, sourceType, parentItemId = null) {
+  const norm = text.trim().toLowerCase();
+  const exists = (state.customItems || []).some(c => c.text.trim().toLowerCase() === norm);
+  if (!exists) {
+    state.customItems   = state.customItems || [];
+    state.customItems.push({ id: uuid(), text: text.trim(), sourceKey, sourceType, parentItemId });
+    state.customItemsAt = Date.now();
+  }
+}
+
+/**
+ * Scan all freeform state and sync any completed entries into customItems.
+ * Called before every cloud save so History reflects current state without
+ * being triggered on every keystroke.
+ */
+function reconcileCustomItems() {
+  // Catalog freeform items (type:freeform, freeformOnly) and category-level Other
+  CATALOG.forEach(cat => {
+    // Named freeform items
+    cat.items.filter(i => i.type === 'freeform' || i.type === 'freeformOnly').forEach(item => {
+      const ffKey = cat.id + '_' + item.id;
+      getFreeformEntries(ffKey).forEach(e => {
+        if (e.text) upsertCustomItem(e.text, ffKey, 'item-freeform');
+      });
+    });
+    // Category-level Other
+    getFreeformEntries(cat.id).forEach(e => {
+      if (e.text) upsertCustomItem(e.text, cat.id, 'category-other');
+    });
+  });
+  // MultiAdd Other labels
+  Object.keys(state.items).forEach(key => {
+    if (!key.includes(':Other:')) return;
+    const label = state.notes['__label_' + key];
+    if (label) upsertCustomItem(label, key.split(':')[0], 'multiadd-other', key.split(':')[0]);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER ORCHESTRATOR
+// ─────────────────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderHeader();
+  if (activeTab === 'request')  renderRequest();
+  if (activeTab === 'shopping') renderShopping();
+  if (activeTab === 'dinners')  renderDinners();
+  if (activeTab === 'history')  renderHistory();
+}
+
+function renderHeader() {
+  // Date display
+  const dateEl = document.getElementById('shopping-date-display');
+  if (dateEl) dateEl.textContent = state.shoppingDate ? formatDate(state.shoppingDate) : 'Tap to set date';
+
+  // Locked pill in header — visible across all tabs when locked
+  const pill = document.getElementById('locked-pill');
+  if (pill) pill.classList.toggle('visible', !!state.locked);
+
+  // Lock button in toolbar — hidden when locked
+  const lockBtn = document.getElementById('lock-btn');
+  if (lockBtn) lockBtn.classList.toggle('hidden', !!state.locked);
+
+  // Request toolbar — only visible on request tab
+  const toolbar = document.getElementById('request-toolbar');
+  if (toolbar) toolbar.style.display = activeTab === 'request' ? '' : 'none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER — REQUEST TAB
+// ─────────────────────────────────────────────────────────────────────────────
+let requestSearch = '';
+
+function onRequestSearch(val) {
+  requestSearch = val.toLowerCase().trim();
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (clearBtn) clearBtn.classList.toggle('visible', !!requestSearch);
+  renderRequest();
+}
+window.onRequestSearch = onRequestSearch;
+
+function clearSearch() {
+  requestSearch = '';
+  const input   = document.getElementById('request-search');
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (input)    input.value = '';
+  if (clearBtn) clearBtn.classList.remove('visible');
+  renderRequest();
+}
+window.clearSearch = clearSearch;
+
+function expandAll()  { CATALOG.forEach(c => openCats.add(c.id));    renderRequest(); }
+function collapseAll(){ openCats.clear();                              renderRequest(); }
+window.expandAll  = expandAll;
+window.collapseAll = collapseAll;
+
+function toggleCat(catId) {
+  if (openCats.has(catId)) openCats.delete(catId);
+  else openCats.add(catId);
+  const card = document.getElementById('cat-' + catId);
+  if (card) card.classList.toggle('open', openCats.has(catId));
+}
+window.toggleCat = toggleCat;
+
+function itemMatchesSearch(item) {
+  if (!requestSearch) return true;
+  if (item.name.toLowerCase().includes(requestSearch)) return true;
+  if (item.variants?.some(v => v.toLowerCase().includes(requestSearch))) return true;
+  return false;
+}
+
+function renderRequest() {
+  const container = document.getElementById('request-catalog');
+  const locked    = state.locked;
+  let html = '';
+
+  CATALOG.forEach(cat => {
+    const isOpen  = openCats.has(cat.id) || !!requestSearch;
+    const count   = countCatSelected(cat);
+    // During search, only show categories that have matching items
+    const showCat = !requestSearch || cat.items.some(i => itemMatchesSearch(i));
+    if (!showCat) return;
+
+    html += `<div class="cat-card${isOpen ? ' open' : ''}" id="cat-${cat.id}">
+      <div class="cat-header" onclick="toggleCat('${cat.id}')">
+        <span class="cat-title">${escHtml(cat.label)}</span>
+        <span class="cat-meta">
+          <span class="cat-count${count === 0 ? ' zero' : ''}" id="cat-count-${cat.id}">${count > 0 ? count + ' selected' : ''}</span>
+          <span class="cat-chevron">▼</span>
+        </span>
+      </div>
+      <div class="cat-body">`;
+
+    // Catalog items (non-freeform types)
+    cat.items.forEach(item => {
+      if (item.type === 'freeformOnly') return; // rendered below
+      if (item.type === 'freeform')     return; // rendered below
+      if (requestSearch && !itemMatchesSearch(item)) return;
+      if (item.type === 'simple')   html += renderSimpleItem(item, locked);
+      if (item.type === 'multiAdd') html += renderMultiAddItem(item, locked);
+    });
+
+    html += renderFreeformSection(cat, locked);
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderSimpleItem(item, locked) {
+  const qty      = getQty(item.id);
+  const selected = qty > 0;
+  return `<div class="item-row${selected ? ' selected' : ''}" id="item-row-${item.id}">
+    <span class="item-name">${escHtml(item.name)}</span>
+    <div class="qty-selector">
+      ${!locked ? `<button class="qty-btn" onclick="adjustQty('${item.id}', -1)">−</button>` : ''}
+      <span class="qty-display${qty === 0 ? ' zero' : ''}" id="qty-${item.id}">${qty === 0 ? '—' : qty}</span>
+      ${!locked ? `<button class="qty-btn" onclick="adjustQty('${item.id}', 1)">+</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderMultiAddItem(item, locked) {
+  const prefix = item.id + ':';
+  // All active variant keys for this item
+  const activeVariants = Object.entries(state.items)
+    .filter(([k, v]) => k.startsWith(prefix) && (v?.qty || 0) > 0)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => {
+      const variantPart = k.slice(prefix.length);
+      const isOther     = variantPart.startsWith('Other:');
+      const label       = isOther
+        ? (state.notes['__label_' + k] || '')   // stored label for Other variants
+        : variantPart;
+      return { key: k, isOther, label, qty: v.qty };
+    });
+
+  const variantOptions = item.variants.map(v =>
+    `<option value="${escAttr(v)}">${escHtml(v)}</option>`
+  ).join('');
+
+  let variantRows = '';
+  activeVariants.forEach(({key, isOther, label, qty}) => {
+    const safeKey = key.replace(/[^a-z0-9_]/gi, '_');
+    variantRows += `<div class="variant-row" id="vrow-${safeKey}">
+      ${isOther
+        ? `<input class="variant-label custom-input" placeholder="Describe item…"
+             value="${escAttr(label)}"
+             oninput="setOtherLabel('${escAttr(key)}', this.value)"
+             onchange="commitOtherLabel('${escAttr(key)}', this.value)"
+             onblur="commitOtherLabel('${escAttr(key)}', this.value)"
+             ${locked ? 'disabled' : ''}>`
+        : `<span class="variant-label">${escHtml(label)}</span>`}
+      <div class="qty-selector">
+        ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', -1)">−</button>` : ''}
+        <span class="qty-display" id="qty-${safeKey}">${qty}</span>
+        ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', 1)">+</button>` : ''}
+      </div>
+    </div>`;
+  });
+
+  return `<div class="multiadd-row${activeVariants.length ? ' has-variants' : ''}" id="multiadd-${item.id}">
+    <div class="multiadd-controls">
+      <span class="multiadd-name">${escHtml(item.name)}</span>
+      ${!locked ? `<div class="multiadd-adder">
+        <select class="multiadd-select" id="multiadd-select-${item.id}">
+          <option value="">Select…</option>
+          ${variantOptions}
+        </select>
+        <button class="multiadd-btn" onclick="addVariant('${item.id}')">Add</button>
+      </div>` : ''}
+    </div>
+    ${activeVariants.length ? `<div class="multiadd-added-variants">${variantRows}</div>` : ''}
+  </div>`;
+}
+
+function setOtherLabel(key, text) {
+  state.notes['__label_' + key] = text;
+}
+
+function commitOtherLabel(key, text) {
+  state.notes['__label_' + key] = text;
+  scheduleSave();
+}
+window.setOtherLabel = setOtherLabel;
+
+function addVariant(itemId) {
+  const sel     = document.getElementById('multiadd-select-' + itemId);
+  const variant = sel?.value;
+  if (!variant) return;
+  sel.value = ''; // reset dropdown
+
+  if (variant === 'Other') {
+    // Create a new Other entry with a uuid
+    const key = itemId + ':Other:' + uuid();
+    setQty(key, 1);
+  } else {
+    const key = itemId + ':' + variant;
+    setQty(key, (getQty(key) || 0) + 1);
+  }
+  scheduleSave();
+  renderRequest();
+}
+window.addVariant = addVariant;
+
+function renderFreeformSection(cat, locked) {
+  let html = '<div class="freeform-section">';
+  let hasContent = false;
+
+  // 1. freeformOnly items (e.g. Lunches) — always shown, unlocked
+  cat.items.filter(i => i.type === 'freeformOnly').forEach(item => {
+    const ffKey  = cat.id + '_' + item.id;
+    const rows   = renderFreeformRows(ffKey, locked);
+    if (rows || !locked) {
+      hasContent = true;
+      html += `<div class="freeform-label">${escHtml(item.name)}</div>` + rows;
+    }
+  });
+
+  // 2. Named freeform items (e.g. Mixed Fruit, Vitamins)
+  cat.items.filter(i => i.type === 'freeform').forEach(item => {
+    const ffKey   = cat.id + '_' + item.id;
+    const entries = getFreeformEntries(ffKey);
+    const hasRows = entries.some(e => e.text);
+    if (!locked || hasRows) {
+      hasContent = true;
+      html += `<div class="freeform-label">${escHtml(item.name)}</div>`;
+      html += renderFreeformRows(ffKey, locked);
+    }
+  });
+
+  // 3. Category-level Other (always last; hide label+rows if locked and empty)
+  const catFfEntries = getFreeformEntries(cat.id);
+  const catFfHasRows = catFfEntries.some(e => e.text);
+  if (!locked || catFfHasRows) {
+    hasContent = true;
+    html += `<div class="freeform-label">Other</div>`;
+    html += renderFreeformRows(cat.id, locked);
+  }
+
+  html += '</div>';
+  return hasContent ? html : '';
+}
+
+function renderFreeformRows(ffKey, locked) {
+  const entries = getFreeformEntries(ffKey);
+  // Locked: only show rows that have text
+  // Unlocked: show all existing rows + one blank at end
+  const displayRows = locked
+    ? entries.filter(e => e.text)
+    : [...entries, { id: '__new__', text: '', qty: 1 }];
+
+  if (displayRows.length === 0) return '';
+
+  let html = '';
+  displayRows.forEach(entry => {
+    const isNew   = entry.id === '__new__';
+    const safeKey = (ffKey + '_' + entry.id).replace(/[^a-z0-9_]/gi, '_');
+    const hasText = !!entry.text;
+    const qty     = entry.qty || 1;
+
+    const rowAttrs = isNew ? `data-ff-new="${escAttr(ffKey)}"` : `data-ff-id="${escAttr(entry.id)}"`;
+    html += `<div class="freeform-row" ${rowAttrs}>
+      <div class="freeform-input-wrap">
+        <input class="freeform-input" placeholder="Add item…"
+          value="${escAttr(entry.text)}"
+          ${locked ? 'disabled' : ''}
+          oninput="onFreeformInput('${escAttr(ffKey)}', '${escAttr(entry.id)}', this.value)"
+          onblur="onFreeformBlur('${escAttr(ffKey)}', '${escAttr(entry.id)}')"
+          >
+        ${hasText && !locked
+          ? `<button class="freeform-clear" onclick="deleteFreeformById('${escAttr(ffKey)}', '${escAttr(entry.id)}')">×</button>`
+          : ''}
+      </div>
+      <div class="qty-selector freeform-qty${hasText ? ' visible' : ''}" id="ff-qty-${safeKey}">
+        ${!locked ? `<button class="qty-btn ff-qty-minus" onclick="adjustFreeformQty('${escAttr(ffKey)}', '${escAttr(entry.id)}', -1)">−</button>` : ''}
+        <span class="qty-display">${qty}</span>
+        ${!locked ? `<button class="qty-btn ff-qty-plus" onclick="adjustFreeformQty('${escAttr(ffKey)}', '${escAttr(entry.id)}', 1)">+</button>` : ''}
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+// Called on every keystroke.
+// Existing rows: update state in place, no re-render.
+// __new__ row: update state in place. On first character, assign a real id
+// (converting it from __new__ to a stable entry) and inject a fresh blank
+// row into the DOM directly — zero re-render, typing is never interrupted.
+function onFreeformInput(ffKey, entryId, text) {
+  if (entryId === '__new__') {
+    // Show/hide qty controls live
+    const newSafeKey = (ffKey + '___new__').replace(/[^a-z0-9_]/gi, '_');
+    const qtyEl = document.getElementById('ff-qty-' + newSafeKey);
+    if (qtyEl) qtyEl.classList.toggle('visible', !!text);
+    if (!text) return;
+
+    // Promote to a real entry: give it a stable id
+    const id  = uuid();
+    const row = document.querySelector(`[data-ff-new="${CSS.escape(ffKey)}"]`);
+    if (row) {
+      // Retarget the input's oninput to the new id so further typing updates state
+      const input = row.querySelector('.freeform-input');
+      if (input) {
+        input.setAttribute('oninput', `onFreeformInput('${ffKey.replace(/'/g,"\'")}', '${id}', this.value)`);
+        input.setAttribute('data-ff-id', id);
+      }
+      // Update the clear button
+      const clrBtn = row.querySelector('.freeform-clear');
+      if (clrBtn) {
+        clrBtn.setAttribute('onclick', `deleteFreeformById('${ffKey.replace(/'/g,"\'")}', '${id}')`);
+        clrBtn.style.display = 'block';
+      }
+      // Update the qty buttons
+      const qtyMinus = row.querySelector('.ff-qty-minus');
+      const qtyPlus  = row.querySelector('.ff-qty-plus');
+      if (qtyMinus) qtyMinus.setAttribute('onclick', `adjustFreeformQty('${ffKey.replace(/'/g,"\'")}', '${id}', -1)`);
+      if (qtyPlus)  qtyPlus.setAttribute('onclick',  `adjustFreeformQty('${ffKey.replace(/'/g,"\'")}', '${id}', 1)`);
+      // Swap data-ff-new for data-ff-id so we don't re-promote it
+      row.removeAttribute('data-ff-new');
+      row.setAttribute('data-ff-id', id);
+      // Update qty display id
+      const qEl = row.querySelector('.freeform-qty');
+      if (qEl) qEl.id = 'ff-qty-' + (ffKey + '_' + id).replace(/[^a-z0-9_]/gi, '_');
+    }
+
+    // Commit to state
+    setFreeformEntry(ffKey, id, text, 1);
+    scheduleSave();
+    updateCatCount(ffKey.split('_')[0]);
+
+    // Inject a new blank row after the current one without re-rendering
+    spawnFreeformBlankRow(ffKey, row);
+    return;
+  }
+
+  // Existing entry — update text in place (upsertCustomItem called on blur, not every keystroke)
+  const entries = getFreeformEntries(ffKey);
+  const e = entries.find(en => en.id === entryId);
+  if (e) {
+    e.text      = text;
+    e.updatedAt = Date.now();
+  }
+  const safeKey = (ffKey + '_' + entryId).replace(/[^a-z0-9_]/gi, '_');
+  const qtyEl   = document.getElementById('ff-qty-' + safeKey);
+  if (qtyEl) qtyEl.classList.toggle('visible', !!text);
+  updateCatCount(ffKey.split('_')[0]);
+  scheduleSave();
+}
+window.onFreeformInput = onFreeformInput;
+
+// Called when user leaves a freeform field - commits text to History
+function onFreeformBlur(ffKey, entryId) {
+  // intentionally empty — History is synced via reconcileCustomItems() before each save
+}
+window.onFreeformBlur = onFreeformBlur;
+
+// Inject a fresh blank freeform row into the DOM after `afterRow`
+function spawnFreeformBlankRow(ffKey, afterRow) {
+  const safeFfKey = ffKey.replace(/'/g, "\'");
+  const newSafeKey = (ffKey + '___new__').replace(/[^a-z0-9_]/gi, '_');
+  const div = document.createElement('div');
+  div.className = 'freeform-row';
+  div.setAttribute('data-ff-new', ffKey);
+  div.innerHTML = `
+    <div class="freeform-input-wrap">
+      <input class="freeform-input" placeholder="Add item…"
+        value=""
+        oninput="onFreeformInput('${safeFfKey}', '__new__', this.value)">
+      <button class="freeform-clear" style="display:none"
+        onclick="">×</button>
+    </div>
+    <div class="qty-selector freeform-qty" id="ff-qty-${newSafeKey}">
+      <button class="qty-btn ff-qty-minus" onclick="">−</button>
+      <span class="qty-display">1</span>
+      <button class="qty-btn ff-qty-plus" onclick="">+</button>
+    </div>`;
+  if (afterRow && afterRow.parentNode) {
+    afterRow.parentNode.insertBefore(div, afterRow.nextSibling);
+  }
+}
+
+function adjustFreeformQty(ffKey, entryId, delta) {
+  if (entryId === '__new__') return;
+  const entries = getFreeformEntries(ffKey);
+  const e       = entries.find(en => en.id === entryId);
+  if (!e) return;
+  const newQty = (e.qty || 1) + delta;
+  if (newQty <= 0) {
+    deleteFreeformEntry(ffKey, entryId);
+    scheduleSave();
+    updateCatCount(ffKey.split('_')[0]);
+    renderRequest();
+    return;
+  }
+  e.qty       = newQty;
+  e.updatedAt = Date.now();
+  scheduleSave();
+  renderRequest();
+}
+window.adjustFreeformQty = adjustFreeformQty;
+
+function deleteFreeformById(ffKey, id) {
+  if (id === '__new__') return;
+  deleteFreeformEntry(ffKey, id);
+  scheduleSave();
+  renderRequest();
+  updateCatCount(ffKey.split('_')[0]);
+}
+window.deleteFreeformById = deleteFreeformById;
+
+function countCatSelected(cat) {
+  let n = 0;
+  cat.items.forEach(item => {
+    if (item.type === 'simple') {
+      if (getQty(item.id) > 0) n++;
+    } else if (item.type === 'multiAdd') {
+      const prefix = item.id + ':';
+      n += Object.keys(state.items).filter(k => k.startsWith(prefix) && (state.items[k]?.qty || 0) > 0).length;
+    } else if (item.type === 'freeform' || item.type === 'freeformOnly') {
+      const ffKey = cat.id + '_' + item.id;
+      n += getFreeformEntries(ffKey).filter(e => e.text).length;
+    }
+  });
+  // Category-level Other freeform
+  n += getFreeformEntries(cat.id).filter(e => e.text).length;
+  return n;
+}
+
+function updateCatCount(catId) {
+  if (!catId) return;
+  const cat    = CATALOG.find(c => c.id === catId);
+  if (!cat) return;
+  const countEl = document.getElementById('cat-count-' + catId);
+  if (!countEl) return;
+  const n = countCatSelected(cat);
+  countEl.textContent = n > 0 ? n + ' selected' : '';
+  countEl.classList.toggle('zero', n === 0);
+}
+
+// Partial DOM update for simple items — avoids full re-render on every tap
+function updateItemRowUI(key) {
+  const qty   = getQty(key);
+  const qtyEl = document.getElementById('qty-' + key);
+  const rowEl = document.getElementById('item-row-' + key);
+  if (qtyEl) {
+    qtyEl.textContent = qty === 0 ? '—' : qty;
+    qtyEl.classList.toggle('zero', qty === 0);
+  }
+  if (rowEl) rowEl.classList.toggle('selected', qty > 0);
+  updateCatCount(getCatIdForKey(key));
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER — SHOPPING TAB
+// ─────────────────────────────────────────────────────────────────────────────
+const SHOP_GROUP_ORDER = ['Misc', 'Pantry', 'Fruit & Vegetables', 'Raw Meat & Seafood Counter', 'Refrigerated & Frozen'];
+
+/**
+ * Build a flat sorted list of all requested items for the Shopping tab.
+ * Each item has: { key, name, qty, shopGroup, shopOrder, isFreeform?, ffKey?, ffEntryId? }
+ */
+function buildShopItems() {
+  const shopItems = [];
+
+  // Catalog items (simple + multiAdd variants)
+  Object.entries(state.items).forEach(([key, val]) => {
+    if (!val || val.qty <= 0) return;
+    const parts   = key.split(':');
+    const itemId  = parts[0];
+    const catItem = CATALOG.flatMap(c => c.items).find(i => i.id === itemId);
+    if (!catItem) return;
+
+    let displayName = catItem.name;
+    if (parts.length >= 2) {
+      const variantPart = parts.slice(1).join(':');
+      if (variantPart.startsWith('Other:')) {
+        // Custom Other — use stored label if present
+        const label = state.notes['__label_' + key];
+        if (label) displayName += ' - ' + label;
+      } else {
+        displayName += ' - ' + variantPart;
+      }
+    }
+
+    shopItems.push({
+      key,
+      name:      displayName,
+      qty:       val.qty,
+      shopGroup: catItem.shopGroup,
+      shopOrder: catItem.shopOrder,
+    });
+  });
+
+  // Freeform items — use the shopGroup of the parent catalog category
+  Object.entries(state.freeform).forEach(([ffKey, entries]) => {
+    (entries || []).forEach(e => {
+      if (!e.text) return;
+      const catId  = ffKey.split('_')[0];
+      const catDef = CATALOG.find(c => c.id === catId);
+      // Use the most representative shopGroup/order for the category
+      // (pick the first non-freeformOnly item's values as a proxy)
+      const refItem = catDef?.items.find(i => i.type === 'simple' || i.type === 'multiAdd');
+      const shopGroup = refItem?.shopGroup || catDef?.items[0]?.shopGroup || 'Misc';
+      const shopOrder = refItem?.shopOrder ?? catDef?.items[0]?.shopOrder ?? 99;
+      shopItems.push({
+        key:        'ff:' + ffKey + ':' + e.id,
+        name:       e.text,
+        qty:        e.qty || 1,
+        shopGroup,
+        shopOrder,
+        isFreeform: true,
+        ffKey,
+        ffEntryId:  e.id,
+      });
+    });
+  });
+
+  // Sort by store order, then alphabetically within group
+  shopItems.sort((a, b) => {
+    const orderA = SHOP_GROUP_ORDER.indexOf(a.shopGroup);
+    const orderB = SHOP_GROUP_ORDER.indexOf(b.shopGroup);
+    const oa = orderA < 0 ? 99 : orderA;
+    const ob = orderB < 0 ? 99 : orderB;
+    if (oa !== ob) return oa - ob;
+    return a.name.localeCompare(b.name);
+  });
+  return shopItems;
+}
+
+function renderShopping() {
+  const container = document.getElementById('shopping-list');
+  const allItems  = buildShopItems();
+  const active    = allItems.filter(i => !state.cart[i.key]);
+  const inCart    = allItems.filter(i =>  state.cart[i.key]);
+
+  if (allItems.length === 0) {
+    container.innerHTML = '<div class="empty-msg">No items requested yet.<br>Add items on the Request tab.</div>';
+    return;
+  }
+
+  let html = '';
+  let lastGroup = null;
+
+  // Active items grouped by store section
+  active.forEach(item => {
+    if (item.shopGroup !== lastGroup) {
+      html += `<div class="shop-group-header">${escHtml(item.shopGroup)}</div>`;
+      lastGroup = item.shopGroup;
+    }
+    html += renderShopItemRow(item, false);
+  });
+
+  // In Cart section
+  if (inCart.length > 0) {
+    html += `<div class="in-cart-section">
+      <div class="in-cart-header">
+        <span>In Cart</span>
+        <span class="cat-count">${inCart.length}</span>
+      </div>`;
+    inCart.forEach(item => { html += renderShopItemRow(item, true); });
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function renderShopItemRow(item, isInCart) {
+  const safeKey  = item.key.replace(/[^a-z0-9]/gi, '_');
+  const keyAttr  = escAttr(item.key);
+  const note     = state.notes[item.key] || '';
+  const hasNote  = !!note;
+  const noteId   = 'shop-note-' + safeKey;
+
+  const qtyBadge = item.qty > 1 ? `<span class="shop-item-qty">×${item.qty}</span>` : '';
+
+  return `<div class="shop-item-row" id="shop-row-${safeKey}">
+    <button class="shop-check-btn${isInCart ? ' checked' : ''}"
+      onclick="toggleCart('${keyAttr}')">✓</button>
+    <div class="shop-item-body">
+      <div class="shop-item-main">
+        <span class="shop-item-name${isInCart ? ' checked' : ''}">${escHtml(item.name)}</span>
+        ${qtyBadge}
+        ${isInCart
+          ? `<button class="shop-return-btn" onclick="returnFromCart('${keyAttr}')">↩</button>`
+          : `
+            ${hasNote
+              ? `<button class="shop-note-tag" onclick="toggleShopNote('${keyAttr}')">${escHtml(note)}</button>`
+              : `<button class="shop-add-note-btn" onclick="toggleShopNote('${keyAttr}')">+ note</button>`}
+            <button class="shop-delete-btn" onclick="deleteShopItem('${keyAttr}')">×</button>`}
+      </div>
+      ${!isInCart ? `<input class="shop-note-input" id="${noteId}"
+        value="${escAttr(note)}"
+        placeholder="Add note (e.g. 2 lbs, organic)…"
+        onchange="saveShopNote('${keyAttr}', this.value)"
+        onblur="onShopNoteBlur('${keyAttr}', this.value)">` : ''}
+    </div>
+  </div>`;
+}
+
+function toggleCart(key) {
+  if (state.cart[key]) delete state.cart[key];
+  else state.cart[key] = true;
+  state.cartAt = Date.now();
+  saveToCloud();
+  renderShopping();
+}
+window.toggleCart = toggleCart;
+
+function returnFromCart(key) {
+  delete state.cart[key];
+  state.cartAt = Date.now();
+  saveToCloud();
+  renderShopping();
+}
+window.returnFromCart = returnFromCart;
+
+function toggleShopNote(key) {
+  const safeKey = key.replace(/[^a-z0-9]/gi, '_');
+  const noteEl  = document.getElementById('shop-note-' + safeKey);
+  if (!noteEl) return;
+  const isOpen = noteEl.classList.toggle('open');
+  if (isOpen) {
+    noteEl.focus();
+    noteEl.select();
+  }
+}
+window.toggleShopNote = toggleShopNote;
+
+function saveShopNote(key, text) {
+  const trimmed = text.trim();
+  if (trimmed) state.notes[key] = trimmed;
+  else delete state.notes[key];
+  state.notesAt = Date.now();
+  scheduleSave();
+}
+window.saveShopNote = saveShopNote;
+
+// On blur: save and re-render so the note tag updates
+function onShopNoteBlur(key, text) {
+  saveShopNote(key, text);
+  renderShopping();
+}
+window.onShopNoteBlur = onShopNoteBlur;
+
+function deleteShopItem(key) {
+  if (key.startsWith('ff:')) {
+    // key format: "ff:ffKey:entryId"
+    // ffKey may itself contain colons (e.g. "refrigerated_lunches"), so
+    // split off only the last segment as entryId
+    const withoutPrefix = key.slice(3);              // "ffKey:entryId"
+    const lastColon     = withoutPrefix.lastIndexOf(':');
+    const ffKey         = withoutPrefix.slice(0, lastColon);
+    const ffEntryId     = withoutPrefix.slice(lastColon + 1);
+    deleteFreeformEntry(ffKey, ffEntryId);
+  } else {
+    deleteItem(key);
+  }
+  saveToCloud();
+  renderShopping();
+}
+window.deleteShopItem = deleteShopItem;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER — DINNERS TAB
+// ─────────────────────────────────────────────────────────────────────────────
+function renderDinners() {
+  if (activeDinnerSub === 'this-week') renderThisWeek();
+  else renderMenu();
+}
+
+// ── This Week ─────────────────────────────────────────────────────────────────
+function renderThisWeek() {
+  const container = document.getElementById('dinner-this-week');
+  const active = (state.thisWeek || []).filter(d => !d.done);
+  const done   = (state.thisWeek || []).filter(d =>  d.done);
+  let html = '';
+
+  if (active.length === 0 && done.length === 0) {
+    html += '<div class="empty-msg">No dinners planned yet.<br>Add from the Menu or type below.</div>';
+  }
+
+  active.forEach(d => { html += renderThisWeekRow(d, false); });
+
+  if (done.length > 0) {
+    html += `<div class="dinner-done-section">
+      <div class="dinner-done-header">
+        <span>Made</span><span class="cat-count">${done.length}</span>
+      </div>`;
+    done.forEach(d => { html += renderThisWeekRow(d, true); });
+    html += '</div>';
+  }
+
+  html += `<div class="dinner-add-row">
+    <input class="dinner-add-input" id="dinner-add-input"
+      placeholder="Add dinner…"
+      onkeydown="if(event.key==='Enter')addThisWeekDinner()">
+    <button class="dinner-add-btn" onclick="addThisWeekDinner()">Add</button>
+  </div>
+  <div class="dinner-footer">
+    <button class="btn-secondary" onclick="openModal('modal-clear-dinners')">Clear All</button>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function renderThisWeekRow(d, isDone) {
+  return `<div class="dinner-row">
+    <button class="dinner-check-btn${isDone ? ' done' : ''}"
+      onclick="toggleDinnerDone('${d.id}')">✓</button>
+    <span class="dinner-name${isDone ? ' done' : ''}">${escHtml(d.name)}</span>
+    <button class="dinner-delete-btn" onclick="deleteThisWeekDinner('${d.id}')">×</button>
+  </div>`;
+}
+
+function addThisWeekDinner() {
+  const input = document.getElementById('dinner-add-input');
+  const name  = input?.value.trim();
+  if (!name) return;
+  state.thisWeek = state.thisWeek || [];
+  state.thisWeek.push({ id: uuid(), name, done: false });
+  state.thisWeekAt = Date.now();
+  if (!state.dinnerMenu[name]) {
+    state.dinnerMenu[name] = { category: 'Uncategorized' };
+    state.dinnerMenuAt = Date.now();
+  }
+  input.value = '';
+  saveToCloud();
+  renderDinners();
+}
+window.addThisWeekDinner = addThisWeekDinner;
+
+function toggleDinnerDone(id) {
+  const d = (state.thisWeek || []).find(d => d.id === id);
+  if (d) { d.done = !d.done; state.thisWeekAt = Date.now(); saveToCloud(); renderDinners(); }
+}
+window.toggleDinnerDone = toggleDinnerDone;
+
+function deleteThisWeekDinner(id) {
+  state.thisWeek   = (state.thisWeek || []).filter(d => d.id !== id);
+  state.thisWeekAt = Date.now();
+  saveToCloud();
+  renderDinners();
+}
+window.deleteThisWeekDinner = deleteThisWeekDinner;
+
+function clearDinners() {
+  state.thisWeek   = [];
+  state.thisWeekAt = Date.now();
+  closeModal('modal-clear-dinners');
+  saveToCloud();
+  renderDinners();
+}
+window.clearDinners = clearDinners;
+
+// ── Menu ──────────────────────────────────────────────────────────────────────
+let openMenuCats = new Set(DINNER_CATEGORIES);
+let menuEditMode = false;
+let menuSearch   = '';
+
+function buildMenuGroups() {
+  const groups = {};
+  DINNER_CATEGORIES.forEach(c => { groups[c] = []; });
+  Object.entries(state.dinnerMenu || {}).forEach(([name, data]) => {
+    const cat = data.category || 'Uncategorized';
+    if (!groups[cat]) groups['Uncategorized'].push(name);
+    else groups[cat].push(name);
+  });
+  DINNER_CATEGORIES.forEach(c => groups[c].sort((a,b) => a.localeCompare(b)));
+  return groups;
+}
+
+// renderMenu: full render including toolbar (called on tab switch, edit toggle, etc.)
+// renderMenuCategories: re-renders only the category cards (called during search)
+function renderMenu() {
+  const container = document.getElementById('dinner-menu');
+
+  // Toolbar — rendered once, not touched during search
+  let toolbarHtml = `<div class="menu-toolbar" id="menu-toolbar">
+    <div class="search-wrap" style="flex:1;margin-bottom:0;">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="menu-search-input" placeholder="Search dinners…"
+        value="${escAttr(menuSearch)}"
+        oninput="onMenuSearch(this.value)">
+      <button class="search-clear${menuSearch ? ' visible' : ''}"
+        id="menu-search-clear" onclick="clearMenuSearch()">×</button>
+    </div>
+    <button class="toolbar-btn" onclick="expandAllMenu()">Expand</button>
+    <button class="toolbar-btn" onclick="collapseAllMenu()">Collapse</button>
+    <button class="menu-edit-btn${menuEditMode ? ' active' : ''}" onclick="toggleMenuEdit()">
+      ${menuEditMode ? 'Done' : 'Edit'}
+    </button>
+  </div>
+  <div id="menu-categories"></div>`;
+
+  container.innerHTML = toolbarHtml;
+  renderMenuCategories();
+}
+
+function renderMenuCategories() {
+  const container     = document.getElementById('menu-categories');
+  if (!container) return;
+  const thisWeekNames = new Set((state.thisWeek || []).map(d => d.name));
+  const searchTerm    = menuSearch.toLowerCase().trim();
+  const groups        = buildMenuGroups();
+  let html            = '';
+
+  DINNER_CATEGORIES.forEach(cat => {
+    let items = groups[cat] || [];
+
+    // Apply search filter
+    if (searchTerm) items = items.filter(n => n.toLowerCase().includes(searchTerm));
+    if (items.length === 0 && cat !== 'Uncategorized' && !menuEditMode) return;
+    if (items.length === 0 && cat === 'Uncategorized' && searchTerm) return;
+
+    const catDomId = 'menu-cat-' + cat.toLowerCase().replace(/\s+/g, '-');
+    const isOpen   = openMenuCats.has(cat) || !!searchTerm;
+
+    html += `<div class="menu-cat-card${isOpen ? ' open' : ''}" id="${catDomId}">
+      <div class="menu-cat-header" onclick="toggleMenuCat('${escAttr(cat)}')">
+        <span class="menu-cat-title">${escHtml(cat)}</span>
+        <span class="menu-cat-chevron">▼</span>
+      </div>
+      <div class="menu-cat-body">`;
+
+    items.forEach(name => {
+      const onList = thisWeekNames.has(name);
+      html += `<div class="menu-item-row">
+        <button class="menu-add-week-btn${onList ? ' on-list' : ''}"
+          onclick="toggleMenuItemThisWeek('${escAttr(name)}')"
+          title="${onList ? 'Remove from this week' : 'Add to this week'}">${onList ? '✓' : '+'}</button>
+        <div class="menu-item-name">
+          ${menuEditMode
+            ? `<input value="${escAttr(name)}"
+                 onchange="renameMenuItem('${escAttr(name)}', this.value)">`
+            : escHtml(name)}
+        </div>
+        ${menuEditMode ? `
+          <select class="menu-cat-select" onchange="moveMenuItem('${escAttr(name)}', this.value)">
+            ${DINNER_CATEGORIES.map(c =>
+              `<option value="${escAttr(c)}"${c === cat ? ' selected' : ''}>${escHtml(c)}</option>`
+            ).join('')}
+          </select>
+          <button class="menu-delete-btn" onclick="deleteMenuItem('${escAttr(name)}')">×</button>
+        ` : (cat === 'Uncategorized' ? `
+          <select class="menu-cat-select" onchange="moveMenuItem('${escAttr(name)}', this.value)">
+            ${DINNER_CATEGORIES.map(c =>
+              `<option value="${escAttr(c)}"${c === cat ? ' selected' : ''}>${escHtml(c)}</option>`
+            ).join('')}
+          </select>
+        ` : '')}
+      </div>`;
+    });
+
+    // Add new dinner field — always in Uncategorized
+    if (cat === 'Uncategorized' && !searchTerm) {
+      html += `<div class="dinner-add-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-light);">
+        <input class="dinner-add-input" id="menu-add-input"
+          placeholder="Add new dinner…"
+          onkeydown="if(event.key==='Enter')addMenuDinner()">
+        <button class="dinner-add-btn" onclick="addMenuDinner()">Add</button>
+      </div>`;
+    }
+
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function expandAllMenu()  { openMenuCats = new Set(DINNER_CATEGORIES); renderMenuCategories(); }
+function collapseAllMenu(){ openMenuCats.clear(); renderMenuCategories(); }
+window.expandAllMenu  = expandAllMenu;
+window.collapseAllMenu = collapseAllMenu;
+
+function toggleMenuCat(cat) {
+  if (openMenuCats.has(cat)) openMenuCats.delete(cat);
+  else openMenuCats.add(cat);
+  // Toggle just the card without full re-render
+  const card = document.getElementById('menu-cat-' + cat.toLowerCase().replace(/[^a-z0-9]/gi,'-'));
+  if (card) card.classList.toggle('open', openMenuCats.has(cat));
+}
+window.toggleMenuCat = toggleMenuCat;
+
+function toggleMenuEdit() {
+  menuEditMode = !menuEditMode;
+  renderMenu();
+}
+window.toggleMenuEdit = toggleMenuEdit;
+
+function onMenuSearch(val) {
+  menuSearch = val;
+  const clearBtn = document.getElementById('menu-search-clear');
+  if (clearBtn) clearBtn.classList.toggle('visible', !!val.trim());
+  renderMenuCategories();   // only re-render categories, not the toolbar (preserves focus)
+}
+window.onMenuSearch = onMenuSearch;
+
+function clearMenuSearch() {
+  menuSearch = '';
+  const input   = document.getElementById('menu-search-input');
+  const clearBtn = document.getElementById('menu-search-clear');
+  if (input)    input.value = '';
+  if (clearBtn) clearBtn.classList.remove('visible');
+  renderMenuCategories();
+}
+window.clearMenuSearch = clearMenuSearch;
+
+function toggleMenuItemThisWeek(name) {
+  state.thisWeek = state.thisWeek || [];
+  const idx = state.thisWeek.findIndex(d => d.name === name);
+  if (idx >= 0) state.thisWeek.splice(idx, 1);
+  else          state.thisWeek.push({ id: uuid(), name, done: false });
+  state.thisWeekAt = Date.now();
+  saveToCloud();
+  renderDinners();
+}
+window.toggleMenuItemThisWeek = toggleMenuItemThisWeek;
+
+function addMenuDinner() {
+  const input = document.getElementById('menu-add-input');
+  const name  = input?.value.trim();
+  if (!name || state.dinnerMenu[name]) return;
+  state.dinnerMenu[name]  = { category: 'Uncategorized' };
+  state.dinnerMenuAt      = Date.now();
+  input.value = '';
+  saveToCloud();
+  renderMenu();
+}
+window.addMenuDinner = addMenuDinner;
+
+function renameMenuItem(oldName, newName) {
+  newName = newName.trim();
+  if (!newName || newName === oldName || state.dinnerMenu[newName]) return;
+  const data = state.dinnerMenu[oldName];
+  delete state.dinnerMenu[oldName];
+  state.dinnerMenu[newName] = data;
+  state.dinnerMenuAt = Date.now();
+  (state.thisWeek   || []).forEach(d => { if (d.name === oldName) d.name = newName; });
+  state.thisWeekAt = Date.now();
+  (state.tripHistory|| []).forEach(t => {
+    t.dinners = (t.dinners || []).map(n => n === oldName ? newName : n);
+  });
+  saveToCloud();
+  renderDinners();
+}
+window.renameMenuItem = renameMenuItem;
+
+function moveMenuItem(name, newCat) {
+  if (state.dinnerMenu[name]) {
+    state.dinnerMenu[name].category = newCat;
+    state.dinnerMenuAt = Date.now();
+  }
+  saveToCloud();
+  renderMenu();
+}
+window.moveMenuItem = moveMenuItem;
+
+function deleteMenuItem(name) {
+  delete state.dinnerMenu[name];
+  state.dinnerMenuAt = Date.now();
+  state.thisWeek     = (state.thisWeek || []).filter(d => d.name !== name);
+  state.thisWeekAt   = Date.now();
+  (state.tripHistory || []).forEach(t => {
+    t.dinners = (t.dinners || []).filter(n => n !== name);
+  });
+  saveToCloud();
+  renderDinners();
+}
+window.deleteMenuItem = deleteMenuItem;
+
+// RENDER — HISTORY TAB
+// ─────────────────────────────────────────────────────────────────────────────
+let pendingPromote  = null;
+let historyPrevTab  = 'request';  // tab to return to when pressing Back
+
+function showHistory() {
+  historyPrevTab = activeTab === 'history' ? 'request' : activeTab;
+  activeTab = 'history';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-history')?.classList.add('active');
+  const toolbar = document.getElementById('request-toolbar');
+  if (toolbar) toolbar.style.display = 'none';
+  renderHeader();
+  renderHistory();
+}
+window.showHistory = showHistory;
+
+function backFromHistory() {
+  switchTab(historyPrevTab || 'request');
+}
+window.backFromHistory = backFromHistory;
+
+// Human-readable source label for a customItem
+function customItemSourceLabel(item) {
+  if (!item.sourceKey) return '';
+  const catId  = item.sourceKey.split('_')[0];
+  const catDef = CATALOG.find(c => c.id === catId);
+  if (!catDef) return '';
+
+  if (item.sourceType === 'multiadd-other' && item.parentItemId) {
+    const parent = catDef.items.find(i => i.id === item.parentItemId);
+    return parent ? `${catDef.label} → ${parent.name} (Other)` : catDef.label;
+  }
+  if (item.sourceType === 'item-freeform') {
+    const itemId  = item.sourceKey.split('_')[1];
+    const catItem = catDef.items.find(i => i.id === itemId);
+    return catItem ? `${catDef.label} → ${catItem.name}` : catDef.label;
+  }
+  return catDef.label + ' (Other)';
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  if (!container) return;
+  const items = [...(state.customItems || [])].sort((a,b) => a.text.localeCompare(b.text));
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="empty-msg">No custom items yet.<br>Items entered via Other or freeform fields appear here.</div>';
+    return;
+  }
+
+  let html = '';
+  items.forEach(item => {
+    const sourceLabel = customItemSourceLabel(item);
+    html += `<div class="history-item-row">
+      <div class="history-item-body">
+        <input class="history-name-input" value="${escAttr(item.text)}"
+          onchange="renameCustomItem('${item.id}', this.value)">
+        ${sourceLabel ? `<div class="history-source">${escHtml(sourceLabel)}</div>` : ''}
+      </div>
+      <button class="history-promote-btn" onclick="openPromoteDialog('${item.id}')" title="Add to catalog">+</button>
+      <button class="history-delete-btn" onclick="deleteCustomItem('${item.id}')">×</button>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function renameCustomItem(id, newText) {
+  const item = (state.customItems || []).find(c => c.id === id);
+  if (!item || !newText.trim()) return;
+  item.text          = newText.trim();
+  state.customItemsAt = Date.now();
+  saveToCloud();
+}
+window.renameCustomItem = renameCustomItem;
+
+function deleteCustomItem(id) {
+  state.customItems   = (state.customItems || []).filter(c => c.id !== id);
+  state.customItemsAt = Date.now();
+  saveToCloud();
+  renderHistory();
+}
+window.deleteCustomItem = deleteCustomItem;
+
+function openPromoteDialog(id) {
+  const item = (state.customItems || []).find(c => c.id === id);
+  if (!item) return;
+  pendingPromote = item;
+
+  const isMultiAddOther = item.sourceType === 'multiadd-other' && item.parentItemId;
+
+  if (isMultiAddOther) {
+    // Promote as a new variant on the parent item's dropdown
+    const catId   = item.sourceKey?.split('_')[0];
+    const catDef  = CATALOG.find(c => c.id === catId);
+    const parent  = catDef?.items.find(i => i.id === item.parentItemId);
+    document.getElementById('modal-promote-title').textContent = 'Add as Variant';
+    document.getElementById('modal-promote-body').textContent =
+      `Add "${item.text}" as a permanent variant of ${parent?.name || item.parentItemId}?`;
+    document.getElementById('modal-promote-cat-row').style.display = 'none';
+  } else {
+    // Promote as a new standalone catalog item
+    document.getElementById('modal-promote-title').textContent = 'Add to Catalog';
+    document.getElementById('modal-promote-body').textContent =
+      `Add "${item.text}" as a new item. Choose its category:`;
+    const sel = document.getElementById('modal-promote-cat');
+    sel.innerHTML = CATALOG.map(c =>
+      `<option value="${escAttr(c.id)}">${escHtml(c.label)}</option>`
+    ).join('');
+    // Pre-select the source category
+    const srcCatId = item.sourceKey?.split('_')[0];
+    if (srcCatId) sel.value = srcCatId;
+    document.getElementById('modal-promote-cat-row').style.display = '';
+  }
+
+  openModal('modal-promote');
+}
+window.openPromoteDialog = openPromoteDialog;
+
+function confirmPromote() {
+  if (!pendingPromote) return;
+  const item            = pendingPromote;
+  const isMultiAddOther = item.sourceType === 'multiadd-other' && item.parentItemId;
+
+  if (isMultiAddOther) {
+    // Add variant to the parent item's CATALOG entry at runtime
+    const catId  = item.sourceKey?.split('_')[0];
+    const catDef = CATALOG.find(c => c.id === catId);
+    const parent = catDef?.items.find(i => i.id === item.parentItemId);
+    if (parent && parent.variants) {
+      // Insert before 'Other', keeping alphabetical order
+      const otherIdx = parent.variants.indexOf('Other');
+      const insertAt = otherIdx >= 0 ? otherIdx : parent.variants.length;
+      parent.variants.splice(insertAt, 0, item.text);
+    }
+  } else {
+    // Add as a simple item to the chosen category at runtime
+    const catId  = document.getElementById('modal-promote-cat')?.value;
+    const catDef = CATALOG.find(c => c.id === catId);
+    if (catDef) {
+      const newItem = {
+        id:        item.text.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_custom',
+        name:      item.text,
+        type:      'simple',
+        shopGroup: catDef.items[0]?.shopGroup || 'Misc',
+        shopOrder: catDef.items[0]?.shopOrder || 99,
+      };
+      // Insert alphabetically (before Other / freeform items)
+      const insertIdx = catDef.items.findIndex(i =>
+        i.type !== 'freeformOnly' && i.type !== 'freeform' && i.name.localeCompare(item.text) > 0
+      );
+      if (insertIdx >= 0) catDef.items.splice(insertIdx, 0, newItem);
+      else catDef.items.push(newItem);
+    }
+  }
+
+  // Remove from customItems now that it's been promoted
+  state.customItems   = (state.customItems || []).filter(c => c.id !== item.id);
+  state.customItemsAt = Date.now();
+  saveToCloud();
+
+  pendingPromote = null;
+  closeModal('modal-promote');
+  renderHistory();
+  // Re-render request tab if visible so promoted item appears
+  if (activeTab === 'request') renderRequest();
+}
+window.confirmPromote = confirmPromote;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id)?.classList.add('visible'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('visible'); }
+window.openModal  = openModal;
+window.closeModal = closeModal;
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('visible');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────────────────────
+loadFromCloud();
+
+</script>
+</body>
+</html>
