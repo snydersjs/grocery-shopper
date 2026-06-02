@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v3 - date/freeform/catalog fixes -->
+<!-- Grocery Shopper v4 - catalogAdditions merge fix -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1391,7 +1391,8 @@ function defaultState() {
     customItemsAt: 0,
 
     // Runtime catalog additions promoted from History: [{catId, item}]
-    catalogAdditions: [],
+    catalogAdditions:   [],
+    catalogAdditionsAt: 0,
   };
 }
 
@@ -1533,6 +1534,17 @@ function mergeStates(local, cloud) {
   merged.lockedAt = Math.max(localLockedAt, cloudLockedAt);
   merged.tripHistory  = cloud.tripHistory  ?? local.tripHistory  ?? [];
 
+  // catalogAdditions: local wins if newer
+  const localCatAddAt = local.catalogAdditionsAt || 0;
+  const cloudCatAddAt = cloud.catalogAdditionsAt || 0;
+  if (localCatAddAt > 0) {
+    merged.catalogAdditions = localCatAddAt >= cloudCatAddAt
+      ? (local.catalogAdditions || []) : (cloud.catalogAdditions || []);
+  } else {
+    merged.catalogAdditions = cloud.catalogAdditions || local.catalogAdditions || [];
+  }
+  merged.catalogAdditionsAt = Math.max(localCatAddAt, cloudCatAddAt);
+
   // customItems: local wins if newer (edits/deletes must not be overwritten by cloud)
   const localCustomAt = local.customItemsAt || 0;
   const cloudCustomAt = cloud.customItemsAt || 0;
@@ -1673,6 +1685,7 @@ async function saveToCloud() {
     if (snap.exists()) {
       state = mergeStates(state, snap.data());
     }
+    applyCatalogAdditions();
     reconcileCustomItems();
     pruneTombstones();
     await setDoc(STATE_REF, state);
@@ -3117,6 +3130,7 @@ function confirmPromote() {
           shopOrder: catDef?.items[0]?.shopOrder || 99,
         };
         state.catalogAdditions.push({ catId, item: newItem });
+        state.catalogAdditionsAt = Date.now();
       }
     }
   }
