@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v2 - freeformAt fix -->
+<!-- Grocery Shopper v3 - date/freeform/catalog fixes -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -169,7 +169,7 @@
   /* ─── Request toolbar (sticky below tabs) ───────────────── */
   .request-toolbar {
     position: sticky;
-    top: 96px; /* height of header+tabs — adjust if needed */
+    top: 0;
     z-index: 90;
     background: var(--bg);
     padding: 8px 16px 6px;
@@ -1290,6 +1290,21 @@ const CATALOG = [
 ];
 
 // Dinner menu seed data (pre-populates if Firestore dinnerMenu is empty)
+// Re-apply any runtime catalog additions stored in state
+function applyCatalogAdditions() {
+  (state.catalogAdditions || []).forEach(({catId, item}) => {
+    const catDef = CATALOG.find(c => c.id === catId);
+    if (!catDef) return;
+    // Only add if not already present
+    if (catDef.items.some(i => i.id === item.id)) return;
+    const insertIdx = catDef.items.findIndex(i =>
+      i.type !== 'freeformOnly' && i.type !== 'freeform' && i.name.localeCompare(item.name) > 0
+    );
+    if (insertIdx >= 0) catDef.items.splice(insertIdx, 0, item);
+    else catDef.items.push(item);
+  });
+}
+
 const DINNER_MENU_SEED = [
   {name:'Fish Tacos',category:'Fish'},
   {name:'Tuna and Sundried Tomato Pasta',category:'Fish'},
@@ -1332,7 +1347,8 @@ const DINNER_CATEGORIES = ['Fish','Meat','Pork','Poultry','Vegetarian','Uncatego
 // Default / empty state shape. Never mutate this directly.
 function defaultState() {
   return {
-    shoppingDate:  '',       // display string e.g. "Saturday, June 7"
+    shoppingDate:   '',      // display string e.g. "Saturday, June 7"
+    shoppingDateAt: 0,
     locked:        false,
     lockedAt:      0,    // timestamp of last lock/unlock
 
@@ -1373,6 +1389,9 @@ function defaultState() {
     // Custom freeform items for History tab: [{ id, text, sourceKey, sourceType, parentItemId }]
     customItems:   [],
     customItemsAt: 0,
+
+    // Runtime catalog additions promoted from History: [{catId, item}]
+    catalogAdditions: [],
   };
 }
 
@@ -1477,6 +1496,7 @@ async function loadFromCloud() {
       DINNER_MENU_SEED.forEach(d => { state.dinnerMenu[d.name] = { category: d.category }; });
       await saveResetToCloud();
     }
+    applyCatalogAdditions();
     setSyncStatus('', '● Ready');
     renderAll();
   } catch(e) {
@@ -1499,7 +1519,13 @@ function mergeStates(local, cloud) {
   const merged = defaultState();
 
   // Simple scalar fields: cloud wins
-  merged.shoppingDate = cloud.shoppingDate ?? local.shoppingDate ?? '';
+  // shoppingDate: local wins if set this session
+  const localDateAt = local.shoppingDateAt || 0;
+  const cloudDateAt = cloud.shoppingDateAt || 0;
+  merged.shoppingDate   = localDateAt >= cloudDateAt && localDateAt > 0
+    ? (local.shoppingDate || '')
+    : (cloud.shoppingDate ?? local.shoppingDate ?? '');
+  merged.shoppingDateAt = Math.max(localDateAt, cloudDateAt);
   // locked: local wins if newer (same pattern as cart/thisWeek)
   const localLockedAt = local.lockedAt || 0;
   const cloudLockedAt = cloud.lockedAt || 0;
@@ -1727,7 +1753,8 @@ window.promptSetDate = promptSetDate;
 
 function saveDate() {
   const v = document.getElementById('date-input').value;
-  state.shoppingDate = v;
+  state.shoppingDate   = v;
+  state.shoppingDateAt = Date.now();
   document.getElementById('shopping-date-display').textContent = formatDate(v);
   closeModal('modal-set-date');
   saveToCloud();
@@ -1812,7 +1839,8 @@ function doneShopping() {
   state.deletedAt    = {};
   state.locked       = false;
   state.lockedAt     = Date.now();
-  state.shoppingDate = '';
+  state.shoppingDate   = '';
+  state.shoppingDateAt = Date.now();
 
   // Switch to Request tab and collapse all categories
   activeTab = 'request';
@@ -1959,7 +1987,15 @@ function renderHeader() {
 
   // Request toolbar — only visible on request tab
   const toolbar = document.getElementById('request-toolbar');
-  if (toolbar) toolbar.style.display = activeTab === 'request' ? '' : 'none';
+  if (toolbar) {
+    toolbar.style.display = activeTab === 'request' ? '' : 'none';
+    // Set sticky top to actual height of header + tab-bar so toolbar sits flush
+    const header  = document.querySelector('header');
+    const tabBar  = document.querySelector('.tab-bar');
+    if (header && tabBar) {
+      toolbar.style.top = (header.offsetHeight + tabBar.offsetHeight) + 'px';
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3065,6 +3101,25 @@ function confirmPromote() {
     }
   }
 
+  // Persist the addition so it survives page reload
+  if (!isMultiAddOther) {
+    const catId = document.getElementById('modal-promote-cat')?.value;
+    if (catId) {
+      state.catalogAdditions = state.catalogAdditions || [];
+      // Avoid duplicates
+      if (!state.catalogAdditions.some(a => a.item.id === item.text.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_custom')) {
+        const catDef = CATALOG.find(c => c.id === catId);
+        const newItem = {
+          id:        item.text.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_custom',
+          name:      item.text,
+          type:      'simple',
+          shopGroup: catDef?.items[0]?.shopGroup || 'Misc',
+          shopOrder: catDef?.items[0]?.shopOrder || 99,
+        };
+        state.catalogAdditions.push({ catId, item: newItem });
+      }
+    }
+  }
   // Remove from customItems now that it's been promoted
   state.customItems   = (state.customItems || []).filter(c => c.id !== item.id);
   state.customItemsAt = Date.now();
