@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v4 - catalogAdditions merge fix -->
+<!-- Grocery Shopper v7 - takeout URL migration -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -813,6 +813,58 @@
     color: #fff;
     border-color: var(--accent);
   }
+  /* ─── Takeout tab ───────────────────────────────────── */
+  .takeout-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .takeout-item-row:last-child { border-bottom: none; }
+  .takeout-name { flex: 1; font-size: 14px; min-width: 0; }
+  .takeout-name input {
+    width: 100%;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    outline: none;
+    background: var(--surface);
+  }
+  .takeout-order-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .takeout-order-btn:hover { background: var(--accent); color: #fff; }
+  .takeout-url-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    color: var(--text-mid);
+    outline: none;
+    margin-top: 4px;
+    background: var(--surface);
+  }
+  .takeout-url-input:focus { border-color: var(--accent-border); }
+
   /* ─── History tab ────────────────────────────────────── */
   .history-header {
     display: flex;
@@ -1083,9 +1135,11 @@
   <div class="dinner-subtab-bar">
     <button class="dinner-subtab-btn active" data-sub="this-week" onclick="switchDinnerSub('this-week')">This Week</button>
     <button class="dinner-subtab-btn" data-sub="menu" onclick="switchDinnerSub('menu')">Menu</button>
+    <button class="dinner-subtab-btn" data-sub="takeout" onclick="switchDinnerSub('takeout')">Takeout</button>
   </div>
   <div id="dinner-this-week"></div>
   <div id="dinner-menu" class="hidden"></div>
+  <div id="dinner-takeout" class="hidden"></div>
 </div>
 
 <!-- ═══ HISTORY PANEL (shown as overlay / separate panel) ════════════════ -->
@@ -1305,6 +1359,39 @@ function applyCatalogAdditions() {
   });
 }
 
+const TAKEOUT_SEED = [
+  {name:'Blue Pan Pizza', category:'Pizza', url:'https://bluepanpizza.hungerrush.com/Order/Menu/2#groups'},
+  {name:'Bonchon', category:'Asian', url:'https://restaurants.bonchon.com/locations/co/denver/8302-e-northfield-blvd-suite-1590'},
+  {name:'Boychik', category:'Mediterranean', url:'https://order.toasttab.com/online/boychik-stanley-marketplace-2501-dallas-street'},
+  {name:'Carmella\'s at Pearl Market', category:'Pizza', url:'https://order.toasttab.com/online/pearl-collective-9196-east-57th-avenue'},
+  {name:'CAVA', category:'Mediterranean', url:'https://cava.com/menu'},
+  {name:'Chi Lin Asian Eatery', category:'Asian', url:'https://www.chilindenver.com/menu'},
+  {name:'Chipotle Mexican Grill', category:'Mexican', url:'https://www.chipotle.com/#menu'},
+  {name:'Coriander', category:'Indian', url:'https://corianderdenver.com/order'},
+  {name:'Cuba Cuba Sandwicheria', category:'American', url:'https://cubacubanorthfield.hrpos.heartland.us/menu'},
+  {name:'Encanto Taqueria y Cantina', category:'Mexican', url:'https://www.toasttab.com/local/order/encantotaqueria'},
+  {name:'Esters', category:'Pizza', url:'https://order.toasttab.com/online/esters-at-oneida-park'},
+  {name:'Famous Philly', category:'American', url:'https://www.tasteofphilly.biz/locations/famousphilly/'},
+  {name:'Illegal Pete\'s', category:'Mexican', url:'https://order.thanx.com/illegalpetes?location=15998'},
+  {name:'In-N-Out Burger', category:'American', url:'https://www.in-n-out.com/menu'},
+  {name:'Lady Nomada', category:'Mexican', url:'https://gastamogroup.olo.com/menu/lady-nomada-central-park'},
+  {name:'MOD Pizza', category:'Pizza', url:'https://orders.modpizza.com/store/4205/Northfield%20Commons'},
+  {name:'Nana\'s Dim Sum & Dumplings', category:'Asian', url:'https://order.toasttab.com/online/nanas-dumplings-montview-2005-clinton-st-ste-a'},
+  {name:'Oblio\'s Pizza', category:'Pizza', url:'https://www.obliospizza.com/menus.html'},
+  {name:'P.F. Chang\'s', category:'Asian', url:'https://order.pfchangs.com/menu/9701'},
+  {name:'Park Burger', category:'American', url:'https://gastamogroup.olo.com/menu/park-burger-holly'},
+  {name:'Parisi', category:'Pizza', url:'https://parisidenver.alohaorderonline.com/'},
+  {name:'Raising Cane\'s', category:'American', url:'https://www.raisingcanes.com/menu/'},
+  {name:'Spice Room', category:'Indian', url:'https://order.denverspiceroom.com/order/spice-room-colfax'},
+  {name:'The Chop Shop', category:'American', url:'https://order.online/store/chop-shop-casual-urban-eatery-lowry-73562?pickup=true'},
+  {name:'Waldo\'s Chicken & Beer', category:'American', url:'https://togoorder.com/web/6083#/'},
+  {name:'Yahya\'s Mediterranean Grill', category:'Mediterranean', url:'https://yahyasgrills.com/'},
+  {name:'Yak & Yeti', category:'Indian', url:'https://theyakandyeti.com/menu/yakandyetirestaurantandbrewpub'},
+  {name:'Zen Asian Sushi Bar & Grill', category:'Asian', url:'https://zensushinorthfield.com/kitchen'},
+];
+
+const TAKEOUT_CATEGORIES = ['American','Asian','Indian','Mediterranean','Mexican','Pizza'];
+
 const DINNER_MENU_SEED = [
   {name:'Fish Tacos',category:'Fish'},
   {name:'Tuna and Sundried Tomato Pasta',category:'Fish'},
@@ -1393,6 +1480,10 @@ function defaultState() {
     // Runtime catalog additions promoted from History: [{catId, item}]
     catalogAdditions:   [],
     catalogAdditionsAt: 0,
+
+    // Takeout restaurants: { name: { category, url } }
+    takeout:   {},
+    takeoutAt: 0,
   };
 }
 
@@ -1478,6 +1569,23 @@ async function loadFromCloud() {
 
       state = mergeStates(state, cloud);
 
+      // Seed takeout if empty
+      if (!cloud.takeout || Object.keys(cloud.takeout).length === 0) {
+        cloud.takeout   = {};
+        cloud.takeoutAt = Date.now();
+        TAKEOUT_SEED.forEach(r => { cloud.takeout[r.name] = { category: r.category, url: r.url }; });
+      } else {
+        // Sync URLs from seed — updates any existing entry whose URL has changed
+        let urlsUpdated = false;
+        TAKEOUT_SEED.forEach(r => {
+          if (cloud.takeout[r.name] && cloud.takeout[r.name].url !== r.url) {
+            cloud.takeout[r.name].url = r.url;
+            urlsUpdated = true;
+          }
+        });
+        if (urlsUpdated) cloud.takeoutAt = Date.now();
+      }
+
       // Seed any missing dinners from DINNER_MENU_SEED (additive only — never overwrites)
       let seeded = false;
       DINNER_MENU_SEED.forEach(d => {
@@ -1533,6 +1641,27 @@ function mergeStates(local, cloud) {
   merged.locked   = localLockedAt >= cloudLockedAt ? (local.locked ?? false) : (cloud.locked ?? false);
   merged.lockedAt = Math.max(localLockedAt, cloudLockedAt);
   merged.tripHistory  = cloud.tripHistory  ?? local.tripHistory  ?? [];
+
+  // takeout: local wins if newer
+  const localTakeoutAt = local.takeoutAt || 0;
+  const cloudTakeoutAt = cloud.takeoutAt || 0;
+  if (localTakeoutAt > 0) {
+    merged.takeout = localTakeoutAt >= cloudTakeoutAt ? (local.takeout || {}) : (cloud.takeout || {});
+  } else {
+    merged.takeout = cloud.takeout || local.takeout || {};
+  }
+  merged.takeoutAt = Math.max(localTakeoutAt, cloudTakeoutAt);
+  // Seed missing takeout entries (additive only)
+  if (merged.takeout) {
+    let takeoutSeeded = false;
+    TAKEOUT_SEED.forEach(r => {
+      if (!merged.takeout[r.name]) {
+        merged.takeout[r.name] = { category: r.category, url: r.url };
+        takeoutSeeded = true;
+      }
+    });
+    if (takeoutSeeded && !merged.takeoutAt) merged.takeoutAt = 1;
+  }
 
   // catalogAdditions: local wins if newer
   const localCatAddAt = local.catalogAdditionsAt || 0;
@@ -1751,6 +1880,7 @@ function switchDinnerSub(sub) {
   document.querySelectorAll('.dinner-subtab-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === sub));
   document.getElementById('dinner-this-week').classList.toggle('hidden', sub !== 'this-week');
   document.getElementById('dinner-menu').classList.toggle('hidden', sub !== 'menu');
+  document.getElementById('dinner-takeout').classList.toggle('hidden', sub !== 'takeout');
   renderDinners();
 }
 window.switchDinnerSub = switchDinnerSub;
@@ -2653,7 +2783,8 @@ window.deleteShopItem = deleteShopItem;
 // ─────────────────────────────────────────────────────────────────────────────
 function renderDinners() {
   if (activeDinnerSub === 'this-week') renderThisWeek();
-  else renderMenu();
+  else if (activeDinnerSub === 'menu') renderMenu();
+  else if (activeDinnerSub === 'takeout') renderTakeout();
 }
 
 // ── This Week ─────────────────────────────────────────────────────────────────
@@ -2955,6 +3086,208 @@ function deleteMenuItem(name) {
   renderDinners();
 }
 window.deleteMenuItem = deleteMenuItem;
+
+// RENDER — TAKEOUT TAB
+// ─────────────────────────────────────────────────────────────────────────────
+let takeoutEditMode = false;
+let takeoutSearch   = '';
+let openTakeoutCats = new Set(TAKEOUT_CATEGORIES);
+
+function renderTakeout() {
+  const container = document.getElementById('dinner-takeout');
+  if (!container) return;
+  const searchTerm = takeoutSearch.toLowerCase().trim();
+
+  // Group and sort
+  const groups = {};
+  TAKEOUT_CATEGORIES.forEach(c => { groups[c] = []; });
+  Object.entries(state.takeout || {}).forEach(([name, data]) => {
+    const cat = data.category || 'Other';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push({ name, ...data });
+  });
+  TAKEOUT_CATEGORIES.forEach(c => groups[c].sort((a,b) => a.name.localeCompare(b.name)));
+
+  // Toolbar
+  let html = `<div class="menu-toolbar">
+    <div class="search-wrap" style="flex:1;margin-bottom:0;">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="takeout-search-input" placeholder="Search restaurants…"
+        value="${escAttr(takeoutSearch)}"
+        oninput="onTakeoutSearch(this.value)">
+      <button class="search-clear${takeoutSearch ? ' visible' : ''}"
+        id="takeout-search-clear" onclick="clearTakeoutSearch()">×</button>
+    </div>
+    <button class="toolbar-btn" onclick="expandAllTakeout()">Expand</button>
+    <button class="toolbar-btn" onclick="collapseAllTakeout()">Collapse</button>
+    <button class="menu-edit-btn${takeoutEditMode ? ' active' : ''}" onclick="toggleTakeoutEdit()">
+      ${takeoutEditMode ? 'Done' : 'Edit'}
+    </button>
+  </div>
+  <div id="takeout-categories"></div>`;
+
+  container.innerHTML = html;
+  renderTakeoutCategories();
+}
+
+function renderTakeoutCategories() {
+  const container = document.getElementById('takeout-categories');
+  if (!container) return;
+  const searchTerm    = takeoutSearch.toLowerCase().trim();
+  const groups        = {};
+  TAKEOUT_CATEGORIES.forEach(c => { groups[c] = []; });
+  Object.entries(state.takeout || {}).forEach(([name, data]) => {
+    const cat = data.category || 'Other';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push({ name, ...data });
+  });
+  TAKEOUT_CATEGORIES.forEach(c => groups[c].sort((a,b) => a.name.localeCompare(b.name)));
+
+  let html = '';
+  TAKEOUT_CATEGORIES.forEach(cat => {
+    let items = groups[cat] || [];
+    if (searchTerm) items = items.filter(r => r.name.toLowerCase().includes(searchTerm));
+    if (items.length === 0 && !takeoutEditMode) return;
+
+    const catDomId = 'takeout-cat-' + cat.toLowerCase().replace(/[^a-z0-9]/gi, '-');
+    const isOpen   = openTakeoutCats.has(cat) || !!searchTerm;
+
+    html += `<div class="menu-cat-card${isOpen ? ' open' : ''}" id="${catDomId}">
+      <div class="menu-cat-header" onclick="toggleTakeoutCat('${escAttr(cat)}')">
+        <span class="menu-cat-title">${escHtml(cat)}</span>
+        <span class="menu-cat-chevron">▼</span>
+      </div>
+      <div class="menu-cat-body">`;
+
+    items.forEach(r => {
+      html += `<div class="takeout-item-row">
+        <div class="takeout-name">
+          ${takeoutEditMode
+            ? `<input value="${escAttr(r.name)}"
+                 onchange="renameTakeout('${escAttr(r.name)}', this.value)">`
+            : escHtml(r.name)}
+          ${takeoutEditMode
+            ? `<input class="takeout-url-input" value="${escAttr(r.url || '')}"
+                 placeholder="Order URL (optional)…"
+                 onchange="updateTakeoutUrl('${escAttr(r.name)}', this.value)">`
+            : ''}
+        </div>
+        ${!takeoutEditMode && r.url
+          ? `<a class="takeout-order-btn" href="${escAttr(r.url)}" target="_blank" rel="noopener">Order ↗</a>`
+          : ''}
+        ${takeoutEditMode ? `
+          <select class="menu-cat-select" onchange="moveTakeout('${escAttr(r.name)}', this.value)">
+            ${TAKEOUT_CATEGORIES.map(c =>
+              `<option value="${escAttr(c)}"${c === cat ? ' selected' : ''}>${escHtml(c)}</option>`
+            ).join('')}
+          </select>
+          <button class="menu-delete-btn" onclick="deleteTakeout('${escAttr(r.name)}')">×</button>
+        ` : ''}
+      </div>`;
+    });
+
+    // Add new restaurant row at bottom of each category in edit mode
+    if (takeoutEditMode && !searchTerm) {
+      html += `<div class="dinner-add-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-light);">
+        <input class="dinner-add-input" id="takeout-add-${escAttr(cat)}"
+          placeholder="Add restaurant…"
+          onkeydown="if(event.key==='Enter')addTakeout('${escAttr(cat)}')">
+        <button class="dinner-add-btn" onclick="addTakeout('${escAttr(cat)}')">Add</button>
+      </div>`;
+    }
+
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function onTakeoutSearch(val) {
+  takeoutSearch = val;
+  const clearBtn = document.getElementById('takeout-search-clear');
+  if (clearBtn) clearBtn.classList.toggle('visible', !!val.trim());
+  renderTakeoutCategories();
+}
+window.onTakeoutSearch = onTakeoutSearch;
+
+function clearTakeoutSearch() {
+  takeoutSearch = '';
+  const input = document.getElementById('takeout-search-input');
+  const clearBtn = document.getElementById('takeout-search-clear');
+  if (input) input.value = '';
+  if (clearBtn) clearBtn.classList.remove('visible');
+  renderTakeoutCategories();
+}
+window.clearTakeoutSearch = clearTakeoutSearch;
+
+function expandAllTakeout()  { openTakeoutCats = new Set(TAKEOUT_CATEGORIES); renderTakeoutCategories(); }
+function collapseAllTakeout(){ openTakeoutCats.clear(); renderTakeoutCategories(); }
+window.expandAllTakeout  = expandAllTakeout;
+window.collapseAllTakeout = collapseAllTakeout;
+
+function toggleTakeoutCat(cat) {
+  if (openTakeoutCats.has(cat)) openTakeoutCats.delete(cat);
+  else openTakeoutCats.add(cat);
+  const card = document.getElementById('takeout-cat-' + cat.toLowerCase().replace(/[^a-z0-9]/gi, '-'));
+  if (card) card.classList.toggle('open', openTakeoutCats.has(cat));
+}
+window.toggleTakeoutCat = toggleTakeoutCat;
+
+function toggleTakeoutEdit() {
+  takeoutEditMode = !takeoutEditMode;
+  renderTakeout();
+}
+window.toggleTakeoutEdit = toggleTakeoutEdit;
+
+function addTakeout(cat) {
+  const input = document.getElementById('takeout-add-' + cat);
+  const name  = input?.value.trim();
+  if (!name || state.takeout[name]) return;
+  state.takeout[name]  = { category: cat, url: '' };
+  state.takeoutAt      = Date.now();
+  input.value = '';
+  saveToCloud();
+  renderTakeoutCategories();
+}
+window.addTakeout = addTakeout;
+
+function renameTakeout(oldName, newName) {
+  newName = newName.trim();
+  if (!newName || newName === oldName || state.takeout[newName]) return;
+  state.takeout[newName] = state.takeout[oldName];
+  delete state.takeout[oldName];
+  state.takeoutAt = Date.now();
+  saveToCloud();
+  renderTakeoutCategories();
+}
+window.renameTakeout = renameTakeout;
+
+function updateTakeoutUrl(name, url) {
+  if (state.takeout[name]) {
+    state.takeout[name].url = url.trim();
+    state.takeoutAt = Date.now();
+    saveToCloud();
+  }
+}
+window.updateTakeoutUrl = updateTakeoutUrl;
+
+function moveTakeout(name, newCat) {
+  if (state.takeout[name]) {
+    state.takeout[name].category = newCat;
+    state.takeoutAt = Date.now();
+    saveToCloud();
+    renderTakeoutCategories();
+  }
+}
+window.moveTakeout = moveTakeout;
+
+function deleteTakeout(name) {
+  delete state.takeout[name];
+  state.takeoutAt = Date.now();
+  saveToCloud();
+  renderTakeoutCategories();
+}
+window.deleteTakeout = deleteTakeout;
 
 // RENDER — HISTORY TAB
 // ─────────────────────────────────────────────────────────────────────────────
