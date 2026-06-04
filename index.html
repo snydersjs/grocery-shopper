@@ -3168,7 +3168,8 @@ function renderTakeoutCategories() {
         <div class="takeout-name">
           ${takeoutEditMode
             ? `<input value="${escAttr(r.name)}"
-                 onchange="renameTakeout('${escAttr(r.name)}', this.value)">`
+                 data-original="${escAttr(r.name)}"
+                 onblur="renameTakeout(this.getAttribute('data-original'), this.value)">`
             : escHtml(r.name)}
           ${takeoutEditMode
             ? `<input class="takeout-url-input" value="${escAttr(r.url || '')}"
