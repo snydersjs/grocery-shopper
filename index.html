@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v8 - takeout Uncategorized + Mexican/Latin -->
+<!-- Grocery Shopper v9 - takeout delete fix -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1569,13 +1569,13 @@ async function loadFromCloud() {
 
       state = mergeStates(state, cloud);
 
-      // Seed takeout if empty
+      // Seed takeout if empty (first ever load only)
       if (!cloud.takeout || Object.keys(cloud.takeout).length === 0) {
         cloud.takeout   = {};
         cloud.takeoutAt = Date.now();
         TAKEOUT_SEED.forEach(r => { cloud.takeout[r.name] = { category: r.category, url: r.url }; });
       } else {
-        // Sync URLs from seed — updates any existing entry whose URL has changed
+        // Sync URLs from seed — only updates URL on existing entries, never re-adds deleted ones
         let urlsUpdated = false;
         TAKEOUT_SEED.forEach(r => {
           if (cloud.takeout[r.name] && cloud.takeout[r.name].url !== r.url) {
@@ -1655,16 +1655,13 @@ function mergeStates(local, cloud) {
     merged.takeout = cloud.takeout || local.takeout || {};
   }
   merged.takeoutAt = Math.max(localTakeoutAt, cloudTakeoutAt);
-  // Seed missing takeout entries (additive only)
-  if (merged.takeout) {
-    let takeoutSeeded = false;
+  // Seed missing takeout entries — only on truly empty lists (first ever load)
+  // Never re-add entries after that, to allow permanent deletions
+  if (merged.takeout && Object.keys(merged.takeout).length === 0) {
     TAKEOUT_SEED.forEach(r => {
-      if (!merged.takeout[r.name]) {
-        merged.takeout[r.name] = { category: r.category, url: r.url };
-        takeoutSeeded = true;
-      }
+      merged.takeout[r.name] = { category: r.category, url: r.url };
     });
-    if (takeoutSeeded && !merged.takeoutAt) merged.takeoutAt = 1;
+    merged.takeoutAt = Date.now();
   }
 
   // catalogAdditions: local wins if newer
