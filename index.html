@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v7 - takeout URL migration -->
+<!-- Grocery Shopper v8 - takeout Uncategorized + Mexican/Latin -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1366,15 +1366,15 @@ const TAKEOUT_SEED = [
   {name:'Carmella\'s at Pearl Market', category:'Pizza', url:'https://order.toasttab.com/online/pearl-collective-9196-east-57th-avenue'},
   {name:'CAVA', category:'Mediterranean', url:'https://cava.com/menu'},
   {name:'Chi Lin Asian Eatery', category:'Asian', url:'https://www.chilindenver.com/menu'},
-  {name:'Chipotle Mexican Grill', category:'Mexican', url:'https://www.chipotle.com/#menu'},
+  {name:'Chipotle Mexican Grill', category:'Mexican/Latin', url:'https://www.chipotle.com/#menu'},
   {name:'Coriander', category:'Indian', url:'https://corianderdenver.com/order'},
   {name:'Cuba Cuba Sandwicheria', category:'American', url:'https://cubacubanorthfield.hrpos.heartland.us/menu'},
   {name:'Encanto Taqueria y Cantina', category:'Mexican', url:'https://www.toasttab.com/local/order/encantotaqueria'},
   {name:'Esters', category:'Pizza', url:'https://order.toasttab.com/online/esters-at-oneida-park'},
   {name:'Famous Philly', category:'American', url:'https://www.tasteofphilly.biz/locations/famousphilly/'},
-  {name:'Illegal Pete\'s', category:'Mexican', url:'https://order.thanx.com/illegalpetes?location=15998'},
+  {name:'Illegal Pete\'s', category:'Mexican/Latin', url:'https://order.thanx.com/illegalpetes?location=15998'},
   {name:'In-N-Out Burger', category:'American', url:'https://www.in-n-out.com/menu'},
-  {name:'Lady Nomada', category:'Mexican', url:'https://gastamogroup.olo.com/menu/lady-nomada-central-park'},
+  {name:'Lady Nomada', category:'Mexican/Latin', url:'https://gastamogroup.olo.com/menu/lady-nomada-central-park'},
   {name:'MOD Pizza', category:'Pizza', url:'https://orders.modpizza.com/store/4205/Northfield%20Commons'},
   {name:'Nana\'s Dim Sum & Dumplings', category:'Asian', url:'https://order.toasttab.com/online/nanas-dumplings-montview-2005-clinton-st-ste-a'},
   {name:'Oblio\'s Pizza', category:'Pizza', url:'https://www.obliospizza.com/menus.html'},
@@ -1390,7 +1390,7 @@ const TAKEOUT_SEED = [
   {name:'Zen Asian Sushi Bar & Grill', category:'Asian', url:'https://zensushinorthfield.com/kitchen'},
 ];
 
-const TAKEOUT_CATEGORIES = ['American','Asian','Indian','Mediterranean','Mexican','Pizza'];
+const TAKEOUT_CATEGORIES = ['American','Asian','Indian','Mediterranean','Mexican/Latin','Pizza','Uncategorized'];
 
 const DINNER_MENU_SEED = [
   {name:'Fish Tacos',category:'Fish'},
@@ -1582,6 +1582,10 @@ async function loadFromCloud() {
             cloud.takeout[r.name].url = r.url;
             urlsUpdated = true;
           }
+        });
+        // Rename category Mexican → Mexican/Latin
+        Object.values(cloud.takeout).forEach(r => {
+          if (r.category === 'Mexican') { r.category = 'Mexican/Latin'; urlsUpdated = true; }
         });
         if (urlsUpdated) cloud.takeoutAt = Date.now();
       }
@@ -3147,7 +3151,7 @@ function renderTakeoutCategories() {
   TAKEOUT_CATEGORIES.forEach(cat => {
     let items = groups[cat] || [];
     if (searchTerm) items = items.filter(r => r.name.toLowerCase().includes(searchTerm));
-    if (items.length === 0 && !takeoutEditMode) return;
+    if (items.length === 0 && !takeoutEditMode && cat !== 'Uncategorized') return;
 
     const catDomId = 'takeout-cat-' + cat.toLowerCase().replace(/[^a-z0-9]/gi, '-');
     const isOpen   = openTakeoutCats.has(cat) || !!searchTerm;
@@ -3182,12 +3186,26 @@ function renderTakeoutCategories() {
             ).join('')}
           </select>
           <button class="menu-delete-btn" onclick="deleteTakeout('${escAttr(r.name)}')">×</button>
-        ` : ''}
+        ` : (cat === 'Uncategorized' ? `
+          <select class="menu-cat-select" onchange="moveTakeout('${escAttr(r.name)}', this.value)">
+            ${TAKEOUT_CATEGORIES.map(c =>
+              `<option value="${escAttr(c)}"${c === cat ? ' selected' : ''}>${escHtml(c)}</option>`
+            ).join('')}
+          </select>
+        ` : '')}
       </div>`;
     });
 
-    // Add new restaurant row at bottom of each category in edit mode
-    if (takeoutEditMode && !searchTerm) {
+    // Uncategorized: always show add field and category dropdown on each item
+    // Other categories: show add field only in edit mode
+    if (cat === 'Uncategorized' && !searchTerm) {
+      html += `<div class="dinner-add-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-light);">
+        <input class="dinner-add-input" id="takeout-add-Uncategorized"
+          placeholder="Add restaurant…"
+          onkeydown="if(event.key==='Enter')addTakeout('Uncategorized')">
+        <button class="dinner-add-btn" onclick="addTakeout('Uncategorized')">Add</button>
+      </div>`;
+    } else if (takeoutEditMode && !searchTerm && cat !== 'Uncategorized') {
       html += `<div class="dinner-add-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border-light);">
         <input class="dinner-add-input" id="takeout-add-${escAttr(cat)}"
           placeholder="Add restaurant…"
