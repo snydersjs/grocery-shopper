@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v9 - takeout delete fix -->
+<!-- Grocery Shopper v10 - sticky toolbars -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -161,7 +161,7 @@
   .spacer { flex: 1; }
 
   /* ─── Tab panels ─────────────────────────────────────── */
-  .tab-panel { display: none; padding: 12px 16px 80px; }
+  .tab-panel { display: none; padding: 0 0 80px; }
   .tab-panel.active { display: block; }
 
   /* locked-banner removed — lock state shown in header pill */
@@ -591,7 +591,12 @@
   .dinner-subtab-bar {
     display: flex;
     gap: 6px;
-    margin-bottom: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 89;
+    background: var(--bg);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
   }
   .dinner-subtab-btn {
     flex: 1;
@@ -703,7 +708,13 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 88;
+    background: var(--bg);
+    padding: 8px 16px;
+    margin: 0 -16px 10px;
+    border-bottom: 1px solid var(--border);
   }
   .menu-cat-card {
     background: var(--surface);
@@ -1108,6 +1119,13 @@
 <!-- ═══ LOCKED PILL (injected into header when locked) ══════════════════ -->
 <!-- rendered by renderHeader() -->
 
+<!-- ═══ DINNER SUB-TAB BAR (sticky, shown only on dinners tab) ══════════ -->
+<div class="dinner-subtab-bar" id="dinner-subtab-bar" style="display:none;">
+  <button class="dinner-subtab-btn active" data-sub="this-week" onclick="switchDinnerSub('this-week')">This Week</button>
+  <button class="dinner-subtab-btn" data-sub="menu" onclick="switchDinnerSub('menu')">Menu</button>
+  <button class="dinner-subtab-btn" data-sub="takeout" onclick="switchDinnerSub('takeout')">Takeout</button>
+</div>
+
 <!-- ═══ REQUEST TOOLBAR (sticky) ════════════════════════════════════════ -->
 <div class="request-toolbar" id="request-toolbar">
   <div class="search-wrap">
@@ -1122,24 +1140,19 @@
 
 <!-- ═══ REQUEST TAB ═══════════════════════════════════════════════════════ -->
 <div id="tab-request" class="tab-panel active">
-  <div id="request-catalog"></div>
+  <div id="request-catalog" style="padding: 12px 16px 0;"></div>
 </div>
 
 <!-- ═══ SHOPPING TAB ══════════════════════════════════════════════════════ -->
 <div id="tab-shopping" class="tab-panel">
-  <div id="shopping-list"></div>
+  <div id="shopping-list" style="padding: 12px 16px 0;"></div>
 </div>
 
 <!-- ═══ DINNERS TAB ═══════════════════════════════════════════════════════ -->
 <div id="tab-dinners" class="tab-panel">
-  <div class="dinner-subtab-bar">
-    <button class="dinner-subtab-btn active" data-sub="this-week" onclick="switchDinnerSub('this-week')">This Week</button>
-    <button class="dinner-subtab-btn" data-sub="menu" onclick="switchDinnerSub('menu')">Menu</button>
-    <button class="dinner-subtab-btn" data-sub="takeout" onclick="switchDinnerSub('takeout')">Takeout</button>
-  </div>
-  <div id="dinner-this-week"></div>
-  <div id="dinner-menu" class="hidden"></div>
-  <div id="dinner-takeout" class="hidden"></div>
+  <div id="dinner-this-week" style="padding: 12px 16px 0;"></div>
+  <div id="dinner-menu" class="hidden" style="padding-bottom:0;"></div>
+  <div id="dinner-takeout" class="hidden" style="padding-bottom:0;"></div>
 </div>
 
 <!-- ═══ HISTORY PANEL (shown as overlay / separate panel) ════════════════ -->
@@ -1148,7 +1161,7 @@
     <button class="history-back-btn" onclick="backFromHistory()">← Back</button>
     <span class="history-title">Custom Items</span>
   </div>
-  <div id="history-list"></div>
+  <div id="history-list" style="padding: 12px 16px 0;"></div>
 </div>
 
 <!-- ═══ MODALS ════════════════════════════════════════════════════════════ -->
@@ -1883,6 +1896,8 @@ function switchDinnerSub(sub) {
   document.getElementById('dinner-menu').classList.toggle('hidden', sub !== 'menu');
   document.getElementById('dinner-takeout').classList.toggle('hidden', sub !== 'takeout');
   renderDinners();
+  // Update toolbar sticky positions after render (menu/takeout toolbar may have just appeared)
+  requestAnimationFrame(renderHeader);
 }
 window.switchDinnerSub = switchDinnerSub;
 
@@ -2129,17 +2144,33 @@ function renderHeader() {
   const lockBtn = document.getElementById('lock-btn');
   if (lockBtn) lockBtn.classList.toggle('hidden', !!state.locked);
 
-  // Request toolbar — only visible on request tab
+  // Measure sticky offset: header + tab-bar height
+  const headerEl = document.querySelector('header');
+  const tabBarEl = document.querySelector('.tab-bar');
+  const stickyBase = headerEl && tabBarEl
+    ? headerEl.offsetHeight + tabBarEl.offsetHeight
+    : 96;
+
+  // Request toolbar — only on request tab
   const toolbar = document.getElementById('request-toolbar');
   if (toolbar) {
     toolbar.style.display = activeTab === 'request' ? '' : 'none';
-    // Set sticky top to actual height of header + tab-bar so toolbar sits flush
-    const header  = document.querySelector('header');
-    const tabBar  = document.querySelector('.tab-bar');
-    if (header && tabBar) {
-      toolbar.style.top = (header.offsetHeight + tabBar.offsetHeight) + 'px';
-    }
+    toolbar.style.top = stickyBase + 'px';
   }
+
+  // Dinner sub-tab bar — only on dinners tab
+  const subtabBar = document.getElementById('dinner-subtab-bar');
+  if (subtabBar) {
+    subtabBar.style.display = activeTab === 'dinners' ? 'flex' : 'none';
+    subtabBar.style.top = stickyBase + 'px';
+  }
+
+  // Menu/takeout toolbars — sticky below subtab bar
+  const subtabHeight = subtabBar && activeTab === 'dinners' ? subtabBar.offsetHeight : 0;
+  const menuToolbar = document.getElementById('menu-toolbar');
+  if (menuToolbar) menuToolbar.style.top = (stickyBase + subtabHeight) + 'px';
+  const takeoutToolbarSearch = document.querySelector('#dinner-takeout .menu-toolbar');
+  if (takeoutToolbarSearch) takeoutToolbarSearch.style.top = (stickyBase + subtabHeight) + 'px';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
