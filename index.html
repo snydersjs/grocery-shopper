@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v12 - sticky-chrome wrapper -->
+<!-- Grocery Shopper v14 - shop section on promote -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1208,6 +1208,18 @@
     <div class="modal-body" id="modal-promote-body"></div>
     <div id="modal-promote-cat-row">
       <select class="modal-select" id="modal-promote-cat"></select>
+      <div style="font-size:13px;color:var(--text-mid);margin-bottom:6px;">Shopping list section:</div>
+      <select class="modal-select" id="modal-promote-shop-section">
+        <option value="misc">Misc</option>
+        <option value="pantry_canned">Pantry — Canned &amp; Dry</option>
+        <option value="pantry_baking">Pantry — Baking/Breakfast</option>
+        <option value="pantry_snacks">Pantry — Snacks</option>
+        <option value="pantry_beverages">Pantry — Beverages</option>
+        <option value="fruit_veg">Fruit &amp; Vegetables</option>
+        <option value="meat">Raw Meat &amp; Seafood Counter</option>
+        <option value="refrigerated_dairy">Refrigerated — Dairy</option>
+        <option value="refrigerated">Refrigerated &amp; Frozen</option>
+      </select>
     </div>
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeModal('modal-promote')">Cancel</button>
@@ -1291,36 +1303,35 @@ const CATALOG = [
     { id:'tortillas',      name:'Tortillas',       type:'simple',   shopGroup:'Refrigerated & Frozen',shopOrder:31 },
   ]},
   { id:'pantry', label:'Canned & Pantry', items:[
-    { id:'beans',            name:'Beans',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Baked','Black','Cannellini','Garbanzo','Navy','Pinto','Other'] },
-    { id:'bread_crumbs',     name:'Bread Crumbs',      type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Italian','Original','Panko','Other'] },
-    { id:'broth',            name:'Broth',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Beef','Chicken','Vegetable','Other'] },
-    { id:'condiments',       name:'Condiments',        type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Cholula','Ketchup','Mayo','Salsa - Green','Salsa - Red','Other'] },
-    { id:'diced_tomatoes',   name:'Diced Tomatoes',    type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'flour',            name:'Flour',             type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'granola',          name:'Granola',           type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'juice',            name:'Juice',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Apple','Lemon','Lime','Orange','Other'] },
-    { id:'mac_cheese',       name:'Mac & Cheese',      type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'minced_ginger',    name:'Minced Ginger',     type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'oatmeal',          name:'Oatmeal',           type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'oil',              name:'Oil',               type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Avocado','Canola','Olive','Other'] },
-    { id:'pasta',            name:'Pasta',             type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'peanut_butter',    name:'Peanut Butter',     type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'quinoa',           name:'Quinoa',            type:'simple',   shopGroup:'Pantry', shopOrder:10 },
-    { id:'rice',             name:'Rice',              type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Basmati','Sushi','Other'] },
-    { id:'salad_dressing',   name:'Salad Dressing',    type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Balsamic','Oil & Vinegar','Other'] },
-    { id:'spices',           name:'Spices',            type:'multiAdd', shopGroup:'Pantry', shopOrder:10, variants:['Basil','Cinnamon','Cumin','Oregano','Pepper','Salt','Other'] },
-    { id:'sun_dried_tomatoes',name:'Sun-Dried Tomatoes',type:'simple',  shopGroup:'Pantry', shopOrder:10 },
+    { id:'beans',            name:'Beans',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Baked','Black','Cannellini','Garbanzo','Navy','Pinto','Other'] },
+    { id:'bread_crumbs',     name:'Bread Crumbs',      type:'multiAdd', shopGroup:'Pantry', shopOrder:10.2, variants:['Italian','Original','Panko','Other'] },
+    { id:'broth',            name:'Broth',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Beef','Chicken','Vegetable','Other'] },
+    { id:'condiments',       name:'Condiments',        type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Cholula','Ketchup','Mayo','Salsa - Green','Salsa - Red','Other'] },
+    { id:'canned_tomatoes',  name:'Tomatoes (Canned)', type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Diced','Fire Roasted','Other','Sun-Dried'] },
+    { id:'flour',            name:'Flour',             type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
+    { id:'granola',          name:'Granola',           type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
+    { id:'juice',            name:'Juice',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.4, variants:['Apple','Lemon','Lime','Orange','Other'] },
+    { id:'mac_cheese',       name:'Mac & Cheese',      type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
+    { id:'minced_ginger',    name:'Minced Ginger',     type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
+    { id:'oatmeal',          name:'Oatmeal',           type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
+    { id:'oil',              name:'Oil',               type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Avocado','Canola','Olive','Other'] },
+    { id:'pasta',            name:'Pasta',             type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
+    { id:'peanut_butter',    name:'Peanut Butter',     type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
+    { id:'quinoa',           name:'Quinoa',            type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
+    { id:'rice',             name:'Rice',              type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Basmati','Sushi','Other'] },
+    { id:'salad_dressing',   name:'Salad Dressing',    type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Balsamic','Oil & Vinegar','Other'] },
+    { id:'spices',           name:'Spices',            type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Basil','Cinnamon','Cumin','Oregano','Pepper','Salt','Other'] },
   ]},
   { id:'snacks', label:'Snacks & Beverages', items:[
-    { id:'potato_chips',    name:'Chips',           type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Cheddar','Salt & Pepper','Sea Salt','Sour Cream & Onion','Tortilla','Other'] },
-    { id:'chocolate',       name:'Chocolate',       type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['55% Bar','70%+ Bar','Chips','Other'] },
-    { id:'crackers',        name:'Crackers',        type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Multigrain','Water','Other'] },
+    { id:'potato_chips',    name:'Chips',           type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.3, variants:['Cheddar','Salt & Pepper','Sea Salt','Sour Cream & Onion','Tortilla','Other'] },
+    { id:'chocolate',       name:'Chocolate',       type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.2, variants:['55% Bar','70%+ Bar','Chips','Other'] },
+    { id:'crackers',        name:'Crackers',        type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.3, variants:['Multigrain','Water','Other'] },
     { id:'koia_shake',      name:'Koia Shake',      type:'simple',   shopGroup:'Refrigerated & Frozen',shopOrder:31 },
-    { id:'nuts',            name:'Nuts',            type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Mixed','Pecans','Pistachios','Walnuts','Other'] },
-    { id:'popcorn',         name:'Popcorn',         type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Bag','Microwave','Other'] },
-    { id:'pretzels',        name:'Pretzels',        type:'simple',   shopGroup:'Pantry',               shopOrder:10 },
-    { id:'sparkling_water', name:'Sparkling Water', type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Sanzo','Spindrift','Waterloo','Other'] },
-    { id:'tea',             name:'Tea',             type:'multiAdd', shopGroup:'Pantry',               shopOrder:10, variants:['Blackberry','Detox','Lemon Ginger','Mandarin','Other'] },
+    { id:'nuts',            name:'Nuts',            type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.3, variants:['Mixed','Pecans','Pistachios','Walnuts','Other'] },
+    { id:'popcorn',         name:'Popcorn',         type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.3, variants:['Bag','Microwave','Other'] },
+    { id:'pretzels',        name:'Pretzels',        type:'simple',   shopGroup:'Pantry',               shopOrder:10.3 },
+    { id:'sparkling_water', name:'Sparkling Water', type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.4, variants:['Sanzo','Spindrift','Waterloo','Other'] },
+    { id:'tea',             name:'Tea',             type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.4, variants:['Blackberry','Detox','Lemon Ginger','Mandarin','Other'] },
   ]},
   { id:'meat', label:'Raw Meat & Seafood Counter', items:[
     { id:'bacon',    name:'Bacon',   type:'simple',   shopGroup:'Raw Meat & Seafood Counter', shopOrder:30 },
@@ -1332,21 +1343,21 @@ const CATALOG = [
     { id:'turkey',   name:'Turkey',  type:'multiAdd', shopGroup:'Raw Meat & Seafood Counter', shopOrder:30, variants:['Ground','Other'] },
   ]},
   { id:'refrigerated', label:'Refrigerated & Frozen', items:[
-    { id:'butter',                  name:'Butter',                   type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'butter',                  name:'Butter',                   type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31.1 },
     { id:'cheese',                  name:'Cheese',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Cheddar','Mexican Blend','Monterey Jack','Mozzarella','Parmesan','Premium','Provolone','Other'] },
     { id:'deli_meat',               name:'Deli Meat',                type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Ham','Prosciutto','Roast Beef','Salami','Turkey','Other'] },
-    { id:'eggs',                    name:'Eggs',                     type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'eggs',                    name:'Eggs',                     type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31.1 },
     { id:'frozen_breakfast_sausage',name:'Frozen Breakfast Sausage', type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'frozen_fruit',            name:'Frozen Fruit',             type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'frozen_tots',             name:'Frozen Tots',              type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'frozen_vegetables',       name:'Frozen Vegetables',        type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Corn','Peas','Other'] },
     { id:'frozen_waffles',          name:'Frozen Waffles',           type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'hummus',                  name:'Hummus',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Plain','Green Chili','Tahini','Red Pepper','Other'] },
-    { id:'oat_milk',                name:'Oat Milk',                 type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'oat_milk',                name:'Oat Milk',                 type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31.1 },
     { id:'pizza',                   name:'Pizza',                    type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Frozen','Refrigerated','Dough','Other'] },
     { id:'salami_stick',            name:'Salami Stick',             type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'tofu',                    name:'Tofu',                     type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
-    { id:'yogurt',                  name:'Yogurt',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Greek','Regular','Other'] },
+    { id:'yogurt',                  name:'Yogurt',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31.1, variants:['Greek','Regular','Other'] },
     { id:'lunches',                 name:'Lunches',                  type:'freeformOnly',shopGroup:'Refrigerated & Frozen', shopOrder:31 },
   ]},
   { id:'misc', label:'Misc', items:[
@@ -2669,11 +2680,15 @@ function buildShopItems() {
 
   // Sort by store order, then alphabetically within group
   shopItems.sort((a, b) => {
+    // Primary: store section order (Misc, Pantry, Fruit & Veg, Meat, Refrigerated)
     const orderA = SHOP_GROUP_ORDER.indexOf(a.shopGroup);
     const orderB = SHOP_GROUP_ORDER.indexOf(b.shopGroup);
     const oa = orderA < 0 ? 99 : orderA;
     const ob = orderB < 0 ? 99 : orderB;
     if (oa !== ob) return oa - ob;
+    // Secondary: shopOrder (handles sub-grouping within a section via decimal values)
+    if (a.shopOrder !== b.shopOrder) return a.shopOrder - b.shopOrder;
+    // Tertiary: alphabetical
     return a.name.localeCompare(b.name);
   });
   return shopItems;
@@ -3452,6 +3467,17 @@ function openPromoteDialog(id) {
     // Pre-select the source category
     const srcCatId = item.sourceKey?.split('_')[0];
     if (srcCatId) sel.value = srcCatId;
+    // Pre-select shopping section based on source category
+    const shopSel = document.getElementById('modal-promote-shop-section');
+    if (shopSel && srcCatId) {
+      const sectionMap = {
+        fruit: 'fruit_veg', vegetables: 'fruit_veg',
+        bakery: 'pantry_canned', pantry: 'pantry_canned',
+        snacks: 'pantry_snacks', meat: 'meat',
+        refrigerated: 'refrigerated', misc: 'misc',
+      };
+      shopSel.value = sectionMap[srcCatId] || 'pantry_canned';
+    }
     document.getElementById('modal-promote-cat-row').style.display = '';
   }
 
@@ -3477,15 +3503,28 @@ function confirmPromote() {
     }
   } else {
     // Add as a simple item to the chosen category at runtime
-    const catId  = document.getElementById('modal-promote-cat')?.value;
+    const catId   = document.getElementById('modal-promote-cat')?.value;
+    const shopSec = document.getElementById('modal-promote-shop-section')?.value || 'pantry_canned';
+    const shopSectionMap = {
+      misc:               { shopGroup: 'Misc',                       shopOrder: 5    },
+      pantry_canned:      { shopGroup: 'Pantry',                     shopOrder: 10.1 },
+      pantry_baking:      { shopGroup: 'Pantry',                     shopOrder: 10.2 },
+      pantry_snacks:      { shopGroup: 'Pantry',                     shopOrder: 10.3 },
+      pantry_beverages:   { shopGroup: 'Pantry',                     shopOrder: 10.4 },
+      fruit_veg:          { shopGroup: 'Fruit & Vegetables',         shopOrder: 20   },
+      meat:               { shopGroup: 'Raw Meat & Seafood Counter',  shopOrder: 30   },
+      refrigerated_dairy: { shopGroup: 'Refrigerated & Frozen',      shopOrder: 31.1 },
+      refrigerated:       { shopGroup: 'Refrigerated & Frozen',      shopOrder: 31.2 },
+    };
+    const shopDef = shopSectionMap[shopSec] || shopSectionMap.pantry_canned;
     const catDef = CATALOG.find(c => c.id === catId);
     if (catDef) {
       const newItem = {
         id:        item.text.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_custom',
         name:      item.text,
         type:      'simple',
-        shopGroup: catDef.items[0]?.shopGroup || 'Misc',
-        shopOrder: catDef.items[0]?.shopOrder || 99,
+        shopGroup: shopDef.shopGroup,
+        shopOrder: shopDef.shopOrder,
       };
       // Insert alphabetically (before Other / freeform items)
       const insertIdx = catDef.items.findIndex(i =>
