@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v20 - alphabetical variant insertion -->
+<!-- Grocery Shopper v21 - request tab edit mode -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -414,6 +414,24 @@
 
   /* ─── Freeform section ───────────────────────────────── */
   .freeform-section { margin-top: 4px; }
+  /* ─── Request tab edit mode ─────────────────────────────── */
+  .req-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .req-delete-btn:hover { color: var(--danger); }
+  .toolbar-btn.edit-active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
   .freeform-label {
     font-size: 11px;
     font-weight: 700;
@@ -1138,6 +1156,7 @@
   <button class="toolbar-btn" onclick="expandAll()">Expand</button>
   <button class="toolbar-btn" onclick="collapseAll()">Collapse</button>
   <button class="toolbar-btn lock" id="lock-btn" onclick="confirmLockList()">Lock</button>
+  <button class="toolbar-btn" id="req-edit-btn" onclick="toggleRequestEdit()">Edit</button>
 </div>
 
 <!-- ═══ REQUEST TAB ═══════════════════════════════════════════════════════ -->
@@ -1235,6 +1254,17 @@
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeModal('modal-clear-dinners')">Cancel</button>
       <button class="modal-confirm danger" onclick="clearDinners()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-catalog-delete">
+  <div class="modal-box">
+    <div class="modal-title">Remove from Catalog?</div>
+    <div class="modal-body" id="modal-catalog-delete-body"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal('modal-catalog-delete')">Cancel</button>
+      <button class="modal-confirm danger" onclick="confirmCatalogDelete()">Remove</button>
     </div>
   </div>
 </div>
@@ -1370,6 +1400,28 @@ const CATALOG = [
 ];
 
 // Dinner menu seed data (pre-populates if Firestore dinnerMenu is empty)
+// Apply catalog deletions stored in state — filters hardcoded items/variants
+function applyCatalogDeletions() {
+  (state.catalogDeletions || []).forEach(({itemId, variant}) => {
+    CATALOG.forEach(cat => {
+      if (variant) {
+        // Remove a specific variant from a multiAdd item
+        const item = cat.items.find(i => i.id === itemId);
+        if (item && item.variants) {
+          item.variants = item.variants.filter(v => v !== variant);
+          // If no non-Other variants remain, remove the item entirely
+          if (item.variants.filter(v => v !== 'Other').length === 0) {
+            cat.items = cat.items.filter(i => i.id !== itemId);
+          }
+        }
+      } else {
+        // Remove the entire item
+        cat.items = cat.items.filter(i => i.id !== itemId);
+      }
+    });
+  });
+}
+
 // Re-apply any runtime catalog additions stored in state
 function applyCatalogAdditions() {
   (state.catalogAdditions || []).forEach(addition => {
@@ -1522,6 +1574,11 @@ function defaultState() {
     catalogAdditions:   [],
     catalogAdditionsAt: 0,
 
+    // Permanent catalog deletions: [{itemId, variant?}]
+    // variant present = delete just that variant; absent = delete whole item
+    catalogDeletions:   [],
+    catalogDeletionsAt: 0,
+
     // Takeout restaurants: { name: { category, url } }
     takeout:   {},
     takeoutAt: 0,
@@ -1533,6 +1590,7 @@ let state = defaultState();
 
 // Track which request categories are open
 let openCats = new Set();
+let requestEditMode = false;
 
 // Active tab
 let activeTab = 'request';
@@ -1650,6 +1708,7 @@ async function loadFromCloud() {
       DINNER_MENU_SEED.forEach(d => { state.dinnerMenu[d.name] = { category: d.category }; });
       await saveResetToCloud();
     }
+    applyCatalogDeletions();
     applyCatalogAdditions();
     setSyncStatus('', '● Ready');
     renderAll();
@@ -1704,6 +1763,17 @@ function mergeStates(local, cloud) {
     });
     merged.takeoutAt = Date.now();
   }
+
+  // catalogDeletions: local wins if newer
+  const localCatDelAt = local.catalogDeletionsAt || 0;
+  const cloudCatDelAt = cloud.catalogDeletionsAt || 0;
+  if (localCatDelAt > 0) {
+    merged.catalogDeletions = localCatDelAt >= cloudCatDelAt
+      ? (local.catalogDeletions || []) : (cloud.catalogDeletions || []);
+  } else {
+    merged.catalogDeletions = cloud.catalogDeletions || local.catalogDeletions || [];
+  }
+  merged.catalogDeletionsAt = Math.max(localCatDelAt, cloudCatDelAt);
 
   // catalogAdditions: local wins if newer
   const localCatAddAt = local.catalogAdditionsAt || 0;
@@ -1856,6 +1926,7 @@ async function saveToCloud() {
     if (snap.exists()) {
       state = mergeStates(state, snap.data());
     }
+    applyCatalogDeletions();
     applyCatalogAdditions();
     reconcileCustomItems();
     pruneTombstones();
@@ -2256,6 +2327,64 @@ function itemMatchesSearch(item) {
   return false;
 }
 
+// ─── Request tab edit mode ───────────────────────────────────────────────────
+let pendingCatalogDelete = null;
+
+function toggleRequestEdit() {
+  requestEditMode = !requestEditMode;
+  const btn = document.getElementById('req-edit-btn');
+  if (btn) {
+    btn.textContent = requestEditMode ? 'Done' : 'Edit';
+    btn.classList.toggle('edit-active', requestEditMode);
+  }
+  renderRequest();
+}
+window.toggleRequestEdit = toggleRequestEdit;
+
+function openCatalogDeleteDialog(itemId, variant) {
+  const catItem = CATALOG.flatMap(c => c.items).find(i => i.id === itemId);
+  const name    = catItem?.name || itemId;
+  const body    = variant
+    ? `Remove "${variant}" from the ${name} dropdown? This affects all users.`
+    : `Remove "${name}" from the catalog? This affects all users.`;
+  document.getElementById('modal-catalog-delete-body').textContent = body;
+  pendingCatalogDelete = { itemId, variant: variant || null };
+  openModal('modal-catalog-delete');
+}
+window.openCatalogDeleteDialog = openCatalogDeleteDialog;
+
+function confirmCatalogDelete() {
+  if (!pendingCatalogDelete) return;
+  const { itemId, variant } = pendingCatalogDelete;
+
+  // Add to catalogDeletions
+  state.catalogDeletions = state.catalogDeletions || [];
+  const alreadyDeleted = state.catalogDeletions.some(d =>
+    d.itemId === itemId && d.variant === variant
+  );
+  if (!alreadyDeleted) {
+    state.catalogDeletions.push({ itemId, variant });
+    state.catalogDeletionsAt = Date.now();
+  }
+
+  // Apply immediately to in-memory CATALOG
+  applyCatalogDeletions();
+
+  // Clear any qty state for deleted item/variant
+  const keyPrefix = variant ? itemId + ':' + variant : itemId;
+  Object.keys(state.items).forEach(k => {
+    if (k === keyPrefix || k.startsWith(keyPrefix + ':')) {
+      deleteItem(k);
+    }
+  });
+
+  pendingCatalogDelete = null;
+  closeModal('modal-catalog-delete');
+  saveToCloud();
+  renderRequest();
+}
+window.confirmCatalogDelete = confirmCatalogDelete;
+
 function renderRequest() {
   const container = document.getElementById('request-catalog');
   const locked    = state.locked;
@@ -2299,11 +2428,13 @@ function renderSimpleItem(item, locked) {
   const selected = qty > 0;
   return `<div class="item-row${selected ? ' selected' : ''}" id="item-row-${item.id}">
     <span class="item-name">${escHtml(item.name)}</span>
-    <div class="qty-selector">
-      ${!locked ? `<button class="qty-btn" onclick="adjustQty('${item.id}', -1)">−</button>` : ''}
-      <span class="qty-display${qty === 0 ? ' zero' : ''}" id="qty-${item.id}">${qty === 0 ? '—' : qty}</span>
-      ${!locked ? `<button class="qty-btn" onclick="adjustQty('${item.id}', 1)">+</button>` : ''}
-    </div>
+    ${requestEditMode
+      ? `<button class="req-delete-btn" onclick="openCatalogDeleteDialog('${escAttr(item.id)}')">×</button>`
+      : `<div class="qty-selector">
+          ${!locked ? `<button class="qty-btn" onclick="adjustQty('${item.id}', -1)">−</button>` : ''}
+          <span class="qty-display${qty === 0 ? ' zero' : ''}" id="qty-${item.id}">${qty === 0 ? '—' : qty}</span>
+          ${!locked ? `<button class="qty-btn" onclick="adjustQty('${item.id}', 1)">+</button>` : ''}
+        </div>`}
   </div>`;
 }
 
@@ -2338,18 +2469,21 @@ function renderMultiAddItem(item, locked) {
              onblur="commitOtherLabel('${escAttr(key)}', this.value)"
              ${locked ? 'disabled' : ''}>`
         : `<span class="variant-label">${escHtml(label)}</span>`}
-      <div class="qty-selector">
-        ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', -1)">−</button>` : ''}
-        <span class="qty-display" id="qty-${safeKey}">${qty}</span>
-        ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', 1)">+</button>` : ''}
-      </div>
+      ${requestEditMode && !isOther
+        ? `<button class="req-delete-btn" onclick="openCatalogDeleteDialog('${escAttr(item.id)}', '${escAttr(label)}')">×</button>`
+        : `<div class="qty-selector">
+            ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', -1)">−</button>` : ''}
+            <span class="qty-display" id="qty-${safeKey}">${qty}</span>
+            ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', 1)">+</button>` : ''}
+          </div>`}
     </div>`;
   });
 
   return `<div class="multiadd-row${activeVariants.length ? ' has-variants' : ''}" id="multiadd-${item.id}">
     <div class="multiadd-controls">
       <span class="multiadd-name">${escHtml(item.name)}</span>
-      ${!locked ? `<div class="multiadd-adder">
+      ${requestEditMode ? `<button class="req-delete-btn" style="margin-left:4px" onclick="openCatalogDeleteDialog('${escAttr(item.id)}')">×</button>` : ''}
+      ${!locked && !requestEditMode ? `<div class="multiadd-adder">
         <select class="multiadd-select" id="multiadd-select-${item.id}">
           <option value="">Select…</option>
           ${variantOptions}
