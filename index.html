@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v19 - stable threshold for history -->
+<!-- Grocery Shopper v20 - alphabetical variant insertion -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1381,9 +1381,11 @@ function applyCatalogAdditions() {
       const parent = catDef.items.find(i => i.id === addition.variantParentId);
       if (!parent || !parent.variants) return;
       if (parent.variants.includes(addition.variantText)) return;
-      const otherIdx = parent.variants.indexOf('Other');
-      const insertAt = otherIdx >= 0 ? otherIdx : parent.variants.length;
-      parent.variants.splice(insertAt, 0, addition.variantText);
+      const otherIdx  = parent.variants.indexOf('Other');
+      const nonOther  = otherIdx >= 0 ? parent.variants.slice(0, otherIdx) : parent.variants.slice();
+      const insertAt  = nonOther.findIndex(v => v.localeCompare(addition.variantText) > 0);
+      const finalIdx  = insertAt >= 0 ? insertAt : (otherIdx >= 0 ? otherIdx : parent.variants.length);
+      parent.variants.splice(finalIdx, 0, addition.variantText);
     } else {
       // Add a new standalone item
       const item = addition.item;
@@ -3525,10 +3527,12 @@ function confirmPromote() {
     const catDef = CATALOG.find(c => c.id === catId);
     const parent = catDef?.items.find(i => i.id === item.parentItemId);
     if (parent && parent.variants) {
-      // Insert before 'Other', keeping alphabetical order
+      // Insert alphabetically, always before 'Other'
       const otherIdx = parent.variants.indexOf('Other');
-      const insertAt = otherIdx >= 0 ? otherIdx : parent.variants.length;
-      parent.variants.splice(insertAt, 0, item.text);
+      const nonOther = otherIdx >= 0 ? parent.variants.slice(0, otherIdx) : parent.variants.slice();
+      const insertAt = nonOther.findIndex(v => v.localeCompare(item.text) > 0);
+      const finalIdx = insertAt >= 0 ? insertAt : (otherIdx >= 0 ? otherIdx : parent.variants.length);
+      parent.variants.splice(finalIdx, 0, item.text);
       // Persist the variant addition so it survives reload
       state.catalogAdditions = state.catalogAdditions || [];
       if (!state.catalogAdditions.some(a => a.variantParentId === item.parentItemId && a.variantText === item.text)) {
