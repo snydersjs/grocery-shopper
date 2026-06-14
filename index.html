@@ -2503,7 +2503,7 @@ function renderMultiAddItem(item, locked) {
         <button class="multiadd-btn" onclick="addVariant('${item.id}')">Add</button>
       </div>` : ''}
     </div>
-    ${activeVariants.length ? `<div class="multiadd-added-variants">${variantRows}</div>` : ''}
+    ${(requestEditMode ? editVariants.length : activeVariants.length) ? `<div class="multiadd-added-variants">${variantRows}</div>` : ''}
   </div>`;
 }
 
