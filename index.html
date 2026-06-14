@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v16 - tomatoes variant order -->
+<!-- Grocery Shopper v18 - potatoes, tea, vitamins display -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1288,7 +1288,7 @@ const CATALOG = [
     { id:'garlic',      name:'Garlic',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'greens',      name:'Lettuce',    type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Micro Greens','Protein Greens','Super Greens','Other'] },
     { id:'onion',       name:'Onion',      type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Red','Shallot','Yellow','Other'] },
-    { id:'potatoes',    name:'Potatoes',   type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Baby','Baking','Fingerling','Sweet','Other'] },
+    { id:'potatoes',    name:'Potatoes',   type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Baby','Fingerling','Russet','Sweet','Yellow','Other'] },
     { id:'tomatoes',    name:'Tomatoes',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'veggie_tray', name:'Veggie Tray',type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'zucchini',    name:'Zucchini',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
@@ -1331,7 +1331,7 @@ const CATALOG = [
     { id:'popcorn',         name:'Popcorn',         type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.3, variants:['Bag','Microwave','Other'] },
     { id:'pretzels',        name:'Pretzels',        type:'simple',   shopGroup:'Pantry',               shopOrder:10.3 },
     { id:'sparkling_water', name:'Sparkling Water', type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.4, variants:['Sanzo','Spindrift','Waterloo','Other'] },
-    { id:'tea',             name:'Tea',             type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.4, variants:['Blackberry','Detox','Lemon Ginger','Mandarin','Other'] },
+    { id:'tea',             name:'Tea',             type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.2, variants:['Blackberry','Detox','Lemon Ginger','Mandarin','Other'] },
   ]},
   { id:'meat', label:'Raw Meat & Seafood Counter', items:[
     { id:'bacon',    name:'Bacon',   type:'simple',   shopGroup:'Raw Meat & Seafood Counter', shopOrder:30 },
@@ -1372,16 +1372,29 @@ const CATALOG = [
 // Dinner menu seed data (pre-populates if Firestore dinnerMenu is empty)
 // Re-apply any runtime catalog additions stored in state
 function applyCatalogAdditions() {
-  (state.catalogAdditions || []).forEach(({catId, item}) => {
-    const catDef = CATALOG.find(c => c.id === catId);
+  (state.catalogAdditions || []).forEach(addition => {
+    const catDef = CATALOG.find(c => c.id === addition.catId);
     if (!catDef) return;
-    // Only add if not already present
-    if (catDef.items.some(i => i.id === item.id)) return;
-    const insertIdx = catDef.items.findIndex(i =>
-      i.type !== 'freeformOnly' && i.type !== 'freeform' && i.name.localeCompare(item.name) > 0
-    );
-    if (insertIdx >= 0) catDef.items.splice(insertIdx, 0, item);
-    else catDef.items.push(item);
+
+    if (addition.type === 'variant') {
+      // Add a variant to an existing multiAdd item
+      const parent = catDef.items.find(i => i.id === addition.variantParentId);
+      if (!parent || !parent.variants) return;
+      if (parent.variants.includes(addition.variantText)) return;
+      const otherIdx = parent.variants.indexOf('Other');
+      const insertAt = otherIdx >= 0 ? otherIdx : parent.variants.length;
+      parent.variants.splice(insertAt, 0, addition.variantText);
+    } else {
+      // Add a new standalone item
+      const item = addition.item;
+      if (!item) return;
+      if (catDef.items.some(i => i.id === item.id)) return;
+      const insertIdx = catDef.items.findIndex(i =>
+        i.type !== 'freeformOnly' && i.type !== 'freeform' && i.name.localeCompare(item.name) > 0
+      );
+      if (insertIdx >= 0) catDef.items.splice(insertIdx, 0, item);
+      else catDef.items.push(item);
+    }
   });
 }
 
@@ -2129,7 +2142,12 @@ function reconcileCustomItems() {
   Object.keys(state.items).forEach(key => {
     if (!key.includes(':Other:')) return;
     const label = state.notes['__label_' + key];
-    if (label) upsertCustomItem(label, key.split(':')[0], 'multiadd-other', key.split(':')[0]);
+    if (label) {
+      const _itemId  = key.split(':')[0];
+      const _catDef  = CATALOG.find(c => c.items.some(i => i.id === _itemId));
+      const _catId   = _catDef?.id || _itemId;
+      upsertCustomItem(label, _catId, 'multiadd-other', _itemId);
+    }
   });
 }
 
@@ -2658,16 +2676,20 @@ function buildShopItems() {
   Object.entries(state.freeform).forEach(([ffKey, entries]) => {
     (entries || []).forEach(e => {
       if (!e.text) return;
-      const catId  = ffKey.split('_')[0];
+      const parts  = ffKey.split('_');
+      const catId  = parts[0];
+      const itemId = parts.slice(1).join('_');
       const catDef = CATALOG.find(c => c.id === catId);
-      // Use the most representative shopGroup/order for the category
-      // (pick the first non-freeformOnly item's values as a proxy)
-      const refItem = catDef?.items.find(i => i.type === 'simple' || i.type === 'multiAdd');
+      // For named freeform items (e.g. Vitamins, Lunches), prefix with item name
+      const namedItem = itemId ? catDef?.items.find(i => i.id === itemId && (i.type === 'freeform' || i.type === 'freeformOnly')) : null;
+      const displayName = namedItem ? `${namedItem.name} - ${e.text}` : e.text;
+      // Use shopGroup/shopOrder from the named item if available, else category proxy
+      const refItem   = namedItem || catDef?.items.find(i => i.type === 'simple' || i.type === 'multiAdd');
       const shopGroup = refItem?.shopGroup || catDef?.items[0]?.shopGroup || 'Misc';
       const shopOrder = refItem?.shopOrder ?? catDef?.items[0]?.shopOrder ?? 99;
       shopItems.push({
         key:        'ff:' + ffKey + ':' + e.id,
-        name:       e.text,
+        name:       displayName,
         qty:        e.qty || 1,
         shopGroup,
         shopOrder,
@@ -3492,7 +3514,7 @@ function confirmPromote() {
 
   if (isMultiAddOther) {
     // Add variant to the parent item's CATALOG entry at runtime
-    const catId  = item.sourceKey?.split('_')[0];
+    const catId  = item.sourceKey;
     const catDef = CATALOG.find(c => c.id === catId);
     const parent = catDef?.items.find(i => i.id === item.parentItemId);
     if (parent && parent.variants) {
@@ -3500,6 +3522,17 @@ function confirmPromote() {
       const otherIdx = parent.variants.indexOf('Other');
       const insertAt = otherIdx >= 0 ? otherIdx : parent.variants.length;
       parent.variants.splice(insertAt, 0, item.text);
+      // Persist the variant addition so it survives reload
+      state.catalogAdditions = state.catalogAdditions || [];
+      if (!state.catalogAdditions.some(a => a.variantParentId === item.parentItemId && a.variantText === item.text)) {
+        state.catalogAdditions.push({
+          type: 'variant',
+          catId,
+          variantParentId: item.parentItemId,
+          variantText:     item.text,
+        });
+        state.catalogAdditionsAt = Date.now();
+      }
     }
   } else {
     // Add as a simple item to the chosen category at runtime
