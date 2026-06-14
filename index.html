@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v18 - potatoes, tea, vitamins display -->
+<!-- Grocery Shopper v19 - stable threshold for history -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2124,25 +2124,32 @@ function upsertCustomItem(text, sourceKey, sourceType, parentItemId = null) {
  * being triggered on every keystroke.
  */
 function reconcileCustomItems() {
+  // Only commit entries stable for at least 3 seconds — prevents partial
+  // words from mid-typing debounce saves ending up in History
+  const stableThreshold = Date.now() - 3000;
+
   // Catalog freeform items (type:freeform, freeformOnly) and category-level Other
   CATALOG.forEach(cat => {
     // Named freeform items
     cat.items.filter(i => i.type === 'freeform' || i.type === 'freeformOnly').forEach(item => {
       const ffKey = cat.id + '_' + item.id;
       getFreeformEntries(ffKey).forEach(e => {
-        if (e.text) upsertCustomItem(e.text, ffKey, 'item-freeform');
+        if (e.text && (e.updatedAt || 0) < stableThreshold)
+          upsertCustomItem(e.text, ffKey, 'item-freeform');
       });
     });
     // Category-level Other
     getFreeformEntries(cat.id).forEach(e => {
-      if (e.text) upsertCustomItem(e.text, cat.id, 'category-other');
+      if (e.text && (e.updatedAt || 0) < stableThreshold)
+        upsertCustomItem(e.text, cat.id, 'category-other');
     });
   });
   // MultiAdd Other labels
   Object.keys(state.items).forEach(key => {
     if (!key.includes(':Other:')) return;
-    const label = state.notes['__label_' + key];
-    if (label) {
+    const label      = state.notes['__label_' + key];
+    const updatedAt  = state.items[key]?.updatedAt || 0;
+    if (label && updatedAt < stableThreshold) {
       const _itemId  = key.split(':')[0];
       const _catDef  = CATALOG.find(c => c.items.some(i => i.id === _itemId));
       const _catId   = _catDef?.id || _itemId;
