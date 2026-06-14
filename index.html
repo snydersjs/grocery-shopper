@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v21 - request tab edit mode -->
+<!-- Grocery Shopper v22 - edit mode diagnostic -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2332,6 +2332,7 @@ let pendingCatalogDelete = null;
 
 function toggleRequestEdit() {
   requestEditMode = !requestEditMode;
+  console.log('[EDIT] requestEditMode is now:', requestEditMode, 'openCats size:', openCats.size);
   const btn = document.getElementById('req-edit-btn');
   if (btn) {
     btn.textContent = requestEditMode ? 'Done' : 'Edit';
@@ -2340,7 +2341,9 @@ function toggleRequestEdit() {
   // Auto-expand all categories in edit mode so variants are visible
   if (requestEditMode) CATALOG.forEach(c => openCats.add(c.id));
   else openCats.clear();
+  console.log('[EDIT] openCats size after expand:', openCats.size);
   renderRequest();
+  console.log('[EDIT] renderRequest done. Check for req-delete-btn:', document.querySelectorAll('.req-delete-btn').length);
 }
 window.toggleRequestEdit = toggleRequestEdit;
 
