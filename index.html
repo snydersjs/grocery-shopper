@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v22 - edit mode diagnostic -->
+<!-- Grocery Shopper v23 - fix null key in edit variants -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2332,18 +2332,14 @@ let pendingCatalogDelete = null;
 
 function toggleRequestEdit() {
   requestEditMode = !requestEditMode;
-  console.log('[EDIT] requestEditMode is now:', requestEditMode, 'openCats size:', openCats.size);
   const btn = document.getElementById('req-edit-btn');
   if (btn) {
     btn.textContent = requestEditMode ? 'Done' : 'Edit';
     btn.classList.toggle('edit-active', requestEditMode);
   }
-  // Auto-expand all categories in edit mode so variants are visible
   if (requestEditMode) CATALOG.forEach(c => openCats.add(c.id));
   else openCats.clear();
-  console.log('[EDIT] openCats size after expand:', openCats.size);
   renderRequest();
-  console.log('[EDIT] renderRequest done. Check for req-delete-btn:', document.querySelectorAll('.req-delete-btn').length);
 }
 window.toggleRequestEdit = toggleRequestEdit;
 
@@ -2473,7 +2469,7 @@ function renderMultiAddItem(item, locked) {
 
   let variantRows = '';
   displayVariants.forEach(({key, isOther, label, qty}) => {
-    const safeKey = key.replace(/[^a-z0-9_]/gi, '_');
+    const safeKey = key ? key.replace(/[^a-z0-9_]/gi, '_') : (item.id + '_' + (label || '').replace(/[^a-z0-9_]/gi, '_'));
     variantRows += `<div class="variant-row" id="vrow-${safeKey}">
       ${isOther
         ? `<input class="variant-label custom-input" placeholder="Describe item…"
