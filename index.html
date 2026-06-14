@@ -2337,6 +2337,9 @@ function toggleRequestEdit() {
     btn.textContent = requestEditMode ? 'Done' : 'Edit';
     btn.classList.toggle('edit-active', requestEditMode);
   }
+  // Auto-expand all categories in edit mode so variants are visible
+  if (requestEditMode) CATALOG.forEach(c => openCats.add(c.id));
+  else openCats.clear();
   renderRequest();
 }
 window.toggleRequestEdit = toggleRequestEdit;
