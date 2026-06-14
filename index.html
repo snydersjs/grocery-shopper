@@ -2448,17 +2448,25 @@ function renderMultiAddItem(item, locked) {
       const variantPart = k.slice(prefix.length);
       const isOther     = variantPart.startsWith('Other:');
       const label       = isOther
-        ? (state.notes['__label_' + k] || '')   // stored label for Other variants
+        ? (state.notes['__label_' + k] || '')
         : variantPart;
       return { key: k, isOther, label, qty: v.qty };
     });
 
-  const variantOptions = item.variants.map(v =>
-    `<option value="${escAttr(v)}">${escHtml(v)}</option>`
-  ).join('');
+  // In edit mode, show all catalog variants (not just active ones)
+  const editVariants = requestEditMode && item.variants
+    ? item.variants.filter(v => v !== 'Other').map(v => ({ key: null, isOther: false, label: v, qty: 0 }))
+    : [];
+
+  const variantOptions = item.variants
+    ? item.variants.map(v => `<option value="${escAttr(v)}">${escHtml(v)}</option>`).join('')
+    : '';
+
+  // In edit mode, show catalog variants; otherwise show active variants
+  const displayVariants = requestEditMode ? editVariants : activeVariants;
 
   let variantRows = '';
-  activeVariants.forEach(({key, isOther, label, qty}) => {
+  displayVariants.forEach(({key, isOther, label, qty}) => {
     const safeKey = key.replace(/[^a-z0-9_]/gi, '_');
     variantRows += `<div class="variant-row" id="vrow-${safeKey}">
       ${isOther
@@ -2471,18 +2479,20 @@ function renderMultiAddItem(item, locked) {
         : `<span class="variant-label">${escHtml(label)}</span>`}
       ${requestEditMode && !isOther
         ? `<button class="req-delete-btn" onclick="openCatalogDeleteDialog('${escAttr(item.id)}', '${escAttr(label)}')">×</button>`
-        : `<div class="qty-selector">
+        : (!requestEditMode ? `<div class="qty-selector">
             ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', -1)">−</button>` : ''}
             <span class="qty-display" id="qty-${safeKey}">${qty}</span>
             ${!locked ? `<button class="qty-btn" onclick="adjustQty('${escAttr(key)}', 1)">+</button>` : ''}
-          </div>`}
+          </div>` : '')}
     </div>`;
   });
 
   return `<div class="multiadd-row${activeVariants.length ? ' has-variants' : ''}" id="multiadd-${item.id}">
     <div class="multiadd-controls">
       <span class="multiadd-name">${escHtml(item.name)}</span>
-      ${requestEditMode ? `<button class="req-delete-btn" style="margin-left:4px" onclick="openCatalogDeleteDialog('${escAttr(item.id)}')">×</button>` : ''}
+      ${requestEditMode && (!item.variants || item.variants.filter(v => v !== 'Other').length === 0)
+        ? `<button class="req-delete-btn" style="margin-left:4px" onclick="openCatalogDeleteDialog('${escAttr(item.id)}')">×</button>`
+        : ''}
       ${!locked && !requestEditMode ? `<div class="multiadd-adder">
         <select class="multiadd-select" id="multiadd-select-${item.id}">
           <option value="">Select…</option>
