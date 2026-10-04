@@ -1,6 +1,7 @@
 <!DOCTYPE html>
+<!-- Grocery Shopper v24 - soups category -->
 <!-- Grocery Shopper v23 - fix null key in edit variants -->
-<html lang="en">
+<html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -29,12 +30,15 @@
     --cart-text:    #9ab89a;
     --shadow:       0 1px 4px rgba(46,125,50,0.08);
   }
-  body {
+  html, body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Lato', sans-serif;
     font-size: 15px;
     min-height: 100vh;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
   }
 
   /* ─── Sync status pill ───────────────────────────────── */
@@ -163,7 +167,7 @@
   .spacer { flex: 1; }
 
   /* ─── Tab panels ─────────────────────────────────────── */
-  .tab-panel { display: none; padding: 0 0 80px; }
+  .tab-panel { display: none; padding: 0 0 80px; overflow-x: hidden; }
   .tab-panel.active { display: block; }
 
   /* locked-banner removed — lock state shown in header pill */
@@ -853,7 +857,7 @@
     border-bottom: 1px solid var(--border-light);
   }
   .takeout-item-row:last-child { border-bottom: none; }
-  .takeout-name { flex: 1; font-size: 14px; min-width: 0; }
+  .takeout-name { flex: 1; font-size: 14px; min-width: 0; overflow: hidden; }
   .takeout-name input {
     width: 100%;
     border: 1px solid var(--accent-border);
@@ -1499,7 +1503,7 @@ const DINNER_MENU_SEED = [
   {name:'Steak Salad',category:'Meat'},
   {name:'BBQ Pork Nachos',category:'Pork'},
   {name:'Breakfast for Dinner',category:'Pork'},
-  {name:'Escarole, White Bean and Sausage Soup',category:'Pork'},
+  {name:'Escarole, White Bean and Sausage Soup',category:'Soups'},
   {name:'Gnocchi with Pancetta',category:'Pork'},
   {name:'Pork chops',category:'Pork'},
   {name:'Pulled Pork Sandwiches',category:'Pork'},
@@ -1511,15 +1515,15 @@ const DINNER_MENU_SEED = [
   {name:'Grilled Chicken',category:'Poultry'},
   {name:'Turkey Kofta',category:'Poultry'},
   {name:'Thai Coconut Curry Noodles',category:'Uncategorized'},
-  {name:'Creamy Vegetable Soup',category:'Vegetarian'},
+  {name:'Creamy Vegetable Soup',category:'Soups'},
   {name:'Fried Halloumi',category:'Vegetarian'},
   {name:'Grilled Cheese',category:'Vegetarian'},
-  {name:'Minestrone',category:'Vegetarian'},
+  {name:'Minestrone',category:'Soups'},
   {name:'Southwest Falafel',category:'Vegetarian'},
-  {name:'Tuscan White Bean Soup',category:'Vegetarian'},
+  {name:'Tuscan White Bean Soup',category:'Soups'},
 ];
 
-const DINNER_CATEGORIES = ['Fish','Meat','Pork','Poultry','Vegetarian','Uncategorized'];
+const DINNER_CATEGORIES = ['Fish','Meat','Pork','Poultry','Soups','Vegetarian','Uncategorized'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATE
@@ -1557,7 +1561,8 @@ function defaultState() {
 
     // This week's dinners: [{ id, name, done }]
     thisWeek:     [],
-    thisWeekAt:   0,   // timestamp of last thisWeek mutation
+    thisWeekAt:   0,
+    dinnerNotes:  {},  // id → note text   // timestamp of last thisWeek mutation
 
     // Permanent dinner menu: name → { category }
     dinnerMenu:   {},
@@ -1697,7 +1702,23 @@ async function loadFromCloud() {
           seeded = true;
         }
       });
-      if (seeded) {
+
+      // Migrate soups to new Soups category (one-time reclassification)
+      const SOUPS_MIGRATION = {
+        'Escarole, White Bean and Sausage Soup': 'Pork',
+        'Creamy Vegetable Soup': 'Vegetarian',
+        'Minestrone': 'Vegetarian',
+        'Tuscan White Bean Soup': 'Vegetarian',
+      };
+      let soupsMigrated = false;
+      Object.entries(SOUPS_MIGRATION).forEach(([name, oldCat]) => {
+        if (state.dinnerMenu[name] && state.dinnerMenu[name].category === oldCat) {
+          state.dinnerMenu[name].category = 'Soups';
+          soupsMigrated = true;
+        }
+      });
+
+      if (seeded || soupsMigrated) {
         state.dinnerMenuAt = Date.now();
         saveResetToCloud();
       }
@@ -1807,7 +1828,10 @@ function mergeStates(local, cloud) {
     // No local mutations this session — always use cloud
     merged.thisWeek = cloud.thisWeek || local.thisWeek || [];
   }
-  merged.thisWeekAt = Math.max(localThisWeekAt, cloudThisWeekAt);
+  merged.thisWeekAt  = Math.max(localThisWeekAt, cloudThisWeekAt);
+  // dinnerNotes follows thisWeek timestamp
+  merged.dinnerNotes = localThisWeekAt >= cloudThisWeekAt
+    ? (local.dinnerNotes || {}) : (cloud.dinnerNotes || {});
 
   // dinnerMenu: same logic
   const localMenuAt = local.dinnerMenuAt || 0;
@@ -2097,6 +2121,7 @@ function doneShopping() {
   state.deletedAt    = {};
   state.locked       = false;
   state.lockedAt     = Date.now();
+  state.dinnerNotes  = {};
   state.shoppingDate   = '';
   state.shoppingDateAt = Date.now();
 
@@ -3049,13 +3074,47 @@ function renderThisWeek() {
 }
 
 function renderThisWeekRow(d, isDone) {
-  return `<div class="dinner-row">
+  const note    = (state.dinnerNotes || {})[d.id] || '';
+  const hasNote = !!note;
+  const noteId  = 'dinner-note-' + d.id;
+  return `<div class="dinner-row" style="flex-wrap:wrap;">
     <button class="dinner-check-btn${isDone ? ' done' : ''}"
       onclick="toggleDinnerDone('${d.id}')">✓</button>
-    <span class="dinner-name${isDone ? ' done' : ''}">${escHtml(d.name)}</span>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span class="dinner-name${isDone ? ' done' : ''}">${escHtml(d.name)}</span>
+        ${hasNote
+          ? `<button class="shop-note-tag" onclick="toggleDinnerNote('${d.id}')">${escHtml(note)}</button>`
+          : `<button class="shop-add-note-btn" onclick="toggleDinnerNote('${d.id}')">+ note</button>`}
+      </div>
+      <input class="shop-note-input" id="${noteId}"
+        value="${escAttr(note)}"
+        placeholder="Add note…"
+        onchange="saveDinnerNote('${d.id}', this.value)"
+        onblur="saveDinnerNote('${d.id}', this.value)">
+    </div>
     <button class="dinner-delete-btn" onclick="deleteThisWeekDinner('${d.id}')">×</button>
   </div>`;
 }
+
+function toggleDinnerNote(id) {
+  const noteEl = document.getElementById('dinner-note-' + id);
+  if (!noteEl) return;
+  const isOpen = noteEl.classList.toggle('open');
+  if (isOpen) { noteEl.focus(); noteEl.select(); }
+}
+window.toggleDinnerNote = toggleDinnerNote;
+
+function saveDinnerNote(id, text) {
+  state.dinnerNotes        = state.dinnerNotes || {};
+  const trimmed            = text.trim();
+  if (trimmed) state.dinnerNotes[id] = trimmed;
+  else delete state.dinnerNotes[id];
+  state.thisWeekAt         = Date.now();
+  scheduleSave();
+  renderThisWeek();
+}
+window.saveDinnerNote = saveDinnerNote;
 
 function addThisWeekDinner() {
   const input = document.getElementById('dinner-add-input');
