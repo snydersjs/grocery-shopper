@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v25 - soups migration fix, search bar position fix -->
+<!-- Grocery Shopper v26 - search bar sticky position fix -->
 <!-- Grocery Shopper v23 - fix null key in edit variants -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
@@ -2013,8 +2013,8 @@ function switchTab(tab) {
   // Collapse all categories when returning to the Request tab
   if (tab === 'request') openCats.clear();
   renderAll();
-  // Re-measure sticky offsets after layout (subtab bar height may not be available yet)
-  requestAnimationFrame(renderHeader);
+  // Re-measure sticky offsets after two frames (subtab bar needs layout pass before offsetHeight is valid)
+  requestAnimationFrame(() => requestAnimationFrame(renderHeader));
 }
 window.switchTab = switchTab;
 
@@ -2026,7 +2026,7 @@ function switchDinnerSub(sub) {
   document.getElementById('dinner-takeout').classList.toggle('hidden', sub !== 'takeout');
   renderDinners();
   // Update toolbar sticky positions after render (menu/takeout toolbar may have just appeared)
-  requestAnimationFrame(renderHeader);
+  requestAnimationFrame(() => requestAnimationFrame(renderHeader));
 }
 window.switchDinnerSub = switchDinnerSub;
 
@@ -2308,7 +2308,8 @@ function renderHeader() {
   }
 
   // Menu/takeout toolbars — sticky below subtab bar
-  const subtabHeight = subtabBar && activeTab === 'dinners' ? subtabBar.offsetHeight : 0;
+  // getBoundingClientRect forces a reflow so we get the real height even on the first frame
+  const subtabHeight = subtabBar && activeTab === 'dinners' ? subtabBar.getBoundingClientRect().height : 0;
   const menuToolbar = document.getElementById('menu-toolbar');
   if (menuToolbar) menuToolbar.style.top = (stickyBase + subtabHeight) + 'px';
   const takeoutToolbarSearch = document.querySelector('#dinner-takeout .menu-toolbar');
