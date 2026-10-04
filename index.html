@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v27 - search bar sticky fix on initial load -->
+<!-- Grocery Shopper v28 - subtab bar inside sticky-chrome, proper search bar anchor -->
 <!-- Grocery Shopper v23 - fix null key in edit variants -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
@@ -172,10 +172,8 @@
 
   /* locked-banner removed — lock state shown in header pill */
 
-  /* ─── Request toolbar (sticky below tabs) ───────────────── */
+  /* ─── Request toolbar (inside sticky-chrome, not independently sticky) ── */
   .request-toolbar {
-    position: sticky;
-    top: 0;
     z-index: 90;
     background: var(--bg);
     padding: 8px 16px 6px;
@@ -615,8 +613,6 @@
   .dinner-subtab-bar {
     display: flex;
     gap: 6px;
-    position: sticky;
-    top: 0;
     z-index: 89;
     background: var(--bg);
     padding: 8px 16px;
@@ -1141,16 +1137,14 @@
   <button class="tab-btn" data-tab="shopping" onclick="switchTab('shopping')">Shopping</button>
   <button class="tab-btn" data-tab="dinners" onclick="switchTab('dinners')">Dinners</button>
 </div>
-</div><!-- end sticky-chrome -->
-
-<!-- ═══ DINNER SUB-TAB BAR (sticky, shown only on dinners tab) ══════════ -->
+<!-- ═══ DINNER SUB-TAB BAR (sticky, inside sticky-chrome) ══════════════ -->
 <div class="dinner-subtab-bar" id="dinner-subtab-bar" style="display:none;">
   <button class="dinner-subtab-btn active" data-sub="this-week" onclick="switchDinnerSub('this-week')">This Week</button>
   <button class="dinner-subtab-btn" data-sub="menu" onclick="switchDinnerSub('menu')">Menu</button>
   <button class="dinner-subtab-btn" data-sub="takeout" onclick="switchDinnerSub('takeout')">Takeout</button>
 </div>
 
-<!-- ═══ REQUEST TOOLBAR (sticky) ════════════════════════════════════════ -->
+<!-- ═══ REQUEST TOOLBAR (sticky, inside sticky-chrome) ══════════════════ -->
 <div class="request-toolbar" id="request-toolbar">
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
@@ -1162,6 +1156,7 @@
   <button class="toolbar-btn lock" id="lock-btn" onclick="confirmLockList()">Lock</button>
   <button class="toolbar-btn" id="req-edit-btn" onclick="toggleRequestEdit()">Edit</button>
 </div>
+</div><!-- end sticky-chrome -->
 
 <!-- ═══ REQUEST TAB ═══════════════════════════════════════════════════════ -->
 <div id="tab-request" class="tab-panel active">
@@ -2286,38 +2281,23 @@ function renderHeader() {
   const lockBtn = document.getElementById('lock-btn');
   if (lockBtn) lockBtn.classList.toggle('hidden', !!state.locked);
 
-  // Measure sticky offset: header + tab-bar height
-  const headerEl = document.querySelector('header');
-  const tabBarEl = document.querySelector('.tab-bar');
-  const stickyBase = headerEl && tabBarEl
-    ? headerEl.offsetHeight + tabBarEl.offsetHeight
-    : 96;
-
-  // Request toolbar — only on request tab
+  // Request toolbar — only on request tab (inside sticky-chrome, no top calc needed)
   const toolbar = document.getElementById('request-toolbar');
-  if (toolbar) {
-    toolbar.style.display = activeTab === 'request' ? '' : 'none';
-    toolbar.style.top = stickyBase + 'px';
-  }
+  if (toolbar) toolbar.style.display = activeTab === 'request' ? '' : 'none';
 
-  // Dinner sub-tab bar — only on dinners tab
+  // Dinner sub-tab bar — only on dinners tab (inside sticky-chrome, no top calc needed)
   const subtabBar = document.getElementById('dinner-subtab-bar');
-  if (subtabBar) {
-    subtabBar.style.display = activeTab === 'dinners' ? 'flex' : 'none';
-    subtabBar.style.top = stickyBase + 'px';
-  }
+  if (subtabBar) subtabBar.style.display = activeTab === 'dinners' ? 'flex' : 'none';
 
-  // Menu/takeout toolbars — sticky below subtab bar
-  // Only set top when dinners tab is active and subtab bar has a real rendered height.
-  // If height is 0 (not yet painted), skip — the rAF calls in switchTab/switchDinnerSub will re-run.
-  if (activeTab === 'dinners' && subtabBar) {
-    const subtabHeight = subtabBar.getBoundingClientRect().height;
-    if (subtabHeight > 0) {
-      const menuToolbar = document.getElementById('menu-toolbar');
-      if (menuToolbar) menuToolbar.style.top = (stickyBase + subtabHeight) + 'px';
-      const takeoutToolbarSearch = document.querySelector('#dinner-takeout .menu-toolbar');
-      if (takeoutToolbarSearch) takeoutToolbarSearch.style.top = (stickyBase + subtabHeight) + 'px';
-    }
+  // Menu/takeout search toolbars — sticky below the entire sticky-chrome block
+  // Measure sticky-chrome's total height (includes header + tabs + subtab bar or request toolbar)
+  const stickyChrome = document.querySelector('.sticky-chrome');
+  const chromeHeight = stickyChrome ? stickyChrome.getBoundingClientRect().height : 0;
+  if (chromeHeight > 0) {
+    const menuToolbar = document.getElementById('menu-toolbar');
+    if (menuToolbar) menuToolbar.style.top = chromeHeight + 'px';
+    const takeoutToolbarSearch = document.querySelector('#dinner-takeout .menu-toolbar');
+    if (takeoutToolbarSearch) takeoutToolbarSearch.style.top = chromeHeight + 'px';
   }
 }
 
