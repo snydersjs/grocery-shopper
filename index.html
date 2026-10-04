@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v28 - subtab bar inside sticky-chrome, proper search bar anchor -->
+<!-- Grocery Shopper v29 - ResizeObserver on sticky-chrome fixes search bar anchor -->
 <!-- Grocery Shopper v23 - fix null key in edit variants -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
@@ -729,7 +729,7 @@
     align-items: center;
     gap: 6px;
     position: sticky;
-    top: 0;
+    top: 0; /* JS overrides this via renderHeader() */
     z-index: 88;
     background: var(--bg);
     padding: 8px 16px;
@@ -2293,12 +2293,11 @@ function renderHeader() {
   // Measure sticky-chrome's total height (includes header + tabs + subtab bar or request toolbar)
   const stickyChrome = document.querySelector('.sticky-chrome');
   const chromeHeight = stickyChrome ? stickyChrome.getBoundingClientRect().height : 0;
-  if (chromeHeight > 0) {
-    const menuToolbar = document.getElementById('menu-toolbar');
-    if (menuToolbar) menuToolbar.style.top = chromeHeight + 'px';
-    const takeoutToolbarSearch = document.querySelector('#dinner-takeout .menu-toolbar');
-    if (takeoutToolbarSearch) takeoutToolbarSearch.style.top = chromeHeight + 'px';
-  }
+  // Always set top (even if 0) so JS value overrides any CSS default
+  const menuToolbar = document.getElementById('menu-toolbar');
+  if (menuToolbar) menuToolbar.style.top = chromeHeight + 'px';
+  const takeoutToolbarSearch = document.querySelector('#dinner-takeout .menu-toolbar');
+  if (takeoutToolbarSearch) takeoutToolbarSearch.style.top = chromeHeight + 'px';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3828,8 +3827,16 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 // BOOT
 // ─────────────────────────────────────────────────────────────────────────────
 loadFromCloud();
-// After first paint, re-measure sticky positions (subtab bar may not have height yet on initial renderAll)
+// After first paint, re-measure sticky positions
 requestAnimationFrame(() => requestAnimationFrame(renderHeader));
+// ResizeObserver: re-run renderHeader whenever sticky-chrome changes height
+// (covers subtab bar appearing/disappearing, font load, etc.)
+const _stickyChrome = document.querySelector('.sticky-chrome');
+if (_stickyChrome && typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(() => {
+    requestAnimationFrame(renderHeader);
+  }).observe(_stickyChrome);
+}
 
 </script>
 </body>
