@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v30 - revert to old sticky architecture (no sticky-chrome wrapper) -->
+<!-- Grocery Shopper v31 - header, tab-bar, request toolbar, dinner subtab bar all sticky -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -616,6 +616,12 @@
     display: flex;
     gap: 6px;
     margin-bottom: 14px;
+    position: sticky;
+    top: 0; /* JS sets this to header + tab-bar height */
+    z-index: 89;
+    background: var(--bg);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
   }
   .dinner-subtab-btn {
     flex: 1;
@@ -2276,14 +2282,18 @@ function renderHeader() {
     tabBarEl.style.top = headerEl.offsetHeight + 'px';
   }
 
+  const belowTabBar = headerEl && tabBarEl ? (headerEl.offsetHeight + tabBarEl.offsetHeight) + 'px' : '0px';
+
   // Request toolbar — only visible on request tab; sticky below header+tabbar
   const toolbar = document.getElementById('request-toolbar');
   if (toolbar) {
     toolbar.style.display = activeTab === 'request' ? '' : 'none';
-    if (headerEl && tabBarEl) {
-      toolbar.style.top = (headerEl.offsetHeight + tabBarEl.offsetHeight) + 'px';
-    }
+    toolbar.style.top = belowTabBar;
   }
+
+  // Dinner subtab bar — sticky below header+tabbar
+  const subtabBar = document.getElementById('dinner-subtab-bar');
+  if (subtabBar) subtabBar.style.top = belowTabBar;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
