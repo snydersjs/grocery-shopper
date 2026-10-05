@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v33 - fix request toolbar gap on non-request tabs -->
+<!-- Grocery Shopper v34 - fix dinner tab gap, fix Coleslaw position -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -1161,7 +1161,7 @@
 <!-- ═══ DINNERS TAB ═══════════════════════════════════════════════════════ -->
 <div id="tab-dinners" class="tab-panel">
   <!-- Dinner sub-tab bar lives inside the dinners panel (not sticky) -->
-  <div class="dinner-subtab-bar" id="dinner-subtab-bar" style="padding: 12px 16px 0;">
+  <div class="dinner-subtab-bar" id="dinner-subtab-bar">
     <button class="dinner-subtab-btn active" data-sub="this-week" onclick="switchDinnerSub('this-week')">This Week</button>
     <button class="dinner-subtab-btn" data-sub="menu" onclick="switchDinnerSub('menu')">Menu</button>
     <button class="dinner-subtab-btn" data-sub="takeout" onclick="switchDinnerSub('takeout')">Takeout</button>
@@ -1309,9 +1309,9 @@ const CATALOG = [
     { id:'broccoli',    name:'Broccoli',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'carrots',     name:'Carrots',    type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'celery',      name:'Celery',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'coleslaw',    name:'Coleslaw',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'cucumber',    name:'Cucumber',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'garlic',      name:'Garlic',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
-    { id:'coleslaw',    name:'Coleslaw',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'greens',      name:'Lettuce',    type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Butter','Micro Greens','Protein Greens','Super Greens','Other'] },
     { id:'onion',       name:'Onion',      type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Green','Red','Shallot','Yellow','Other'] },
     { id:'potatoes',    name:'Potatoes',   type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Baby','Fingerling','Russet','Sweet','Yellow','Yukon Gold','Other'] },
