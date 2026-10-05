@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v31 - header, tab-bar, request toolbar, dinner subtab bar all sticky -->
+<!-- Grocery Shopper v32 - catalog updates: condiments, beans, pasta, rice/grains, jams, veg, misc, refrigerated -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -1311,9 +1311,10 @@ const CATALOG = [
     { id:'celery',      name:'Celery',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'cucumber',    name:'Cucumber',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'garlic',      name:'Garlic',     type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
-    { id:'greens',      name:'Lettuce',    type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Micro Greens','Protein Greens','Super Greens','Other'] },
-    { id:'onion',       name:'Onion',      type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Red','Shallot','Yellow','Other'] },
-    { id:'potatoes',    name:'Potatoes',   type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Baby','Fingerling','Russet','Sweet','Yellow','Other'] },
+    { id:'coleslaw',    name:'Coleslaw',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
+    { id:'greens',      name:'Lettuce',    type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Butter','Micro Greens','Protein Greens','Super Greens','Other'] },
+    { id:'onion',       name:'Onion',      type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Green','Red','Shallot','Yellow','Other'] },
+    { id:'potatoes',    name:'Potatoes',   type:'multiAdd', shopGroup:'Fruit & Vegetables', shopOrder:20, variants:['Baby','Fingerling','Russet','Sweet','Yellow','Yukon Gold','Other'] },
     { id:'tomatoes',    name:'Tomatoes',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'veggie_tray', name:'Veggie Tray',type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
     { id:'zucchini',    name:'Zucchini',   type:'simple',   shopGroup:'Fruit & Vegetables', shopOrder:20 },
@@ -1328,24 +1329,26 @@ const CATALOG = [
     { id:'tortillas',      name:'Tortillas',       type:'simple',   shopGroup:'Refrigerated & Frozen',shopOrder:31 },
   ]},
   { id:'pantry', label:'Canned & Pantry', items:[
-    { id:'beans',            name:'Beans',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Baked','Black','Cannellini','Garbanzo','Navy','Pinto','Other'] },
+    { id:'beans',            name:'Beans',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Baked','Black','Cannellini','Garbanzo','Lupini','Navy','Pinto','Other'] },
     { id:'bread_crumbs',     name:'Bread Crumbs',      type:'multiAdd', shopGroup:'Pantry', shopOrder:10.2, variants:['Italian','Original','Panko','Other'] },
     { id:'broth',            name:'Broth',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Beef','Chicken','Vegetable','Other'] },
-    { id:'condiments',       name:'Condiments',        type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Cholula','Ketchup','Mayo','Salsa - Green','Salsa - Red','Other'] },
+    { id:'condiments',       name:'Condiments',        type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['BBQ Sauce','Cholula','Hoisin','Ketchup','Mayo','Mustard','Peanut Sauce','Salsa - Green','Salsa - Red','Other'] },
     { id:'flour',            name:'Flour',             type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
     { id:'granola',          name:'Granola',           type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
+    { id:'green_chiles',     name:'Green Chiles',      type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
     { id:'juice',            name:'Juice',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.4, variants:['Apple','Lemon','Lime','Orange','Other'] },
+    { id:'jams',             name:'Jams',              type:'multiAdd', shopGroup:'Pantry', shopOrder:10.2, variants:['Fig','Mixed Berry','Strawberry','Other'] },
     { id:'mac_cheese',       name:'Mac & Cheese',      type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
     { id:'minced_ginger',    name:'Minced Ginger',     type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
     { id:'oatmeal',          name:'Oatmeal',           type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
     { id:'oil',              name:'Oil',               type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Avocado','Canola','Olive','Other'] },
-    { id:'pasta',            name:'Pasta',             type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
+    { id:'pasta',            name:'Pasta',             type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Egg','Fusilli','Penne','Rice Noodles','Spaghetti','Other'] },
     { id:'peanut_butter',    name:'Peanut Butter',     type:'simple',   shopGroup:'Pantry', shopOrder:10.2 },
-    { id:'quinoa',           name:'Quinoa',            type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
-    { id:'rice',             name:'Rice',              type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Basmati','Sushi','Other'] },
+    { id:'rice',             name:'Rice & Grains',     type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Barley','Basmati','Quinoa','Sushi','Other'] },
     { id:'salad_dressing',   name:'Salad Dressing',    type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Balsamic','Oil & Vinegar','Other'] },
     { id:'spices',           name:'Spices',            type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Basil','Cinnamon','Cumin','Oregano','Pepper','Salt','Other'] },
     { id:'canned_tomatoes',  name:'Tomatoes (Canned)', type:'multiAdd', shopGroup:'Pantry', shopOrder:10.1, variants:['Diced','Fire Roasted','Sun-Dried','Other'] },
+    { id:'tomato_sauce',     name:'Tomato Sauce',      type:'simple',   shopGroup:'Pantry', shopOrder:10.1 },
   ]},
   { id:'snacks', label:'Snacks & Beverages', items:[
     { id:'potato_chips',    name:'Chips',           type:'multiAdd', shopGroup:'Pantry',               shopOrder:10.3, variants:['Cheddar','Salt & Pepper','Sea Salt','Sour Cream & Onion','Tortilla','Other'] },
@@ -1377,6 +1380,7 @@ const CATALOG = [
     { id:'frozen_tots',             name:'Frozen Tots',              type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'frozen_vegetables',       name:'Frozen Vegetables',        type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Corn','Peas','Other'] },
     { id:'frozen_waffles',          name:'Frozen Waffles',           type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
+    { id:'gnocchi',                 name:'Gnocchi',                  type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31 },
     { id:'hummus',                  name:'Hummus',                   type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Plain','Green Chili','Tahini','Red Pepper','Other'] },
     { id:'oat_milk',                name:'Oat Milk',                 type:'simple',      shopGroup:'Refrigerated & Frozen', shopOrder:31.1 },
     { id:'pizza',                   name:'Pizza',                    type:'multiAdd',    shopGroup:'Refrigerated & Frozen', shopOrder:31, variants:['Frozen','Refrigerated','Dough','Other'] },
@@ -1386,9 +1390,12 @@ const CATALOG = [
     { id:'lunches',                 name:'Lunches',                  type:'freeformOnly',shopGroup:'Refrigerated & Frozen', shopOrder:31 },
   ]},
   { id:'misc', label:'Misc', items:[
+    { id:'conditioner',         name:'Conditioner',         type:'simple',  shopGroup:'Misc', shopOrder:5 },
+    { id:'dental_floss',        name:'Dental Floss',        type:'simple',  shopGroup:'Misc', shopOrder:5 },
     { id:'dish_soap',           name:'Dish Soap',           type:'simple',  shopGroup:'Misc', shopOrder:5 },
     { id:'dishwasher_detergent',name:'Dishwasher Detergent',type:'simple',  shopGroup:'Misc', shopOrder:5 },
     { id:'hand_soap',           name:'Hand Soap',           type:'simple',  shopGroup:'Misc', shopOrder:5 },
+    { id:'shampoo',             name:'Shampoo',             type:'simple',  shopGroup:'Misc', shopOrder:5 },
     { id:'sunscreen',           name:'Sunscreen',           type:'simple',  shopGroup:'Misc', shopOrder:5 },
     { id:'vitamins',            name:'Vitamins',            type:'freeform',shopGroup:'Misc', shopOrder:5 },
   ]},
