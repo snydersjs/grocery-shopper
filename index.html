@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Grocery Shopper v35 - remove sticky from dinner subtab bar, fix gap -->
+<!-- Grocery Shopper v36 - fix multi-device data loss: strict timestamp comparisons, cart union merge -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -1765,11 +1765,11 @@ function mergeStates(local, cloud) {
   merged.lockedAt = Math.max(localLockedAt, cloudLockedAt);
   merged.tripHistory  = cloud.tripHistory  ?? local.tripHistory  ?? [];
 
-  // takeout: local wins if newer
+  // takeout: local wins only if it has been mutated AND is strictly newer than cloud
   const localTakeoutAt = local.takeoutAt || 0;
   const cloudTakeoutAt = cloud.takeoutAt || 0;
-  if (localTakeoutAt > 0) {
-    merged.takeout = localTakeoutAt >= cloudTakeoutAt ? (local.takeout || {}) : (cloud.takeout || {});
+  if (localTakeoutAt > 0 && localTakeoutAt > cloudTakeoutAt) {
+    merged.takeout = local.takeout || {};
   } else {
     merged.takeout = cloud.takeout || local.takeout || {};
   }
@@ -1783,59 +1783,57 @@ function mergeStates(local, cloud) {
     merged.takeoutAt = Date.now();
   }
 
-  // catalogDeletions: local wins if newer
+  // catalogDeletions: local wins only if mutated AND strictly newer than cloud
   const localCatDelAt = local.catalogDeletionsAt || 0;
   const cloudCatDelAt = cloud.catalogDeletionsAt || 0;
-  if (localCatDelAt > 0) {
-    merged.catalogDeletions = localCatDelAt >= cloudCatDelAt
-      ? (local.catalogDeletions || []) : (cloud.catalogDeletions || []);
+  if (localCatDelAt > 0 && localCatDelAt > cloudCatDelAt) {
+    merged.catalogDeletions = local.catalogDeletions || [];
   } else {
     merged.catalogDeletions = cloud.catalogDeletions || local.catalogDeletions || [];
   }
   merged.catalogDeletionsAt = Math.max(localCatDelAt, cloudCatDelAt);
 
-  // catalogAdditions: local wins if newer
+  // catalogAdditions: local wins only if mutated AND strictly newer than cloud
   const localCatAddAt = local.catalogAdditionsAt || 0;
   const cloudCatAddAt = cloud.catalogAdditionsAt || 0;
-  if (localCatAddAt > 0) {
-    merged.catalogAdditions = localCatAddAt >= cloudCatAddAt
-      ? (local.catalogAdditions || []) : (cloud.catalogAdditions || []);
+  if (localCatAddAt > 0 && localCatAddAt > cloudCatAddAt) {
+    merged.catalogAdditions = local.catalogAdditions || [];
   } else {
     merged.catalogAdditions = cloud.catalogAdditions || local.catalogAdditions || [];
   }
   merged.catalogAdditionsAt = Math.max(localCatAddAt, cloudCatAddAt);
 
-  // customItems: local wins if newer (edits/deletes must not be overwritten by cloud)
+  // customItems: local wins only if mutated AND strictly newer than cloud
   const localCustomAt = local.customItemsAt || 0;
   const cloudCustomAt = cloud.customItemsAt || 0;
-  if (localCustomAt > 0) {
-    merged.customItems = localCustomAt >= cloudCustomAt ? (local.customItems || []) : (cloud.customItems || []);
+  if (localCustomAt > 0 && localCustomAt > cloudCustomAt) {
+    merged.customItems = local.customItems || [];
   } else {
     merged.customItems = cloud.customItems || local.customItems || [];
   }
   merged.customItemsAt = Math.max(localCustomAt, cloudCustomAt);
 
-  // thisWeek: local wins only if it has been mutated this session (thisWeekAt > 0 locally)
-  // Otherwise cloud wins — this prevents an empty local session from overwriting cloud data.
+  // thisWeek: local wins only if mutated AND strictly newer than cloud
+  // Using strict > prevents a fresh session (thisWeekAt=0) from tying with and overwriting cloud.
   const localThisWeekAt = local.thisWeekAt || 0;
   const cloudThisWeekAt = cloud.thisWeekAt || 0;
-  if (localThisWeekAt > 0) {
-    // Local has been mutated — use whichever is newer
-    merged.thisWeek = localThisWeekAt >= cloudThisWeekAt ? (local.thisWeek || []) : (cloud.thisWeek || []);
+  if (localThisWeekAt > 0 && localThisWeekAt > cloudThisWeekAt) {
+    // Local has been mutated and is newer — local wins
+    merged.thisWeek = local.thisWeek || [];
   } else {
-    // No local mutations this session — always use cloud
+    // No local mutations, or cloud is newer — always use cloud
     merged.thisWeek = cloud.thisWeek || local.thisWeek || [];
   }
   merged.thisWeekAt  = Math.max(localThisWeekAt, cloudThisWeekAt);
   // dinnerNotes follows thisWeek timestamp
-  merged.dinnerNotes = localThisWeekAt >= cloudThisWeekAt
+  merged.dinnerNotes = (localThisWeekAt > 0 && localThisWeekAt > cloudThisWeekAt)
     ? (local.dinnerNotes || {}) : (cloud.dinnerNotes || {});
 
-  // dinnerMenu: same logic
+  // dinnerMenu: local wins only if mutated AND strictly newer than cloud
   const localMenuAt = local.dinnerMenuAt || 0;
   const cloudMenuAt = cloud.dinnerMenuAt || 0;
-  if (localMenuAt > 0) {
-    merged.dinnerMenu = localMenuAt >= cloudMenuAt ? (local.dinnerMenu || {}) : (cloud.dinnerMenu || {});
+  if (localMenuAt > 0 && localMenuAt > cloudMenuAt) {
+    merged.dinnerMenu = local.dinnerMenu || {};
   } else {
     merged.dinnerMenu = cloud.dinnerMenu || local.dinnerMenu || {};
   }
@@ -1885,33 +1883,35 @@ function mergeStates(local, cloud) {
     }
   });
 
-  // Merge freeform: local wins if mutated this session (prevents deleted entries restoring)
+  // Merge freeform: local wins only if mutated AND strictly newer than cloud
   const localFreeformAt = local.freeformAt || 0;
   const cloudFreeformAt = cloud.freeformAt || 0;
-  if (localFreeformAt > 0) {
-    // Local has been mutated — use whichever is newer per-key
-    // Since we can't do per-entry tombstones cheaply, take the whole local freeform
-    // when local is newer (local always is on an immediate save)
-    merged.freeform   = localFreeformAt >= cloudFreeformAt ? (local.freeform || {}) : (cloud.freeform || {});
+  if (localFreeformAt > 0 && localFreeformAt > cloudFreeformAt) {
+    merged.freeform = local.freeform || {};
   } else {
-    // No local mutations — use cloud
+    // No local mutations, or cloud is newer — use cloud
     merged.freeform = cloud.freeform || local.freeform || {};
   }
   merged.freeformAt = Math.max(localFreeformAt, cloudFreeformAt);
 
-  // Merge cart: local wins — cart changes are always immediate saves,
-  // so local state is always at least as fresh as cloud. Union would
-  // restore items the user just unchecked/returned.
-  // For multi-device: whichever device saved last wins (last-write-wins via cartAt).
+  // Merge cart: union both devices' checked-off items, then use whichever cartAt is newer
+  // as the reference timestamp. Union is safe — worst case a checked item briefly reappears;
+  // replacing is dangerous — it wipes cart state from the other device.
   const localCartAt = local.cartAt || 0;
   const cloudCartAt = cloud.cartAt || 0;
-  merged.cart   = localCartAt >= cloudCartAt ? (local.cart || {}) : (cloud.cart || {});
+  const localCart = local.cart || {};
+  const cloudCart = cloud.cart || {};
+  merged.cart = Object.assign({}, cloudCart, localCart);  // union; local overrides on conflict
   merged.cartAt = Math.max(localCartAt, cloudCartAt);
 
-  // Merge notes: local wins (same rationale)
+  // Merge notes: local wins only if mutated AND strictly newer than cloud
   const localNotesAt = local.notesAt || 0;
   const cloudNotesAt = cloud.notesAt || 0;
-  merged.notes   = localNotesAt >= cloudNotesAt ? (local.notes || {}) : (cloud.notes || {});
+  if (localNotesAt > 0 && localNotesAt > cloudNotesAt) {
+    merged.notes = local.notes || {};
+  } else {
+    merged.notes = cloud.notes || local.notes || {};
+  }
   merged.notesAt = Math.max(localNotesAt, cloudNotesAt);
 
   return merged;
