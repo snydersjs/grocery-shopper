@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Dinners (recipes.html) v9 (tap ✓ to remove from grocery list) - companion to Grocery Shopper. Firestore collection: recipes -->
+<!-- Dinners (recipes.html) v10 (item-level Other, e.g. Meat › Other) - companion to Grocery Shopper. Firestore collection: recipes -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -3174,10 +3174,16 @@ const GROCERY_CATALOG_FALLBACK = [{"id":"fruit","label":"Fruit","items":[{"id":"
 // Target: 'itemId', 'itemId:Variant', or 'other:sectionId' (typed into that section's Other field)
 const GROCERY_RULES = [
   // Pantry items that aren't in the grocery catalog (checked first so e.g. "rice vinegar" isn't rice)
+  [/^\s*(cold |warm |hot )?water\b/, 'other:pantry'],
+  [/frozen peas/, 'frozen_vegetables:Peas'],
   [/vinegar/, 'other:pantry'],
-  [/sesame oil/, 'other:pantry'],
-  [/soy sauce|tamari|fish sauce|worcestershire|gochujang|sofrito|enchilada sauce|marinara|adobo|chipotle|coconut milk|tomato paste|capers|honey|maple syrup|sugar|cornstarch|bouillon|peanuts?\b(?! (butter|sauce))|olives|chili crisp|sriracha|hot sauce|wine\b/, 'other:pantry'],
-  [/red pepper flake|chil[ie] flake|crushed red pepper|garlic powder|onion powder|paprika|turmeric|coriander|curry powder|garam masala|chili powder|cayenne|nutmeg|mustard powder|italian seasoning|dried thyme|dried dill|dried sage|\bsage\b|bay lea/, 'other:pantry'],
+  [/sesame oil/, 'otherItem:oil'],
+  [/soy sauce|tamari|fish sauce|worcestershire|gochujang|sofrito|enchilada sauce|marinara|adobo|chipotle|chili crisp|sriracha|hot sauce/, 'otherItem:condiments'],
+  [/tomato paste/, 'otherItem:canned_tomatoes'],
+  [/coconut milk|capers|honey|maple syrup|sugar|cornstarch|bouillon|peanuts?\b(?! (butter|sauce))|olives|wine\b/, 'other:pantry'],
+  [/red pepper flake|chil[ie] flake|crushed red pepper|garlic powder|onion powder|paprika|turmeric|coriander|curry powder|garam masala|chili powder|cayenne|nutmeg|mustard powder|italian seasoning|dried thyme|dried dill|dried sage|\bsage\b|bay lea/, 'otherItem:spices'],
+  // Cooked meat isn't from the raw meat counter
+  [/\b(cooked|rotisserie)\b.*\b(chicken|beef|pork|turkey|shrimp)/, 'other:refrigerated'],
   [/dried basil/, 'spices:Basil'],
   [/\bcumin\b/, 'spices:Cumin'],
   [/oregano/, 'spices:Oregano'],
@@ -3201,7 +3207,7 @@ const GROCERY_RULES = [
   [/scallion|green onion/, 'onion:Green'],
   [/shallot/, 'onion:Shallot'],
   [/red onion/, 'onion:Red'],
-  [/white onion|pearl onion|sweet onion/, 'other:vegetables'],
+  [/white onion|pearl onion|sweet onion/, 'otherItem:onion'],
   [/\bonions?\b/, 'onion:Yellow'],
   [/sweet potato/, 'potatoes:Sweet'],
   [/yukon/, 'potatoes:Yukon Gold'],
@@ -3311,6 +3317,19 @@ const GROCERY_RULES = [
   [/canola|neutral oil|vegetable oil/, 'oil:Canola'],
   [/mac (and|&) cheese/, 'mac_cheese'],
   [/\bflour\b/, 'flour'],
+  // Families: not a listed choice, so it goes in that item's own "Other" (e.g. Meat › Other: "Beef chuck")
+  [/\bbeef\b(?! (broth|stock|bouillon))|\bchuck\b|brisket|short rib|\bveal\b|\blamb\b/, 'otherItem:meat_cut'],
+  [/chicken(?! (broth|stock|bouillon))/, 'otherItem:chicken'],
+  [/\bpork\b/, 'otherItem:pork'],
+  [/turkey/, 'otherItem:turkey'],
+  [/sausage|bratwurst|\bbrats?\b|kielbasa|andouille/, 'otherItem:sausage'],
+  [/\bcod\b|salmon|shrimp|tuna|halibut|mahi|scallop|\bfish\b/, 'otherItem:seafood'],
+  [/pancetta|mortadella|pastrami|capicola/, 'otherItem:deli_meat'],
+  [/cheese|ricotta|feta|halloumi|gruy[eè]re|\bbrie\b|swiss(?! chard)/, 'otherItem:cheese'],
+  [/pasta|fettuccine|linguine|orzo|lasagna|ditalini|rigatoni|macaroni|noodle|ramen|udon/, 'otherItem:pasta'],
+  [/\brice\b(?! (vinegar|paper|wine|cake))|arborio|farro|couscous/, 'otherItem:rice'],
+  [/\bbeans?\b|lentil/, 'otherItem:beans'],
+  [/potato/, 'otherItem:potatoes'],
 ];
 
 // When nothing matches: which section's Other field it goes in
@@ -3418,13 +3437,17 @@ function otherSectionFor(text, catalog) {
 function matchIngredient(name, catalog) {
   const text = String(name || '').toLowerCase().replace(/\([^)]*\)/g, ' ');
   const asOther = catId => ({ kind: 'other', catId: catalog.some(c => c.id === catId) ? catId : otherSectionFor(text, catalog), text: shoppingText(name) });
+  // The item's own Other (e.g. Meat › Other), if the grocery app still offers it; otherwise the section's Other
+  const asItemOther = (found) => (found && (found.item.variants || []).includes('Other'))
+    ? { kind: 'other', catId: found.cat.id, itemId: found.item.id, itemName: found.item.name, text: shoppingText(name) }
+    : asOther(found ? found.cat.id : otherSectionFor(text, catalog));
 
   // Try the main part first ("neutral oil, for tofu" → "neutral oil"), then the whole text
   const head = text.split(/[,:;]/)[0];
   const findRule = s => {
     if (/bell pepper/.test(s)) {
       const color = (s.match(/\b(red|green|yellow|orange)\b/) || [])[1];
-      return color ? 'bell_peppers:' + color.charAt(0).toUpperCase() + color.slice(1) : 'other:vegetables';
+      return color ? 'bell_peppers:' + color.charAt(0).toUpperCase() + color.slice(1) : 'otherItem:bell_peppers';
     }
     for (const [re, t] of GROCERY_RULES) { if (re.test(s)) return t; }
     return null;
@@ -3432,12 +3455,16 @@ function matchIngredient(name, catalog) {
   const target = findRule(head) || findRule(text);
   if (!target) return asOther(otherSectionFor(text, catalog));
   if (target.startsWith('other:')) return asOther(target.slice(6));
+  if (target.startsWith('otherItem:')) {
+    const f = findCatalogItem(catalog, target.slice(10));
+    return f ? asItemOther(f) : asOther(otherSectionFor(text, catalog));
+  }
 
   const [itemId, variant] = target.split(/:(.+)/);
   const found = findCatalogItem(catalog, itemId);
   if (!found) return asOther(otherSectionFor(text, catalog));               // item was removed from the grocery catalog
-  if (variant && !(found.item.variants || []).includes(variant)) return asOther(found.cat.id);
-  if (!variant && found.item.type === 'multiAdd') return asOther(found.cat.id);
+  if (variant && !(found.item.variants || []).includes(variant)) return asItemOther(found);
+  if (!variant && found.item.type === 'multiAdd') return asItemOther(found);
   return { kind: 'item', catId: found.cat.id, itemId, variant: variant || null,
            label: `${found.cat.label} › ${found.item.name}${variant ? ' › ' + variant : ''}` };
 }
@@ -3513,14 +3540,17 @@ async function openGroceryAdd(k) {
     return;
   }
 
-  const selected = match.kind === 'item' ? groceryKey(match) : 'other:' + match.catId;
+  const selected = match.kind === 'item' ? groceryKey(match) : (match.itemId ? 'otherItem:' + match.itemId : 'other:' + match.catId);
   const options = catalog.map(c => {
     const opts = [];
     c.items.forEach(it => {
       if (it.type === 'simple') opts.push([it.id, it.name]);
-      else if (it.type === 'multiAdd') (it.variants || []).filter(v => v !== 'Other').forEach(v => opts.push([`${it.id}:${v}`, `${it.name} › ${v}`]));
+      else if (it.type === 'multiAdd') {
+        (it.variants || []).filter(v => v !== 'Other').forEach(v => opts.push([`${it.id}:${v}`, `${it.name} › ${v}`]));
+        if ((it.variants || []).includes('Other')) opts.push([`otherItem:${it.id}`, `${it.name} › Other (type a name)`]);
+      }
     });
-    opts.push(['other:' + c.id, 'Other (type a name)']);
+    opts.push(['other:' + c.id, `${c.label} › Other (type a name)`]);
     return `<optgroup label="${escAttr(c.label)}">${opts.map(([v, l]) =>
       `<option value="${escAttr(v)}"${v === selected ? ' selected' : ''}>${escHtml(l)}</option>`).join('')}</optgroup>`;
   }).join('');
@@ -3545,7 +3575,12 @@ window.openGroceryAdd = openGroceryAdd;
 
 function readGroceryTarget() {
   const v = document.getElementById('grocery-target').value;
-  if (v.startsWith('other:')) return { kind: 'other', catId: v.slice(6), text: document.getElementById('grocery-other-text').value.trim() };
+  const text = document.getElementById('grocery-other-text').value.trim();
+  if (v.startsWith('other:')) return { kind: 'other', catId: v.slice(6), text };
+  if (v.startsWith('otherItem:')) {
+    const f = findCatalogItem(groceryCtx.catalog, v.slice(10));
+    return { kind: 'other', catId: f?.cat.id, itemId: v.slice(10), itemName: f?.item.name, text };
+  }
   const [itemId, variant] = v.split(/:(.+)/);
   return { kind: 'item', itemId, variant: variant || null };
 }
@@ -3647,6 +3682,7 @@ async function removeFromGroceryList(target) {
     });
     const next = { ...data, items, deletedAt, cart, notes, freeform };
     if (ffChanged) next.freeformAt = now;
+    if (refs.some(r => r.type === 'item')) next.notesAt = now;
     tx.set(GROCERY_REF, next);
   });
 }
@@ -3670,6 +3706,14 @@ async function addToGroceryList(t) {
       tx.set(GROCERY_REF, { ...data, items, deletedAt });
     } else {
       if (otherTextOnList(data, t.text)) { result = 'already'; return; }
+      if (t.itemId) {
+        // Same shape the grocery app uses when you pick "Other" in an item's dropdown
+        const key = `${t.itemId}:Other:${uuid()}`;
+        const items = { ...(data.items || {}), [key]: { qty: 1, updatedAt: now } };
+        const notes = { ...(data.notes || {}), ['__label_' + key]: t.text };
+        tx.set(GROCERY_REF, { ...data, items, notes, notesAt: now });
+        return;
+      }
       const freeform = { ...(data.freeform || {}) };
       freeform[t.catId] = [...(freeform[t.catId] || []), { id: uuid(), text: t.text, qty: 1, updatedAt: now }];
       tx.set(GROCERY_REF, { ...data, freeform, freeformAt: now });
