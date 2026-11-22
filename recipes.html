@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Dinners (recipes.html) v3 (scaled instructions, quarter-lb rounding, collapsible ingredients) - companion to Grocery Shopper. Firestore collection: recipes -->
+<!-- Dinners (recipes.html) v6 (full-width sizing like grocery app, takeout top-up) - companion to Grocery Shopper. Firestore collection: recipes -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -90,14 +90,14 @@
   /* ─── Panels ─── */
   .tab-panel { display: none; padding: 12px 16px 80px; overflow-x: hidden; }
   .tab-panel.active { display: block; }
-  .page { max-width: 720px; margin: 0 auto; }
+  .page { width: 100%; }   /* full width, same as the grocery app */
 
   /* ─── Toolbar / search ─── */
   .menu-toolbar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
   .search-wrap { position: relative; flex: 1; min-width: 0; }
   .search-wrap input {
-    width: 100%; padding: 8px 28px 8px 32px; border: 1px solid var(--border); border-radius: 8px;
-    font-family: 'Lato', sans-serif; font-size: 16px; background: var(--surface); color: var(--text); outline: none;
+    width: 100%; padding: 9px 28px 9px 34px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'Lato', sans-serif; font-size: 14px; background: var(--surface); color: var(--text); outline: none;
   }
   .search-wrap input:focus { border-color: var(--accent-border); }
   .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; pointer-events: none; }
@@ -108,7 +108,7 @@
   .search-clear.visible { display: block; }
   .toolbar-btn {
     background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-    padding: 7px 10px; font-size: 12px; color: var(--text-mid); cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    padding: 5px 10px; font-size: 12px; color: var(--text-mid); cursor: pointer; white-space: nowrap; flex-shrink: 0;
   }
   .toolbar-btn:hover { background: var(--surface2); }
   .toolbar-btn.primary { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; font-weight: 700; }
@@ -143,7 +143,7 @@
   }
   .menu-item-row:last-child { border-bottom: none; }
   .menu-add-week-btn {
-    width: 30px; height: 30px; border: 1px solid var(--accent-border); border-radius: 6px;
+    width: 28px; height: 28px; border: 1px solid var(--accent-border); border-radius: 6px;
     background: var(--accent-light); color: var(--accent-dark); font-size: 18px; line-height: 1;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; font-weight: 700; transition: all 0.15s;
@@ -193,7 +193,7 @@
   .dinner-add-row { display: flex; gap: 8px; margin-top: 14px; }
   .dinner-add-input {
     flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
-    font-family: 'Lato', sans-serif; font-size: 16px; background: var(--surface); color: var(--text); outline: none;
+    font-family: 'Lato', sans-serif; font-size: 14px; background: var(--surface); color: var(--text); outline: none;
   }
   .dinner-add-input:focus { border-color: var(--accent-border); }
   .dinner-add-btn {
@@ -217,7 +217,7 @@
   .shop-add-note-btn:hover { border-color: var(--accent-border); color: var(--accent-dark); }
   .shop-note-input {
     display: none; width: 100%; padding: 6px 8px; border: 1px solid var(--accent-border); border-radius: 6px;
-    font-family: 'Lato', sans-serif; font-size: 16px; background: var(--surface); color: var(--text);
+    font-family: 'Lato', sans-serif; font-size: 13px; background: var(--surface); color: var(--text);
     outline: none; margin-top: 6px;
   }
   .shop-note-input.open { display: block; }
@@ -230,7 +230,7 @@
   .takeout-name { flex: 1; font-size: 14px; min-width: 0; overflow: hidden; }
   .takeout-name input, .menu-inline-input {
     width: 100%; border: 1px solid var(--accent-border); border-radius: 6px; padding: 5px 8px;
-    font-family: 'Lato', sans-serif; font-size: 16px; outline: none; background: var(--surface);
+    font-family: 'Lato', sans-serif; font-size: 14px; outline: none; background: var(--surface);
   }
   .takeout-order-btn {
     display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px;
@@ -241,7 +241,7 @@
   .takeout-order-btn:hover { background: var(--accent-dark); color: #fff; }
   .takeout-url-input {
     width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px;
-    font-family: 'Lato', sans-serif; font-size: 16px; color: var(--text-mid); outline: none;
+    font-family: 'Lato', sans-serif; font-size: 12px; color: var(--text-mid); outline: none;
     margin-top: 4px; background: var(--surface);
   }
   .menu-cat-select {
@@ -320,6 +320,17 @@
   .rv-card.collapsible.open .menu-cat-chevron { transform: rotate(180deg); }
   .rv-card-head .cat-count { margin-left: 6px; letter-spacing: 0; }
   b.scaled { color: var(--accent-darker); }
+  .import-target { font-size: 14px; color: var(--text-mid); margin: -2px 0 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .imp-tag { font-size: 11px; font-weight: 700; border-radius: 10px; padding: 2px 8px; }
+  .imp-tag.new { background: var(--accent-light); color: var(--accent-dark); border: 1px solid var(--accent-border); }
+  .imp-tag.match { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+  .imp-tag.replace { background: var(--warn-bg); color: #7a5f00; border: 1px solid var(--warn-border); }
+  .imp-tag.skip { background: #fdecea; color: var(--danger); border: 1px solid #f5c2c0; }
+  .imp-warn { font-size: 12px; color: #7a5f00; margin-top: 3px; }
+  .imp-ings { list-style: none; margin-top: 6px; }
+  .imp-ings .ing { font-size: 13px; padding: 4px 0; cursor: default; }
+  .imp-steps { margin: 8px 0 0 18px; font-size: 13px; line-height: 1.45; color: var(--text-mid); }
+  .imp-steps li { padding: 2px 0; }
   .rv-notes { font-size: 14px; line-height: 1.55; color: var(--text-mid); white-space: pre-wrap; }
   .loading-msg, .empty-msg { text-align: center; color: var(--text-dim); font-size: 14px; padding: 24px 0; line-height: 1.6; }
   .error-box {
@@ -334,7 +345,7 @@
   }
   .ed-input, .ed-select, .ed-textarea {
     width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
-    font-family: 'Lato', sans-serif; font-size: 16px; background: var(--surface); color: var(--text); outline: none;
+    font-family: 'Lato', sans-serif; font-size: 14px; background: var(--surface); color: var(--text); outline: none;
   }
   .ed-input:focus, .ed-select:focus, .ed-textarea:focus { border-color: var(--accent-border); }
   .ed-textarea { min-height: 120px; line-height: 1.45; resize: vertical; }
@@ -418,6 +429,7 @@
 <div id="tab-takeout" class="tab-panel"><div class="page" id="takeout-view"></div></div>
 <div id="tab-recipe"  class="tab-panel"><div class="page" id="recipe-view"></div></div>
 <div id="tab-editor"  class="tab-panel"><div class="page" id="editor-view"></div></div>
+<div id="tab-import"  class="tab-panel"><div class="page" id="import-view"></div></div>
 
 <!-- ═══ MODALS ═══ -->
 <div class="modal-overlay" id="modal-clear-week">
@@ -1815,6 +1827,7 @@ function defaultPlanner() {
     takeout:     {},   // name → { category, url }
     takeoutAt:   0,
     takeoutImportedAt: 0,
+    takeoutToppedUpAt: 0,
   };
 }
 
@@ -1931,8 +1944,18 @@ const STEP_QTY_RE = new RegExp('(?<![\\w.\\/°])(' + STEP_NUM + ')(\\s*(?:–|�
 const STEP_SKIP_AFTER = /^\s*(?:-\s*[a-z]|°|º|degrees?\b|min\b|mins\b|minutes?\b|sec\b|secs\b|seconds?\b|hours?\b|hrs?\b|days?\b|weeks?\b|inch(?:es)?\b|in\.|"|%|percent\b|times?\b|batch(?:es)?\b|steps?\b|x\b|(?:additional|more|extra)\s+(?:min|minutes?|seconds?|hours?)\b|(?:\w+\s+)?per\s+(?:serving|sandwich|person|portion|pita|taco|bowl)\b)/i;
 const STEP_UNIT_AFTER = /^\s*(lbs?|pounds?|oz|ounces?|cups?|cans?|cloves?|tbsp|tsp)\b/i;
 
+// Dry rice: our rice cooker does 0.5, 1 or 1.5 cups, so rice rounds to the nearest ½ cup (min ½)
+const RICE_RE = /\brice\b/i;
+const NOT_RICE_RE = /vinegar|noodle|wine|\bcooked\b|paper|cake|milk|water|broth|flour/i;
+function isDryRice(name) {
+  const head = String(name || '').split(/,| plus /i)[0];   // "dry rice plus water…" → "dry rice"
+  return RICE_RE.test(head) && !NOT_RICE_RE.test(head);
+}
+function roundRiceCups(v) { return Math.max(0.5, Math.round(v * 2) / 2); }
+
 function fmtStepQty(v, unit) {
   if (unit === 'lb') return fmtLb(v);
+  if (unit === 'rice') return fmtFrac(roundRiceCups(v));
   if (unit === 'oz') return v >= 4 ? String(Math.round(v)) : fmtFrac(v);
   return fmtFrac(v);
 }
@@ -1949,7 +1972,12 @@ function scaleStepHtml(text, factor) {
     if (/(?:step|#)\s*$/i.test(before)) return m;
     if (STEP_SKIP_AFTER.test(after)) return m;
     const um = after.match(STEP_UNIT_AFTER);
-    const unit = um ? (/^(lbs?|pounds?)$/i.test(um[1]) ? 'lb' : /^(oz|ounces?)$/i.test(um[1]) ? 'oz' : 'other') : '';
+    let unit = um ? (/^(lbs?|pounds?)$/i.test(um[1]) ? 'lb' : /^(oz|ounces?)$/i.test(um[1]) ? 'oz' : 'other') : '';
+    if (um && /^cups?$/i.test(um[1])) {
+      // "1½ cups basmati rice", "1 cup dry long-grain rice": round like the rice cooker
+      const next = after.slice(um[0].length, um[0].length + 40);
+      if (/^\s*(?:[\w-]+\s+){0,3}rice\b/i.test(next) && !NOT_RICE_RE.test(next.split(/[,.;]/)[0])) unit = 'rice';
+    }
     // Inside parentheses, leave can/package sizes like "(15 oz)" alone
     if (unit === 'oz' && (before.match(/\(/g) || []).length > (before.match(/\)/g) || []).length) return m;
     const va = parseQty(a);
@@ -2042,6 +2070,7 @@ function mergePlanner(local, cloud) {
   }
   merged.takeoutAt = Math.max(localTakeoutAt, cloudTakeoutAt);
   merged.takeoutImportedAt = Math.max(local.takeoutImportedAt || 0, cloud.takeoutImportedAt || 0);
+  merged.takeoutToppedUpAt = Math.max(local.takeoutToppedUpAt || 0, cloud.takeoutToppedUpAt || 0);
   return merged;
 }
 
@@ -2111,6 +2140,34 @@ async function runSeedIfNeeded() {
 }
 
 /** First load ever: copy the grocery app's current takeout list (read only). */
+/**
+ * One-time top-up: adds restaurants (and links) from the grocery app that the
+ * recipe app doesn't have yet. Never removes or changes anything already here,
+ * except filling in a link that is blank. Reads the grocery app only.
+ */
+async function topUpTakeoutIfNeeded() {
+  const now = Date.now();
+  await runTransaction(db, async tx => {
+    const pSnap = await tx.get(PLANNER_REF);
+    if (!pSnap.exists() || pSnap.data().takeoutToppedUpAt) return;
+    const gSnap = await tx.get(GROCERY_REF);
+    const data = pSnap.data();
+    const mine = JSON.parse(JSON.stringify(data.takeout || {}));
+    const theirs = (gSnap.exists() && gSnap.data().takeout) || {};
+    const byName = {};
+    Object.keys(mine).forEach(n => { byName[normName(n)] = n; });
+    Object.entries(theirs).forEach(([n, r]) => {
+      const existing = byName[normName(n)];
+      if (!existing) {
+        mine[n] = { category: (r && r.category) || 'Uncategorized', url: (r && r.url) || '' };
+      } else if (!mine[existing].url && r && r.url) {
+        mine[existing].url = r.url;
+      }
+    });
+    tx.set(PLANNER_REF, { ...data, takeout: mine, takeoutAt: now, takeoutToppedUpAt: now });
+  });
+}
+
 async function importTakeoutIfNeeded() {
   const now = Date.now();
   await runTransaction(db, async tx => {
@@ -2245,6 +2302,10 @@ async function loadFromCloud() {
       await importTakeoutIfNeeded();
       pSnap = await getDoc(PLANNER_REF);
     }
+    if (pSnap.exists() && !pSnap.data().takeoutToppedUpAt) {
+      await topUpTakeoutIfNeeded();
+      pSnap = await getDoc(PLANNER_REF);
+    }
 
     index   = mergeIndex(index,   iSnap.exists() ? iSnap.data() : {});
     planner = mergePlanner(planner, pSnap.exists() ? pSnap.data() : {});
@@ -2324,7 +2385,7 @@ function markTab(tab) {
 
 function switchTab(tab) {
   if (currentView.v !== 'tab') {
-    if (currentView.v === 'editor' && editorDirty && !confirm('Discard your changes?')) return;
+    if ((currentView.v === 'editor' || currentView.v === 'import') && editorDirty && !confirm('Discard your changes?')) return;
     editorDirty = false;
     pendingTab = tab;
     history.go(-(currentView.d || 1));   // unwind recipe/editor views; popstate finishes the switch
@@ -2354,6 +2415,11 @@ function applyView(state) {
     renderRecipeView(currentView.id);
     window.scrollTo(0, 0);
     requestWakeLock();
+  } else if (currentView.v === 'import') {
+    showPanel('tab-import');
+    renderImport(currentView.id || null);
+    window.scrollTo(0, 0);
+    releaseWakeLock();
   } else if (currentView.v === 'editor') {
     showPanel('tab-editor');
     renderEditor(currentView.id || null, currentView.preset || null);
@@ -2370,7 +2436,7 @@ function applyView(state) {
 }
 
 window.addEventListener('popstate', e => {
-  if (currentView.v === 'editor' && editorDirty) {
+  if ((currentView.v === 'editor' || currentView.v === 'import') && editorDirty) {
     if (!confirm('Discard your changes?')) {
       history.pushState(currentView, '');   // stay in the editor
       return;
@@ -2386,6 +2452,8 @@ window.goBack = goBack;
 function openRecipe(id) { pushView({ v: 'recipe', id }); }
 window.openRecipe = openRecipe;
 function openEditor(id) { pushView({ v: 'editor', id: id || null }); }
+function openImport(id) { pushView({ v: 'import', id: id || null }); }
+window.openImport = openImport;
 window.openEditor = openEditor;
 
 // Keep the screen awake while a recipe is open (supported on recent iPhones and Chrome/Edge)
@@ -2446,7 +2514,7 @@ function renderMeals() {
         <button class="search-clear${mealSearch ? ' visible' : ''}" id="meal-search-clear" onclick="clearMealSearch()">×</button>
       </div>
       <button class="toolbar-btn" onclick="toggleAllMealCats()" id="meal-expand-btn">${openMealCats.size ? 'Collapse' : 'Expand'}</button>
-      <button class="toolbar-btn primary" onclick="openEditor()">+ New</button>
+      <button class="toolbar-btn primary" onclick="openImport()">Import</button>
     </div>
     <div id="meal-categories"></div>`;
   renderMealCategories();
@@ -2560,7 +2628,7 @@ function renderWeek() {
   if (!loaded && !loadError) { container.innerHTML = '<div class="loading-msg">Loading…</div>'; return; }
   const active = (planner.thisWeek || []).filter(d => !d.done);
   const done   = (planner.thisWeek || []).filter(d =>  d.done);
-  let html = errorBox() + '<div class="week-card">';
+  let html = errorBox() + '<div>';
 
   if (active.length === 0 && done.length === 0) {
     html += '<div class="empty-msg">No dinners planned yet.<br>Tap + next to a meal, or type one below.</div>';
@@ -2715,7 +2783,7 @@ function renderRecipeView(id) {
   if (!meal.hasRecipe) {
     container.innerHTML = head + `<div class="rv-card"><div class="rv-card-body">
       <div class="empty-msg">No recipe yet.</div>
-      <div style="text-align:center;padding-bottom:10px;"><button class="btn-primary" onclick="openEditor('${jsArg(id)}')">Add recipe</button></div>
+      <div style="text-align:center;padding-bottom:10px;"><button class="btn-primary" onclick="openImport('${jsArg(id)}')">Add recipe</button></div>
     </div></div>`;
     return;
   }
@@ -2732,7 +2800,7 @@ function renderRecipeView(id) {
     if (!r) {
       container.innerHTML = head + `<div class="rv-card"><div class="rv-card-body">
         <div class="empty-msg">Recipe not found.</div>
-        <div style="text-align:center;padding-bottom:10px;"><button class="btn-primary" onclick="openEditor('${jsArg(id)}')">Add recipe</button></div>
+        <div style="text-align:center;padding-bottom:10px;"><button class="btn-primary" onclick="openImport('${jsArg(id)}')">Add recipe</button></div>
       </div></div>`;
       return;
     }
@@ -2764,6 +2832,9 @@ function ingredientHtml(ing, factor) {
   let qtyText;
   if (ing.unit === 'lb') {
     qtyText = `${fmtLb(q)} lb`;
+  } else if (ing.unit === 'cup' && isDryRice(ing.name)) {
+    const c = roundRiceCups(q);
+    qtyText = `${fmtFrac(c)} ${unitLabel('cup', c)}`;
   } else if (ing.unit === 'oz') {
     qtyText = `${q >= 4 ? Math.round(q) : fmtFrac(q)} oz`;
   } else {
@@ -3060,6 +3131,301 @@ async function confirmDeleteMeal() {
 window.confirmDeleteMeal = confirmDeleteMeal;
 
 // ─────────────────────────────────────────────────────────────────────────────
+// IMPORT RECIPES  (paste the formatted text from Claude or ChatGPT)
+// ─────────────────────────────────────────────────────────────────────────────
+const AI_PROMPT = `Convert the recipe(s) in the attached photo(s) or text into JSON for my recipe app.
+Reply with ONLY one JSON code block, nothing else.
+
+Format (an array, even for a single recipe):
+[
+  {
+    "name": "Fish Tacos",
+    "category": "Fish",
+    "servings": 4,
+    "ingredients": [
+      { "qty": 1.5,  "unit": "lb",  "name": "cod fillets" },
+      { "qty": 0.5,  "unit": "cup", "name": "sour cream" },
+      { "qty": 2,    "unit": "",    "name": "limes, cut into wedges" },
+      { "qty": null, "unit": "",    "name": "salt, to taste" }
+    ],
+    "instructions": ["First step.", "Second step."],
+    "notes": ""
+  }
+]
+
+Rules:
+- Scale everything to serve 4, including amounts mentioned in the instructions.
+- category must be one of: Fish, Meat, Pork, Poultry, Soups, Vegetarian, Uncategorized
+- qty is a number with decimals (0.5, not 1/2), or null for "to taste" or optional items.
+- unit is one of: lb, oz, cup, tbsp, tsp, can, clove, pinch, or "" for countable items.
+- Meat, poultry, pork and fish are always in lb.
+- instructions: one string per step, no step numbers. Write the actual amounts in each step using digits or fractions (e.g. "Add 1½ tbsp olive oil"), never words like "half".
+- notes: cooking tips as one string, or "" if none.
+- name: short and plain, no appliance names or extra descriptions in parentheses. If I give you a meal name, use exactly that name.`;
+
+// Accepts strict JSON, or JavaScript-style objects (unquoted keys, single quotes,
+// trailing commas, "const X = [...]"), with or without a ``` code fence around it.
+function parseLoose(text) {
+  let s = String(text || '').trim();
+  s = s.replace(/```[a-zA-Z]*\s*/g, '').replace(/```/g, '').trim();
+  const first = s.search(/[\[{]/);
+  const last  = Math.max(s.lastIndexOf(']'), s.lastIndexOf('}'));
+  if (first < 0 || last < first) throw new Error('No recipe data found. Paste the whole block the AI gave you.');
+  s = s.slice(first, last + 1);
+  try { return JSON.parse(s); } catch (e) { /* fall through to the lenient pass */ }
+
+  // Lenient pass: walk the text, converting JS-style syntax to JSON outside of strings
+  let out = '', i = 0;
+  while (i < s.length) {
+    const ch = s[i];
+    if (ch === '"' || ch === "'") {
+      const q = ch; let str = ''; i++;
+      while (i < s.length && s[i] !== q) {
+        if (s[i] === '\\' && i + 1 < s.length) { str += s[i] + s[i + 1]; i += 2; continue; }
+        if (s[i] === '\n') { str += '\\n'; i++; continue; }
+        str += (q === "'" && s[i] === '"') ? '\\"' : s[i];
+        i++;
+      }
+      if (q === "'") str = str.replace(/\\'/g, "'");
+      out += '"' + str + '"'; i++;
+      continue;
+    }
+    if (ch === '/' && s[i + 1] === '/') { while (i < s.length && s[i] !== '\n') i++; continue; }
+    if (/[A-Za-z_$]/.test(ch)) {
+      let j = i; while (j < s.length && /[\w$]/.test(s[j])) j++;
+      const word = s.slice(i, j);
+      let k = j; while (k < s.length && /\s/.test(s[k])) k++;
+      if (s[k] === ':' && !['true','false','null'].includes(word)) out += '"' + word + '"';
+      else out += word;
+      i = j; continue;
+    }
+    out += ch; i++;
+  }
+  out = out.replace(/,\s*([\]}])/g, '$1');
+  try { return JSON.parse(out); }
+  catch (e) { throw new Error('Couldn\'t read that text. Make sure you copied the whole code block, from the first [ to the last ].'); }
+}
+
+function normUnit(u) {
+  const k = String(u || '').trim().toLowerCase().replace(/\.$/, '');
+  if (!k) return '';
+  return UNIT_ALIASES[k] || null;   // null = not a unit the app knows
+}
+
+// Turn whatever the AI produced into the app's recipe shape, collecting warnings
+function normalizeRecipe(raw) {
+  const warnings = [];
+  const r = raw && typeof raw === 'object' ? raw : {};
+  const name = String(r.name || r.title || '').trim();
+  let category = String(r.category || '').trim();
+  const catMatch = MEAL_CATEGORIES.find(c => c.toLowerCase() === category.toLowerCase());
+  if (!catMatch) { if (category) warnings.push(`Category "${category}" isn't one of yours, so it goes in Uncategorized.`); category = 'Uncategorized'; }
+  else category = catMatch;
+
+  let baseServings = parseInt(r.servings ?? r.baseServings ?? r.serves, 10);
+  if (!(baseServings > 0 && baseServings <= 20)) baseServings = BASE_SERVINGS;
+  if (baseServings !== BASE_SERVINGS) warnings.push(`Written for ${baseServings} servings (the app will still scale it).`);
+
+  const ingredients = [];
+  (Array.isArray(r.ingredients) ? r.ingredients : []).forEach(i => {
+    if (typeof i === 'string') { const p = parseIngredientLine(i); if (p) ingredients.push(p); return; }
+    if (!i || typeof i !== 'object') return;
+    let ingName = String(i.name ?? i.item ?? i.ingredient ?? '').trim();
+    if (!ingName) return;
+    let qty = i.qty ?? i.quantity ?? i.amount ?? null;
+    qty = (qty === null || qty === '') ? null : (typeof qty === 'number' ? qty : parseQty(qty));
+    let unit = normUnit(i.unit);
+    if (unit === null) { ingName = `${String(i.unit).trim()} ${ingName}`; unit = ''; }   // e.g. "bunch" stays readable
+    ingredients.push({ qty, unit, name: ingName });
+  });
+  if (!ingredients.length) warnings.push('No ingredients found.');
+
+  let instructions = r.instructions ?? r.steps ?? r.directions ?? [];
+  instructions = Array.isArray(instructions)
+    ? instructions.map(s => String(typeof s === 'object' && s ? (s.text ?? s.step ?? '') : s).trim().replace(/^(?:step\s*)?\d+\s*[.):-]\s*/i, '')).filter(Boolean)
+    : parseSteps(instructions);
+  if (!instructions.length) warnings.push('No instructions found.');
+
+  let notes = r.notes ?? r.tips ?? '';
+  if (Array.isArray(notes)) notes = notes.join(' ');
+  notes = String(notes || '').trim();
+
+  return { name, category, baseServings, ingredients, instructions, notes, warnings };
+}
+
+function findMealIdByName(name) {
+  const n = normName(name);
+  const hit = Object.entries(index.meals).find(([, m]) => normName(m.name) === n);
+  return hit ? hit[0] : null;
+}
+
+let importTargetId = null;
+let importPlan = [];   // [{ recipe, targetId|null, replaces:boolean }]
+
+function renderImport(targetId) {
+  importTargetId = targetId && index.meals[targetId] ? targetId : null;
+  importPlan = [];
+  editorDirty = false;
+  const target = importTargetId ? index.meals[importTargetId] : null;
+  const container = document.getElementById('import-view');
+  container.innerHTML = `
+    <div class="rv-top">
+      <button class="back-btn" onclick="goBack()">Cancel</button>
+      <div class="spacer"></div>
+      <button class="toolbar-btn" onclick="copyAiPrompt()">📋 Copy AI prompt</button>
+    </div>
+    <div class="rv-title">${target ? 'Add recipe' : 'Import recipes'}</div>
+    ${target ? `<div class="import-target">Adding to: <b>${escHtml(target.name)}</b> <span class="rv-cat">${escHtml(normCat(target.category))}</span></div>` : ''}
+    <div class="ed-hint" style="margin-bottom:10px;">
+      1. Send a photo of the recipe to Claude or ChatGPT with the AI prompt (tap <b>Copy AI prompt</b>)${target ? `, and tell it the meal name is "${escHtml(target.name)}"` : ''}.<br>
+      2. Copy the code block it gives you and paste it below.<br>
+      3. Tap <b>Preview</b>, check it, then <b>Save</b>.
+    </div>
+    <textarea class="ed-textarea" id="import-text" style="min-height:220px;font-family:ui-monospace,Consolas,monospace;font-size:13px;"
+      placeholder='Paste here, e.g. [ { "name": "Fish Tacos", ... } ]' oninput="onImportInput()"></textarea>
+    <div class="ed-btn-row" style="margin-top:10px;">
+      <button class="btn-primary" onclick="previewImport()">Preview</button>
+      <button class="btn-secondary" onclick="clearImport()">Clear</button>
+    </div>
+    <div id="import-preview"></div>`;
+}
+
+function onImportInput() {
+  editorDirty = !!document.getElementById('import-text').value.trim();
+  if (importPlan.length) { importPlan = []; document.getElementById('import-preview').innerHTML = ''; }
+}
+window.onImportInput = onImportInput;
+
+function clearImport() {
+  document.getElementById('import-text').value = '';
+  document.getElementById('import-preview').innerHTML = '';
+  importPlan = []; editorDirty = false;
+}
+window.clearImport = clearImport;
+
+async function copyAiPrompt() {
+  try { await navigator.clipboard.writeText(AI_PROMPT); toast('AI prompt copied'); }
+  catch (e) {
+    // Fallback for browsers that block clipboard access
+    const ta = document.createElement('textarea');
+    ta.value = AI_PROMPT; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('AI prompt copied'); } catch (e2) { toast('Couldn\'t copy. Long-press to copy instead.'); }
+    ta.remove();
+  }
+}
+window.copyAiPrompt = copyAiPrompt;
+
+function previewImport() {
+  const box = document.getElementById('import-preview');
+  const text = document.getElementById('import-text').value;
+  if (!text.trim()) { toast('Paste the recipe text first'); return; }
+  let data;
+  try { data = parseLoose(text); }
+  catch (e) { box.innerHTML = `<div class="error-box" style="margin-top:12px;">${escHtml(e.message)}</div>`; importPlan = []; return; }
+  if (data && !Array.isArray(data) && Array.isArray(data.recipes)) data = data.recipes;
+  const list = (Array.isArray(data) ? data : [data]).map(normalizeRecipe);
+
+  if (importTargetId && list.length > 1) {
+    box.innerHTML = `<div class="error-box" style="margin-top:12px;">This text has ${list.length} recipes, but you're adding a recipe to one meal. Paste just one, or use <b>Import</b> on the Meals tab for several.</div>`;
+    importPlan = []; return;
+  }
+
+  const seen = new Set();
+  importPlan = list.map(rec => {
+    let targetId = importTargetId || (rec.name ? findMealIdByName(rec.name) : null);
+    const key = targetId || normName(rec.name);
+    const dup = seen.has(key); seen.add(key);
+    const meal = targetId ? index.meals[targetId] : null;
+    if (!rec.name && !meal) rec.warnings.unshift('No meal name, so this one will be skipped.');
+    if (dup) rec.warnings.unshift('Appears twice in what you pasted. Only the first is saved.');
+    return { recipe: rec, targetId, replaces: !!(meal && meal.hasRecipe), skip: dup || (!rec.name && !meal) };
+  });
+
+  const toSave = importPlan.filter(p => !p.skip);
+  const replacing = toSave.filter(p => p.replaces).length;
+  box.innerHTML = `<div class="ed-label" style="margin-top:18px;">Preview: ${toSave.length} recipe${toSave.length === 1 ? '' : 's'} to save</div>
+    ${importPlan.map(p => previewCardHtml(p)).join('')}
+    ${toSave.length ? `<div class="ed-btn-row" style="margin-top:12px;">
+      <button class="btn-primary" id="import-save-btn" onclick="saveImport()">Save ${toSave.length} recipe${toSave.length === 1 ? '' : 's'}${replacing ? ` (replaces ${replacing})` : ''}</button>
+    </div>` : ''}`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+window.previewImport = previewImport;
+
+function previewCardHtml(p) {
+  const r = p.recipe;
+  const meal = p.targetId ? index.meals[p.targetId] : null;
+  const shownName = meal ? meal.name : r.name;
+  const shownCat  = meal ? normCat(meal.category) : r.category;
+  const status = p.skip ? '<span class="imp-tag skip">Skipped</span>'
+    : p.replaces ? '<span class="imp-tag replace">Replaces existing recipe</span>'
+    : meal ? '<span class="imp-tag match">Adds recipe to existing meal</span>'
+    : '<span class="imp-tag new">New meal</span>';
+  return `<div class="rv-card" style="margin-top:8px;">
+    <div class="rv-card-body">
+      <div style="font-weight:700;font-size:15px;margin-bottom:4px;">${escHtml(shownName || '(no name)')}</div>
+      <div class="rv-meta" style="margin-bottom:8px;"><span class="rv-cat">${escHtml(shownCat)}</span>${status}</div>
+      ${meal && r.name && normName(r.name) !== normName(meal.name) ? `<div class="ed-hint">The AI called it "${escHtml(r.name)}". Your meal name is kept.</div>` : ''}
+      ${r.warnings.map(w => `<div class="imp-warn">⚠ ${escHtml(w)}</div>`).join('')}
+      <div class="ed-hint" style="margin-top:6px;">${r.ingredients.length} ingredients · ${r.instructions.length} steps${r.notes ? ' · notes' : ''}</div>
+      <ul class="imp-ings">${r.ingredients.map(i => ingredientHtml(i, 1)).join('')}</ul>
+      <ol class="imp-steps">${r.instructions.map(s => `<li>${escHtml(s)}</li>`).join('')}</ol>
+    </div>
+  </div>`;
+}
+
+async function saveImport() {
+  const toSave = importPlan.filter(p => !p.skip);
+  if (!toSave.length) return;
+  const replacing = toSave.filter(p => p.replaces);
+  if (replacing.length && !confirm(`This replaces the existing recipe for: ${replacing.map(p => index.meals[p.targetId].name).join(', ')}. Continue?`)) return;
+
+  const btn = document.getElementById('import-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const now = Date.now();
+  const savedIds = [];
+  try {
+    for (const p of toSave) {
+      const r = p.recipe;
+      let id = p.targetId;
+      const meal = id ? index.meals[id] : null;
+      const name = meal ? meal.name : r.name;
+      const category = meal ? normCat(meal.category) : r.category;
+      if (!id) {
+        id = slugify(name);
+        while (index.meals[id] || index.deletedAt[id]) id = slugify(name) + '-' + shortId();
+      }
+      const recipe = { name, category, baseServings: r.baseServings, ingredients: r.ingredients, instructions: r.instructions, notes: r.notes, updatedAt: now };
+      await setDoc(recipeRef(id), recipe);
+      recipeCache[id] = recipe;
+      index.meals[id] = { name, category, hasRecipe: true, updatedAt: now };
+      delete index.deletedAt[id];
+      savedIds.push(id);
+    }
+    await saveIndex();
+  } catch (e) {
+    console.error('Import error:', e);
+    if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
+    toast(savedIds.length ? `Saved ${savedIds.length}, then hit an error. Try again for the rest.` : 'Couldn\'t save. Check your connection and try again.');
+    if (savedIds.length) saveIndex().catch(() => {});
+    return;
+  }
+  editorDirty = false;
+  toast(`Saved ${savedIds.length} recipe${savedIds.length === 1 ? '' : 's'}`);
+  if (importTargetId && savedIds.length === 1) {
+    history.back();   // came from that meal's screen: go back to it, now showing the recipe
+  } else if (savedIds.length === 1) {
+    const next = { v: 'recipe', id: savedIds[0], d: currentView.d };
+    history.replaceState(next, '');
+    applyView(next);
+  } else {
+    history.go(-(currentView.d || 1));
+  }
+}
+window.saveImport = saveImport;
+
+// ─────────────────────────────────────────────────────────────────────────────
 // TAKEOUT TAB  (same behavior as the grocery app's Takeout tab)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderTakeout() {
@@ -3241,7 +3607,7 @@ requestAnimationFrame(() => requestAnimationFrame(renderHeader));
 window.addEventListener('resize', renderHeader);
 
 // Exposed only for automated testing
-window.__dinners = { parseQty, fmtFrac, scaleStepHtml, fmtLb, parseIngredientLine, mergeIndex, mergePlanner, fmtQtyInput, parseSteps };
+window.__dinners = { isDryRice, parseLoose, normalizeRecipe, AI_PROMPT, parseQty, fmtFrac, scaleStepHtml, fmtLb, parseIngredientLine, mergeIndex, mergePlanner, fmtQtyInput, parseSteps };
 </script>
 </body>
 </html>
