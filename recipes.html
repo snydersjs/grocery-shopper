@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Dinners (recipes.html) v6 (full-width sizing like grocery app, takeout top-up) - companion to Grocery Shopper. Firestore collection: recipes -->
+<!-- Dinners (recipes.html) v8 (compact recipe header) - companion to Grocery Shopper. Firestore collection: recipes -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -293,13 +293,36 @@
     background: var(--surface2); color: var(--text-mid); font-size: 15px; font-weight: 700; cursor: pointer;
   }
   .serv-btn.active { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
-  .serv-label { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+  .rv-title { margin-bottom: 12px; }
+  #week-pill-wrap { white-space: nowrap; }
+  .week-circle {
+    display: inline-flex; align-items: center; justify-content: center; vertical-align: 2px;
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--accent-dark);
+    background: var(--surface); color: var(--accent-dark); font-size: 18px; font-weight: 700; line-height: 1;
+    cursor: pointer; padding: 0;
+  }
+  .week-circle.on { background: var(--accent-dark); color: #fff; font-size: 14px; }
   .ing-list { list-style: none; }
   .ing {
     padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 15px; line-height: 1.35;
     cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
   .ing:last-child { border-bottom: none; }
+  .ing.has-cart { display: flex; align-items: center; gap: 10px; }
+  .ing-text { flex: 1; min-width: 0; }
+  .cart-btn {
+    width: 32px; height: 32px; flex-shrink: 0; border: 1px solid var(--accent-border); border-radius: 6px;
+    background: var(--accent-light); font-size: 15px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: var(--accent-dark); font-weight: 700;
+  }
+  .cart-btn:hover { background: #d6eed8; }
+  .cart-btn.on { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; font-size: 16px; }
+  .grocery-warn {
+    font-size: 13px; color: #7a5f00; background: var(--warn-bg); border: 1px solid var(--warn-border);
+    border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; line-height: 1.4;
+  }
+  .grocery-already { font-size: 13px; font-weight: 700; color: var(--accent-dark); margin-top: 10px; }
+  .modal-confirm:disabled { opacity: 0.45; cursor: default; }
   .ing-qty { font-weight: 700; color: var(--accent-darker); }
   .ing.got .ing-qty, .ing.got .ing-name { color: var(--text-dim); text-decoration: line-through; }
   .step-list { list-style: none; counter-reset: step; }
@@ -411,7 +434,6 @@
     <div class="header-title">Dinners</div>
     <div class="header-right">
       <span id="sync-status">●&nbsp;Ready</span>
-      <a class="header-icon-btn" href="index.html">🛒 Grocery</a>
     </div>
   </div>
 </header>
@@ -452,6 +474,10 @@
       <button class="modal-confirm danger" onclick="confirmDeleteMeal()">Delete</button>
     </div>
   </div>
+</div>
+
+<div class="modal-overlay" id="modal-grocery">
+  <div class="modal-box" id="modal-grocery-box"></div>
 </div>
 
 <div id="toast"></div>
@@ -2774,11 +2800,7 @@ function renderRecipeView(id) {
   }
 
   const head = `${top}
-    <div class="rv-title">${escHtml(meal.name)}</div>
-    <div class="rv-meta">
-      <span class="rv-cat">${escHtml(normCat(meal.category))}</span>
-      <span id="week-pill-wrap">${weekPillHtml(id)}</span>
-    </div>`;
+    <div class="rv-title">${escHtml(meal.name)}&nbsp;<span id="week-pill-wrap">${weekPillHtml(id)}</span></div>`;
 
   if (!meal.hasRecipe) {
     container.innerHTML = head + `<div class="rv-card"><div class="rv-card-body">
@@ -2791,6 +2813,7 @@ function renderRecipeView(id) {
   const cached = recipeCache[id];
   if (cached) {
     container.innerHTML = head + recipeBodyHtml(cached);
+    refreshCartIcons();
   } else {
     container.innerHTML = head + '<div class="loading-msg">Loading recipe…</div>';
   }
@@ -2804,7 +2827,7 @@ function renderRecipeView(id) {
       </div></div>`;
       return;
     }
-    if (!cached || cached.updatedAt !== r.updatedAt) container.innerHTML = head + recipeBodyHtml(r);
+    if (!cached || cached.updatedAt !== r.updatedAt) { container.innerHTML = head + recipeBodyHtml(r); refreshCartIcons(); }
   }).catch(e => {
     console.error('Recipe load error:', e);
     if (!cached && currentView.v === 'recipe' && currentView.id === id) {
@@ -2815,17 +2838,23 @@ function renderRecipeView(id) {
 
 function weekPillHtml(id) {
   const on = isOnWeek(id);
-  return `<button class="week-pill${on ? ' on' : ''}" onclick="toggleMealThisWeek('${jsArg(id)}')">${on ? '✓ On This Week' : '+ Add to This Week'}</button>`;
+  return `<button class="week-circle${on ? ' on' : ''}" onclick="toggleMealThisWeek('${jsArg(id)}')" title="${on ? 'On This Week (tap to remove)' : 'Add to This Week'}">${on ? '✓' : '+'}</button>`;
 }
 function renderWeekPill(id) {
   const wrap = document.getElementById('week-pill-wrap');
   if (wrap) wrap.innerHTML = weekPillHtml(id);
 }
 
-function ingredientHtml(ing, factor) {
+function cartBtnHtml(k) {
+  if (k == null) return '';
+  return `<button class="cart-btn" id="cart-${k}" title="Add to grocery list" onclick="event.stopPropagation();openGroceryAdd(${k})">🛒</button>`;
+}
+
+function ingredientHtml(ing, factor, k) {
   const name = escHtml(ing.name);
+  const cls = k == null ? 'ing' : 'ing has-cart';
   if (ing.qty == null || ing.qty === '') {
-    return `<li class="ing" onclick="this.classList.toggle('got')"><span class="ing-name">${name}</span></li>`;
+    return `<li class="${cls}" onclick="this.classList.toggle('got')"><span class="ing-text"><span class="ing-name">${name}</span></span>${cartBtnHtml(k)}</li>`;
   }
   // Pressure-cooker minimum liquid: never scale below the amount written
   const q = (/minimum/i.test(ing.name) && factor < 1) ? ing.qty : ing.qty * factor;
@@ -2840,12 +2869,13 @@ function ingredientHtml(ing, factor) {
   } else {
     qtyText = `${fmtFrac(q)}${ing.unit ? ' ' + unitLabel(ing.unit, q) : ''}`;
   }
-  return `<li class="ing" onclick="this.classList.toggle('got')">
-    <span class="ing-qty">${escHtml(qtyText)}</span> <span class="ing-name">${name}</span>
+  return `<li class="${cls}" onclick="this.classList.toggle('got')">
+    <span class="ing-text"><span class="ing-qty">${escHtml(qtyText)}</span> <span class="ing-name">${name}</span></span>${cartBtnHtml(k)}
   </li>`;
 }
 
 function recipeBodyHtml(r) {
+  cartRecipe = r;
   const base   = r.baseServings || BASE_SERVINGS;
   const factor = servings / base;
   const ings   = r.ingredients || [];
@@ -2857,7 +2887,6 @@ function recipeBodyHtml(r) {
       <div class="serv-row">
         ${SERVING_OPTIONS.map(n => `<button class="serv-btn${n === servings ? ' active' : ''}" onclick="setServings(${n})">${n}</button>`).join('')}
       </div>
-      <div class="serv-label">Recipe as written serves ${base}.${servings !== base ? ` Showing amounts for ${servings}.` : ''}</div>
     </div>
   </div>`;
 
@@ -2867,7 +2896,7 @@ function recipeBodyHtml(r) {
       <span class="menu-cat-chevron">▼</span>
     </div>
     <div class="rv-card-body">
-      ${ings.length ? `<ul class="ing-list">${ings.map(i => ingredientHtml(i, factor)).join('')}</ul>` : '<div class="empty-msg">No ingredients listed.</div>'}
+      ${ings.length ? `<ul class="ing-list">${ings.map((i, k) => ingredientHtml(i, factor, k)).join('')}</ul>` : '<div class="empty-msg">No ingredients listed.</div>'}
     </div>
   </div>`;
 
@@ -3129,6 +3158,444 @@ async function confirmDeleteMeal() {
   history.go(-(currentView.d || 1));   // all the way back to the list
 }
 window.confirmDeleteMeal = confirmDeleteMeal;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADD AN INGREDIENT TO THE GROCERY LIST  (🛒 button on each ingredient)
+// Writes ONE item to the grocery app's list (grocery/state), inside a transaction:
+//   • a standard grocery item, e.g. "Meat › Ground Beef" (items[key] = {qty:1})
+//   • or a typed entry in a section's "Other" field (freeform[sectionId])
+// Never changes the grocery app's catalog or anything else on the list.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Backup copy of the grocery catalog (normally read live from index.html)
+const GROCERY_CATALOG_FALLBACK = [{"id":"fruit","label":"Fruit","items":[{"id":"apples","name":"Apples","type":"simple"},{"id":"bananas","name":"Bananas","type":"simple"},{"id":"blackberries","name":"Blackberries","type":"simple"},{"id":"blueberries","name":"Blueberries","type":"simple"},{"id":"cherries","name":"Cherries","type":"simple"},{"id":"ruby_red_grapefruit","name":"Grapefruit - Ruby Red","type":"simple"},{"id":"lemon","name":"Lemon","type":"simple"},{"id":"lime","name":"Lime","type":"simple"},{"id":"pears","name":"Pears","type":"simple"},{"id":"strawberries","name":"Strawberries","type":"simple"}]},{"id":"vegetables","label":"Vegetables","items":[{"id":"avocados","name":"Avocados","type":"simple"},{"id":"bell_peppers","name":"Bell Pepper","type":"multiAdd","variants":["Green","Orange","Red","Yellow","Other"]},{"id":"bok_choy","name":"Bok Choy","type":"simple"},{"id":"broccoli","name":"Broccoli","type":"simple"},{"id":"carrots","name":"Carrots","type":"simple"},{"id":"celery","name":"Celery","type":"simple"},{"id":"coleslaw","name":"Coleslaw","type":"simple"},{"id":"cucumber","name":"Cucumber","type":"simple"},{"id":"garlic","name":"Garlic","type":"simple"},{"id":"greens","name":"Lettuce","type":"multiAdd","variants":["Butter","Micro Greens","Protein Greens","Super Greens","Other"]},{"id":"onion","name":"Onion","type":"multiAdd","variants":["Green","Red","Shallot","Yellow","Other"]},{"id":"potatoes","name":"Potatoes","type":"multiAdd","variants":["Baby","Fingerling","Russet","Sweet","Yellow","Yukon Gold","Other"]},{"id":"tomatoes","name":"Tomatoes","type":"simple"},{"id":"veggie_tray","name":"Veggie Tray","type":"simple"},{"id":"zucchini","name":"Zucchini","type":"simple"}]},{"id":"bakery","label":"Bakery","items":[{"id":"bagels","name":"Bagels","type":"simple"},{"id":"baguette","name":"Baguette","type":"simple"},{"id":"hamburger_buns","name":"Hamburger Buns","type":"simple"},{"id":"hotdog_buns","name":"Hotdog Buns","type":"simple"},{"id":"pita","name":"Pita","type":"simple"},{"id":"sandwich_bread","name":"Sandwich Bread","type":"multiAdd","variants":["Multigrain","Sourdough","White","Other"]},{"id":"tortillas","name":"Tortillas","type":"simple"}]},{"id":"pantry","label":"Canned & Pantry","items":[{"id":"beans","name":"Beans","type":"multiAdd","variants":["Baked","Black","Cannellini","Garbanzo","Lupini","Navy","Pinto","Other"]},{"id":"bread_crumbs","name":"Bread Crumbs","type":"multiAdd","variants":["Italian","Original","Panko","Other"]},{"id":"broth","name":"Broth","type":"multiAdd","variants":["Beef","Chicken","Vegetable","Other"]},{"id":"condiments","name":"Condiments","type":"multiAdd","variants":["BBQ Sauce","Cholula","Hoisin","Ketchup","Mayo","Mustard","Peanut Sauce","Salsa - Green","Salsa - Red","Other"]},{"id":"flour","name":"Flour","type":"simple"},{"id":"granola","name":"Granola","type":"simple"},{"id":"green_chiles","name":"Green Chiles","type":"simple"},{"id":"juice","name":"Juice","type":"multiAdd","variants":["Apple","Lemon","Lime","Orange","Other"]},{"id":"jams","name":"Jams","type":"multiAdd","variants":["Fig","Mixed Berry","Strawberry","Other"]},{"id":"mac_cheese","name":"Mac & Cheese","type":"simple"},{"id":"minced_ginger","name":"Minced Ginger","type":"simple"},{"id":"oatmeal","name":"Oatmeal","type":"simple"},{"id":"oil","name":"Oil","type":"multiAdd","variants":["Avocado","Canola","Olive","Other"]},{"id":"pasta","name":"Pasta","type":"multiAdd","variants":["Egg","Fusilli","Penne","Rice Noodles","Spaghetti","Other"]},{"id":"peanut_butter","name":"Peanut Butter","type":"simple"},{"id":"rice","name":"Rice & Grains","type":"multiAdd","variants":["Barley","Basmati","Quinoa","Sushi","Other"]},{"id":"salad_dressing","name":"Salad Dressing","type":"multiAdd","variants":["Balsamic","Oil & Vinegar","Other"]},{"id":"spices","name":"Spices","type":"multiAdd","variants":["Basil","Cinnamon","Cumin","Oregano","Pepper","Salt","Other"]},{"id":"canned_tomatoes","name":"Tomatoes (Canned)","type":"multiAdd","variants":["Diced","Fire Roasted","Sun-Dried","Other"]},{"id":"tomato_sauce","name":"Tomato Sauce","type":"simple"}]},{"id":"snacks","label":"Snacks & Beverages","items":[{"id":"potato_chips","name":"Chips","type":"multiAdd","variants":["Cheddar","Salt & Pepper","Sea Salt","Sour Cream & Onion","Tortilla","Other"]},{"id":"chocolate","name":"Chocolate","type":"multiAdd","variants":["55% Bar","70%+ Bar","Chips","Other"]},{"id":"crackers","name":"Crackers","type":"multiAdd","variants":["Multigrain","Water","Other"]},{"id":"koia_shake","name":"Koia Shake","type":"simple"},{"id":"nuts","name":"Nuts","type":"multiAdd","variants":["Mixed","Pecans","Pistachios","Walnuts","Other"]},{"id":"popcorn","name":"Popcorn","type":"multiAdd","variants":["Bag","Microwave","Other"]},{"id":"pretzels","name":"Pretzels","type":"simple"},{"id":"sparkling_water","name":"Sparkling Water","type":"multiAdd","variants":["Sanzo","Spindrift","Waterloo","Other"]},{"id":"tea","name":"Tea","type":"multiAdd","variants":["Blackberry","Detox","Lemon Ginger","Mandarin","Other"]}]},{"id":"meat","label":"Raw Meat & Seafood Counter","items":[{"id":"bacon","name":"Bacon","type":"simple"},{"id":"chicken","name":"Chicken","type":"multiAdd","variants":["Breast","Ground","Thighs","Wings","Other"]},{"id":"meat_cut","name":"Meat","type":"multiAdd","variants":["Ground Beef","Hotdogs","Steak","Other"]},{"id":"pork","name":"Pork","type":"multiAdd","variants":["Chops","Ground","Loin","Other"]},{"id":"sausage","name":"Sausage","type":"multiAdd","variants":["Breakfast Bulk","Chorizo","Mild Italian","Other"]},{"id":"seafood","name":"Seafood","type":"multiAdd","variants":["Tilapia","Crab Cakes","Other"]},{"id":"turkey","name":"Turkey","type":"multiAdd","variants":["Ground","Other"]}]},{"id":"refrigerated","label":"Refrigerated & Frozen","items":[{"id":"butter","name":"Butter","type":"simple"},{"id":"cheese","name":"Cheese","type":"multiAdd","variants":["Cheddar","Mexican Blend","Monterey Jack","Mozzarella","Parmesan","Premium","Provolone","Other"]},{"id":"deli_meat","name":"Deli Meat","type":"multiAdd","variants":["Ham","Prosciutto","Roast Beef","Salami","Turkey","Other"]},{"id":"eggs","name":"Eggs","type":"simple"},{"id":"frozen_breakfast_sausage","name":"Frozen Breakfast Sausage","type":"simple"},{"id":"frozen_fruit","name":"Frozen Fruit","type":"simple"},{"id":"frozen_tots","name":"Frozen Tots","type":"simple"},{"id":"frozen_vegetables","name":"Frozen Vegetables","type":"multiAdd","variants":["Corn","Peas","Other"]},{"id":"frozen_waffles","name":"Frozen Waffles","type":"simple"},{"id":"gnocchi","name":"Gnocchi","type":"simple"},{"id":"hummus","name":"Hummus","type":"multiAdd","variants":["Plain","Green Chili","Tahini","Red Pepper","Other"]},{"id":"oat_milk","name":"Oat Milk","type":"simple"},{"id":"pizza","name":"Pizza","type":"multiAdd","variants":["Frozen","Refrigerated","Dough","Other"]},{"id":"salami_stick","name":"Salami Stick","type":"simple"},{"id":"tofu","name":"Tofu","type":"simple"},{"id":"yogurt","name":"Yogurt","type":"multiAdd","variants":["Greek","Regular","Other"]},{"id":"lunches","name":"Lunches","type":"freeformOnly"}]},{"id":"misc","label":"Misc","items":[{"id":"conditioner","name":"Conditioner","type":"simple"},{"id":"dental_floss","name":"Dental Floss","type":"simple"},{"id":"dish_soap","name":"Dish Soap","type":"simple"},{"id":"dishwasher_detergent","name":"Dishwasher Detergent","type":"simple"},{"id":"hand_soap","name":"Hand Soap","type":"simple"},{"id":"shampoo","name":"Shampoo","type":"simple"},{"id":"sunscreen","name":"Sunscreen","type":"simple"},{"id":"vitamins","name":"Vitamins","type":"freeform"}]}];
+
+// Ingredient wording → grocery item. First match wins, so specific phrases come first.
+// Target: 'itemId', 'itemId:Variant', or 'other:sectionId' (typed into that section's Other field)
+const GROCERY_RULES = [
+  // Pantry items that aren't in the grocery catalog (checked first so e.g. "rice vinegar" isn't rice)
+  [/vinegar/, 'other:pantry'],
+  [/sesame oil/, 'other:pantry'],
+  [/soy sauce|tamari|fish sauce|worcestershire|gochujang|sofrito|enchilada sauce|marinara|adobo|chipotle|coconut milk|tomato paste|capers|honey|maple syrup|sugar|cornstarch|bouillon|peanuts?\b(?! (butter|sauce))|olives|chili crisp|sriracha|hot sauce|wine\b/, 'other:pantry'],
+  [/red pepper flake|chil[ie] flake|crushed red pepper|garlic powder|onion powder|paprika|turmeric|coriander|curry powder|garam masala|chili powder|cayenne|nutmeg|mustard powder|italian seasoning|dried thyme|dried dill|dried sage|\bsage\b|bay lea/, 'other:pantry'],
+  [/dried basil/, 'spices:Basil'],
+  [/\bcumin\b/, 'spices:Cumin'],
+  [/oregano/, 'spices:Oregano'],
+  [/cinnamon/, 'spices:Cinnamon'],
+  [/pepper jack/, 'cheese:Monterey Jack'],
+  [/\bsalt\b/, 'spices:Salt'],
+  [/(black|white|ground) pepper|^pepper\b/, 'spices:Pepper'],
+  // Bakery (before eggs, flour, hot dogs)
+  [/tortilla chip/, 'potato_chips:Tortilla'],
+  [/tortilla/, 'tortillas'],
+  [/hamburger bun/, 'hamburger_buns'],
+  [/hot ?dog bun/, 'hotdog_buns'],
+  [/\bpitas?\b/, 'pita'],
+  [/baguette/, 'baguette'],
+  [/bagel/, 'bagels'],
+  // Canned tomatoes (before onion, for "diced tomatoes with green pepper and onion")
+  [/fire[- ]roasted[^,]*tomato/, 'canned_tomatoes:Fire Roasted'],
+  [/sun[- ]dried/, 'canned_tomatoes:Sun-Dried'],
+  [/(diced|crushed|chopped) tomatoes/, 'canned_tomatoes:Diced'],
+  // Produce
+  [/scallion|green onion/, 'onion:Green'],
+  [/shallot/, 'onion:Shallot'],
+  [/red onion/, 'onion:Red'],
+  [/white onion|pearl onion|sweet onion/, 'other:vegetables'],
+  [/\bonions?\b/, 'onion:Yellow'],
+  [/sweet potato/, 'potatoes:Sweet'],
+  [/yukon/, 'potatoes:Yukon Gold'],
+  [/baby potato/, 'potatoes:Baby'],
+  [/fingerling/, 'potatoes:Fingerling'],
+  [/russet/, 'potatoes:Russet'],
+  [/yellow potato/, 'potatoes:Yellow'],
+  [/butter lettuce/, 'greens:Butter'],
+  [/micro ?greens?/, 'greens:Micro Greens'],
+  [/bok choy/, 'bok_choy'],
+  [/broccoli/, 'broccoli'],
+  [/carrot/, 'carrots'],
+  [/celery/, 'celery'],
+  [/coleslaw/, 'coleslaw'],
+  [/cucumber/, 'cucumber'],
+  [/\bgarlic\b/, 'garlic'],
+  [/avocado oil/, 'oil:Avocado'],
+  [/avocado/, 'avocados'],
+  [/zucchini/, 'zucchini'],
+  [/lemon/, 'lemon'],
+  [/\blimes?\b/, 'lime'],
+  [/apple(?! cider)/, 'apples'],
+  [/banana/, 'bananas'],
+  [/blueberr/, 'blueberries'],
+  [/blackberr/, 'blackberries'],
+  [/strawberr/, 'strawberries'],
+  [/cherr(y|ies)(?! tomato)/, 'cherries'],
+  [/\bpears?\b/, 'pears'],
+  [/ginger/, 'minced_ginger'],
+  [/green chile|hatch/, 'green_chiles'],
+  [/snow peas|sugar snap/, 'other:vegetables'],
+  // Meat & seafood
+  [/ground beef/, 'meat_cut:Ground Beef'],
+  [/steak|flank|sirloin|skirt/, 'meat_cut:Steak'],
+  [/hot ?dogs?\b/, 'meat_cut:Hotdogs'],
+  [/ground chicken/, 'chicken:Ground'],
+  [/chicken[^,]*\b(breast|cutlet)|\bchicken cutlet/, 'chicken:Breast'],
+  [/chicken[^,]*thigh/, 'chicken:Thighs'],
+  [/chicken wing/, 'chicken:Wings'],
+  [/ground turkey/, 'turkey:Ground'],
+  [/pork chop/, 'pork:Chops'],
+  [/ground pork/, 'pork:Ground'],
+  [/pork loin/, 'pork:Loin'],
+  [/italian sausage/, 'sausage:Mild Italian'],
+  [/chorizo|lingui/, 'sausage:Chorizo'],
+  [/breakfast sausage/, 'sausage:Breakfast Bulk'],
+  [/bacon/, 'bacon'],
+  [/tilapia/, 'seafood:Tilapia'],
+  [/crab cake/, 'seafood:Crab Cakes'],
+  [/prosciutto/, 'deli_meat:Prosciutto'],
+  [/salami/, 'deli_meat:Salami'],
+  [/roast beef/, 'deli_meat:Roast Beef'],
+  [/\bham\b/, 'deli_meat:Ham'],
+  // Refrigerated
+  [/parmesan|parmigiano|romano/, 'cheese:Parmesan'],
+  [/mozzarella/, 'cheese:Mozzarella'],
+  [/monterey jack/, 'cheese:Monterey Jack'],
+  [/cheddar/, 'cheese:Cheddar'],
+  [/provolone/, 'cheese:Provolone'],
+  [/mexican blend/, 'cheese:Mexican Blend'],
+  [/peanut butter/, 'peanut_butter'],
+  [/peanut sauce/, 'condiments:Peanut Sauce'],
+  [/\bbutter\b/, 'butter'],
+  [/greek yogurt/, 'yogurt:Greek'],
+  [/yogurt/, 'yogurt:Regular'],
+  [/oat milk/, 'oat_milk'],
+  [/egg noodle/, 'pasta:Egg'],
+  [/\beggs?\b|egg white/, 'eggs'],
+  [/tofu/, 'tofu'],
+  [/gnocchi/, 'gnocchi'],
+  [/hummus/, 'hummus:Plain'],
+  [/pizza dough/, 'pizza:Dough'],
+  [/frozen corn|corn kernel/, 'frozen_vegetables:Corn'],
+  [/\bpeas\b/, 'frozen_vegetables:Peas'],
+  // Canned & pantry
+  [/chickpea|garbanzo/, 'beans:Garbanzo'],
+  [/cannellini|white bean/, 'beans:Cannellini'],
+  [/navy bean/, 'beans:Navy'],
+  [/black bean/, 'beans:Black'],
+  [/pinto/, 'beans:Pinto'],
+  [/baked bean/, 'beans:Baked'],
+  [/chicken (broth|stock)/, 'broth:Chicken'],
+  [/beef (broth|stock)/, 'broth:Beef'],
+  [/vegetable (broth|stock)/, 'broth:Vegetable'],
+  [/\bbroth\b|\bstock\b/, 'broth:Chicken'],
+  [/bbq sauce|barbecue sauce/, 'condiments:BBQ Sauce'],
+  [/hoisin/, 'condiments:Hoisin'],
+  [/ketchup/, 'condiments:Ketchup'],
+  [/\bmayo/, 'condiments:Mayo'],
+  [/mustard|dijon/, 'condiments:Mustard'],
+  [/salsa verde/, 'condiments:Salsa - Green'],
+  [/salsa/, 'condiments:Salsa - Red'],
+  [/tomato sauce/, 'tomato_sauce'],
+  [/tomato/, 'tomatoes'],
+  [/basmati/, 'rice:Basmati'],
+  [/quinoa/, 'rice:Quinoa'],
+  [/barley/, 'rice:Barley'],
+  [/sushi rice/, 'rice:Sushi'],
+  [/rice noodle/, 'pasta:Rice Noodles'],
+  [/spaghetti/, 'pasta:Spaghetti'],
+  [/penne/, 'pasta:Penne'],
+  [/fusilli/, 'pasta:Fusilli'],
+  [/panko/, 'bread_crumbs:Panko'],
+  [/italian bread ?crumb/, 'bread_crumbs:Italian'],
+  [/bread ?crumb/, 'bread_crumbs:Original'],
+  [/olive oil/, 'oil:Olive'],
+  [/canola|neutral oil|vegetable oil/, 'oil:Canola'],
+  [/mac (and|&) cheese/, 'mac_cheese'],
+  [/\bflour\b/, 'flour'],
+];
+
+// When nothing matches: which section's Other field it goes in
+const OTHER_SECTION_RULES = [
+  [/chard|kale|spinach|marjoram/, 'vegetables'],
+  [/beef|pork|chicken|turkey|lamb|veal|shrimp|cod|salmon|fish|sausage|chuck|shoulder|scallop|crab|brat/, 'meat'],
+  [/cream|milk|cheese|ricotta|feta|halloumi|swiss|kimchi|tofu/, 'refrigerated'],
+  [/\bbuns?\b|bread|rolls?\b|lavash|naan|flatbread/, 'bakery'],
+  [/orange|berr|grape|mango|pineapple|peach|melon/, 'fruit'],
+  [/cilantro|parsley|basil|dill|marjoram|mint|thyme|rosemary|sprig|jalape|mushroom|tatsoi|chard|escarole|kale|spinach|cabbage|radish|tomatillo|lettuce|asparagus|green bean|squash|serrano|poblano|leek|fennel|eggplant|arugula|herb|potato|chiles?\b|corn\b/, 'vegetables'],
+];
+
+// Words dropped from text typed into an Other field ("garlic cloves, minced" → "Garlic cloves")
+const SHOP_TEXT_DROP = /\b(boneless|skinless|thin|thinly|finely|roughly|coarsely|freshly|fresh|chopped|minced|diced|sliced|grated|shredded|torn|halved|crushed|peeled|cubed|julienned|drained|rinsed|packed|lightly|large|medium|small|about|approximately|optional|plus|divided|softened|beaten|thawed|uncooked|cooked|dry|head|bunch(es)?|slices?|tsp|tbsp|cups?|oz|lbs?|sprigs?\s+of|juice of|zest of|for serving)\b/gi;
+
+function shoppingText(name) {
+  const segs = String(name || '').replace(/\([^)]*\)/g, ' ').split(/,|:/).map(s => s.trim()).filter(Boolean);
+  for (const seg of segs) {
+    const c = seg.replace(/\bplus\b.*$/i, '').replace(SHOP_TEXT_DROP, ' ').replace(/\b\d+(\.\d+)?\b|[½¼¾⅓⅔⅛]/g, ' ').replace(/\s+/g, ' ').trim().replace(/^[^a-z]+/i, '').replace(/^(and|or|of)\s+/i, '').trim();
+    if (/[a-z]{3}/i.test(c)) return c.charAt(0).toUpperCase() + c.slice(1);
+  }
+  return String(name || '').trim();
+}
+
+// ─── Grocery catalog + list (read on demand) ────────────────────────────────
+let baseCatalogPromise = null;
+function getBaseCatalog() {
+  if (!baseCatalogPromise) {
+    baseCatalogPromise = (async () => {
+      try {
+        const res = await fetch('index.html', { cache: 'no-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const html = await res.text();
+        const start = html.indexOf('const CATALOG = [');
+        if (start < 0) throw new Error('CATALOG not found');
+        const from = html.indexOf('[', start);
+        const to = html.indexOf('\n];', from);
+        const cat = parseLoose(html.slice(from, to + 2));
+        if (!Array.isArray(cat) || !cat.length || !cat[0].items) throw new Error('bad CATALOG');
+        return cat;
+      } catch (e) {
+        console.warn('Using built-in grocery catalog:', e.message);
+        return GROCERY_CATALOG_FALLBACK;
+      }
+    })();
+  }
+  return baseCatalogPromise;
+}
+
+// Same rules the grocery app uses for its runtime catalog additions/deletions
+function applyGroceryCatalogChanges(base, gState) {
+  const cat = JSON.parse(JSON.stringify(base));
+  (gState.catalogDeletions || []).forEach(({ itemId, variant }) => {
+    cat.forEach(c => {
+      if (variant) {
+        const it = c.items.find(i => i.id === itemId);
+        if (it && it.variants) {
+          it.variants = it.variants.filter(v => v !== variant);
+          if (it.variants.filter(v => v !== 'Other').length === 0) c.items = c.items.filter(i => i.id !== itemId);
+        }
+      } else c.items = c.items.filter(i => i.id !== itemId);
+    });
+  });
+  (gState.catalogAdditions || []).forEach(a => {
+    const c = cat.find(x => x.id === a.catId);
+    if (!c) return;
+    if (a.type === 'variant') {
+      const p = c.items.find(i => i.id === a.variantParentId);
+      if (p && p.variants && !p.variants.includes(a.variantText)) p.variants.splice(Math.max(0, p.variants.indexOf('Other')), 0, a.variantText);
+    } else if (a.item && !c.items.some(i => i.id === a.item.id)) {
+      c.items.push(a.item);
+    }
+  });
+  return cat;
+}
+
+let groceryState = null;
+async function loadGroceryState() {
+  const snap = await getDoc(GROCERY_REF);
+  groceryState = snap.exists() ? snap.data() : {};
+  return groceryState;
+}
+async function getGroceryContext() {
+  const [base, gState] = await Promise.all([getBaseCatalog(), loadGroceryState()]);
+  return { catalog: applyGroceryCatalogChanges(base, gState), gState };
+}
+
+function findCatalogItem(catalog, itemId) {
+  for (const c of catalog) {
+    const it = c.items.find(i => i.id === itemId);
+    if (it) return { cat: c, item: it };
+  }
+  return null;
+}
+
+function otherSectionFor(text, catalog) {
+  const t = String(text).toLowerCase();
+  let id = 'pantry';
+  for (const [re, sec] of OTHER_SECTION_RULES) { if (re.test(t)) { id = sec; break; } }
+  if (!catalog.some(c => c.id === id)) id = (catalog.find(c => c.id === 'pantry') || catalog[0]).id;
+  return id;
+}
+
+// → { kind:'item', catId, itemId, variant, label }  or  { kind:'other', catId, text }
+function matchIngredient(name, catalog) {
+  const text = String(name || '').toLowerCase().replace(/\([^)]*\)/g, ' ');
+  const asOther = catId => ({ kind: 'other', catId: catalog.some(c => c.id === catId) ? catId : otherSectionFor(text, catalog), text: shoppingText(name) });
+
+  // Try the main part first ("neutral oil, for tofu" → "neutral oil"), then the whole text
+  const head = text.split(/[,:;]/)[0];
+  const findRule = s => {
+    if (/bell pepper/.test(s)) {
+      const color = (s.match(/\b(red|green|yellow|orange)\b/) || [])[1];
+      return color ? 'bell_peppers:' + color.charAt(0).toUpperCase() + color.slice(1) : 'other:vegetables';
+    }
+    for (const [re, t] of GROCERY_RULES) { if (re.test(s)) return t; }
+    return null;
+  };
+  const target = findRule(head) || findRule(text);
+  if (!target) return asOther(otherSectionFor(text, catalog));
+  if (target.startsWith('other:')) return asOther(target.slice(6));
+
+  const [itemId, variant] = target.split(/:(.+)/);
+  const found = findCatalogItem(catalog, itemId);
+  if (!found) return asOther(otherSectionFor(text, catalog));               // item was removed from the grocery catalog
+  if (variant && !(found.item.variants || []).includes(variant)) return asOther(found.cat.id);
+  if (!variant && found.item.type === 'multiAdd') return asOther(found.cat.id);
+  return { kind: 'item', catId: found.cat.id, itemId, variant: variant || null,
+           label: `${found.cat.label} › ${found.item.name}${variant ? ' › ' + variant : ''}` };
+}
+
+function groceryKey(t) { return t.variant ? `${t.itemId}:${t.variant}` : t.itemId; }
+
+function otherTextOnList(gState, text) {
+  const n = normName(text);
+  const ff = gState.freeform || {};
+  if (Object.values(ff).some(list => (list || []).some(e => normName(e.text) === n))) return true;
+  const notes = gState.notes || {};
+  return Object.keys(gState.items || {}).some(k => k.includes(':Other:') && (gState.items[k]?.qty || 0) > 0 && normName(notes['__label_' + k]) === n);
+}
+
+function isOnGroceryList(target, gState) {
+  if (target.kind === 'item') return ((gState.items || {})[groceryKey(target)]?.qty || 0) > 0;
+  return otherTextOnList(gState, target.text);
+}
+
+// ─── Recipe screen: cart icons ──────────────────────────────────────────────
+let cartRecipe = null;   // the recipe currently shown, for the 🛒 buttons
+
+async function refreshCartIcons() {
+  const r = cartRecipe;
+  if (!r) return;
+  try {
+    const { catalog, gState } = await getGroceryContext();
+    if (r !== cartRecipe) return;
+    (r.ingredients || []).forEach((ing, k) => {
+      const btn = document.getElementById('cart-' + k);
+      if (!btn) return;
+      const on = isOnGroceryList(matchIngredient(ing.name, catalog), gState);
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '✓' : '🛒';
+      btn.title = on ? 'Already on the grocery list' : 'Add to grocery list';
+    });
+  } catch (e) { console.warn('Grocery list check failed:', e); }
+}
+
+// ─── Pop-up ─────────────────────────────────────────────────────────────────
+let groceryCtx = null;     // { catalog, gState }
+let groceryIng = null;     // the ingredient being added
+
+async function openGroceryAdd(k) {
+  const ing = cartRecipe?.ingredients?.[k];
+  if (!ing) return;
+  const box = document.getElementById('modal-grocery-box');
+  box.innerHTML = '<div class="loading-msg">Checking the grocery list…</div>';
+  openModal('modal-grocery');
+  try { groceryCtx = await getGroceryContext(); }
+  catch (e) {
+    box.innerHTML = `<div class="modal-title">Couldn't reach the grocery list</div>
+      <div class="modal-body">Check your connection and try again.</div>
+      <div class="modal-actions"><button class="modal-cancel" onclick="closeModal('modal-grocery')">Close</button></div>`;
+    return;
+  }
+  groceryIng = ing;
+  const { catalog, gState } = groceryCtx;
+  const match = matchIngredient(ing.name, catalog);
+
+  if (isOnGroceryList(match, gState)) {
+    box.innerHTML = `<div class="modal-title">Already on the list</div>
+      <div class="modal-body"><b>${escHtml(match.kind === 'item' ? match.label : match.text)}</b> is already on the grocery list.</div>
+      <div class="modal-actions"><button class="modal-confirm" onclick="closeModal('modal-grocery')">OK</button></div>`;
+    return;
+  }
+
+  const selected = match.kind === 'item' ? groceryKey(match) : 'other:' + match.catId;
+  const options = catalog.map(c => {
+    const opts = [];
+    c.items.forEach(it => {
+      if (it.type === 'simple') opts.push([it.id, it.name]);
+      else if (it.type === 'multiAdd') (it.variants || []).filter(v => v !== 'Other').forEach(v => opts.push([`${it.id}:${v}`, `${it.name} › ${v}`]));
+    });
+    opts.push(['other:' + c.id, 'Other (type a name)']);
+    return `<optgroup label="${escAttr(c.label)}">${opts.map(([v, l]) =>
+      `<option value="${escAttr(v)}"${v === selected ? ' selected' : ''}>${escHtml(l)}</option>`).join('')}</optgroup>`;
+  }).join('');
+
+  box.innerHTML = `<div class="modal-title">Add to grocery list</div>
+    <div class="ed-hint" style="margin:-2px 0 10px;">From recipe: ${escHtml(ing.name)}</div>
+    ${gState.locked ? '<div class="grocery-warn">🔒 The grocery list is locked for shopping. You can still add this, but whoever is shopping may not see it.</div>' : ''}
+    <label class="ed-label" for="grocery-target" style="margin-top:4px;">Goes to</label>
+    <select class="ed-select" id="grocery-target" onchange="onGroceryTargetChange()">${options}</select>
+    <div id="grocery-other-wrap">
+      <label class="ed-label" for="grocery-other-text">Name on the list</label>
+      <input class="ed-input" id="grocery-other-text" value="${escAttr(match.kind === 'other' ? match.text : shoppingText(ing.name))}" oninput="onGroceryTargetChange()" autocomplete="off">
+    </div>
+    <div id="grocery-already" class="grocery-already hidden">Already on the list</div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="modal-cancel" onclick="closeModal('modal-grocery')">Cancel</button>
+      <button class="modal-confirm" id="grocery-add-btn" onclick="confirmGroceryAdd()">Add</button>
+    </div>`;
+  onGroceryTargetChange();
+}
+window.openGroceryAdd = openGroceryAdd;
+
+function readGroceryTarget() {
+  const v = document.getElementById('grocery-target').value;
+  if (v.startsWith('other:')) return { kind: 'other', catId: v.slice(6), text: document.getElementById('grocery-other-text').value.trim() };
+  const [itemId, variant] = v.split(/:(.+)/);
+  return { kind: 'item', itemId, variant: variant || null };
+}
+
+function onGroceryTargetChange() {
+  const t = readGroceryTarget();
+  document.getElementById('grocery-other-wrap').classList.toggle('hidden', t.kind !== 'other');
+  const already = t.kind === 'other' ? (!!t.text && otherTextOnList(groceryCtx.gState, t.text)) : isOnGroceryList(t, groceryCtx.gState);
+  document.getElementById('grocery-already').classList.toggle('hidden', !already);
+  document.getElementById('grocery-add-btn').disabled = already || (t.kind === 'other' && !t.text);
+}
+window.onGroceryTargetChange = onGroceryTargetChange;
+
+async function confirmGroceryAdd() {
+  const t = readGroceryTarget();
+  if (t.kind === 'other' && !t.text) return;
+  const btn = document.getElementById('grocery-add-btn');
+  btn.disabled = true; btn.textContent = 'Adding…';
+  let result;
+  try { result = await addToGroceryList(t); }
+  catch (e) {
+    console.error('Grocery add error:', e);
+    btn.disabled = false; btn.textContent = 'Add';
+    toast('Couldn\'t add it. Check your connection and try again.');
+    return;
+  }
+  closeModal('modal-grocery');
+  toast(result === 'already' ? 'Already on the list' : 'Added to the grocery list');
+  refreshCartIcons();
+}
+window.confirmGroceryAdd = confirmGroceryAdd;
+
+// Adds one item inside a transaction, so nothing else on the grocery list is touched
+async function addToGroceryList(t) {
+  let result = 'added';
+  await runTransaction(db, async tx => {
+    result = 'added';
+    const snap = await tx.get(GROCERY_REF);
+    if (!snap.exists()) throw new Error('Grocery list not found');
+    const data = snap.data();
+    const now = Date.now();
+    if (t.kind === 'item') {
+      const key = groceryKey(t);
+      const items = { ...(data.items || {}) };
+      if ((items[key]?.qty || 0) > 0) { result = 'already'; return; }
+      items[key] = { qty: 1, updatedAt: now };
+      const deletedAt = { ...(data.deletedAt || {}) };
+      delete deletedAt[key];                       // same as the grocery app does when re-adding
+      tx.set(GROCERY_REF, { ...data, items, deletedAt });
+    } else {
+      if (otherTextOnList(data, t.text)) { result = 'already'; return; }
+      const freeform = { ...(data.freeform || {}) };
+      freeform[t.catId] = [...(freeform[t.catId] || []), { id: uuid(), text: t.text, qty: 1, updatedAt: now }];
+      tx.set(GROCERY_REF, { ...data, freeform, freeformAt: now });
+    }
+  });
+  return result;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // IMPORT RECIPES  (paste the formatted text from Claude or ChatGPT)
@@ -3607,7 +4074,7 @@ requestAnimationFrame(() => requestAnimationFrame(renderHeader));
 window.addEventListener('resize', renderHeader);
 
 // Exposed only for automated testing
-window.__dinners = { isDryRice, parseLoose, normalizeRecipe, AI_PROMPT, parseQty, fmtFrac, scaleStepHtml, fmtLb, parseIngredientLine, mergeIndex, mergePlanner, fmtQtyInput, parseSteps };
+window.__dinners = { matchIngredient, shoppingText, getBaseCatalog, applyGroceryCatalogChanges, isDryRice, parseLoose, normalizeRecipe, AI_PROMPT, parseQty, fmtFrac, scaleStepHtml, fmtLb, parseIngredientLine, mergeIndex, mergePlanner, fmtQtyInput, parseSteps };
 </script>
 </body>
 </html>
