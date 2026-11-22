@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Dinners (recipes.html) v1 - companion to Grocery Shopper. Firestore collection: recipes -->
+<!-- Dinners (recipes.html) v3 (scaled instructions, quarter-lb rounding, collapsible ingredients) - companion to Grocery Shopper. Firestore collection: recipes -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -302,10 +302,6 @@
   .ing:last-child { border-bottom: none; }
   .ing-qty { font-weight: 700; color: var(--accent-darker); }
   .ing.got .ing-qty, .ing.got .ing-name { color: var(--text-dim); text-decoration: line-through; }
-  .ing-pack {
-    display: inline-block; margin-top: 3px; font-size: 12px; color: #7a5f00;
-    background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 1px 7px;
-  }
   .step-list { list-style: none; counter-reset: step; }
   .step-list li {
     counter-increment: step; position: relative; padding: 8px 0 8px 36px;
@@ -317,10 +313,13 @@
     width: 24px; height: 24px; border-radius: 50%; background: var(--accent-dark); color: #fff;
     font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
   }
-  .scale-note {
-    font-size: 12px; color: #7a5f00; background: var(--warn-bg); border: 1px solid var(--warn-border);
-    border-radius: 8px; padding: 6px 10px; margin-bottom: 8px;
-  }
+  .rv-card.collapsible .rv-card-head { cursor: pointer; user-select: none; -webkit-user-select: none; }
+  .rv-card.collapsible .rv-card-head:hover { background: var(--accent-darker); }
+  .rv-card.collapsible .rv-card-body { display: none; }
+  .rv-card.collapsible.open .rv-card-body { display: block; }
+  .rv-card.collapsible.open .menu-cat-chevron { transform: rotate(180deg); }
+  .rv-card-head .cat-count { margin-left: 6px; letter-spacing: 0; }
+  b.scaled { color: var(--accent-darker); }
   .rv-notes { font-size: 14px; line-height: 1.55; color: var(--text-mid); white-space: pre-wrap; }
   .loading-msg, .empty-msg { text-align: center; color: var(--text-dim); font-size: 14px; padding: 24px 0; line-height: 1.6; }
   .error-box {
@@ -483,12 +482,6 @@ const BASE_SERVINGS      = 4;
 const UNITS              = ['', 'lb', 'oz', 'cup', 'tbsp', 'tsp', 'can', 'clove', 'pinch'];
 const TOMBSTONE_MAX_AGE  = 30 * 24 * 60 * 60 * 1000;
 
-// Protein pack sizes you can buy (lb). Recipe amounts round UP to the next pack,
-// unless they are within PACK_TOLERANCE of a smaller pack (so 1.03 lb says "1 lb pack").
-const PACK_SIZES     = [0.25, 0.5, 1, 1.25, 1.5, 2, 3];
-const PACK_TOLERANCE = 0.05;
-// Only "lb" ingredients whose name matches this get a pack suggestion (so potatoes and pasta don't)
-const PROTEIN_RE = /\b(beef|chuck|steak|flank|sirloin|skirt|brisket|chicken|turkey|pork|sausage|chorizo|lingui|prosciutto|pancetta|bacon|ham|lamb|veal|cod|tilapia|salmon|shrimp|fish|tuna|halibut|mahi|halloumi|tofu)/i;
 
 // Fallback takeout list (copied from index.html), used only if the grocery app has none
 const TAKEOUT_SEED = [
@@ -1811,6 +1804,7 @@ function defaultIndex() {
     meals:     {},   // mealId → { name, category, hasRecipe, updatedAt }
     deletedAt: {},   // mealId → timestamp (tombstones, pruned after 30 days)
     seededAt:  0,    // set once by the seed; keeps the seed from ever running again
+    namesAlignedAt: 0, // set once by the name/meal-list alignment with the grocery app
   };
 }
 function defaultPlanner() {
@@ -1925,22 +1919,61 @@ function fmtQtyInput(q, unit) {
   const { diff } = nearestFrac(q - w);
   return diff < 0.01 ? fmtFrac(q) : trimNum(q);
 }
-function fmtLb(n) { return n < 0.1 ? String(Math.round(n * 100) / 100) : String(Math.round(n * 10) / 10); }
+// Pounds round to the nearest ¼ lb (never below ¼ lb)
+function fmtLb(n) { return trimNum(Math.max(0.25, Math.round(n * 4) / 4)); }
+
+// ─── Scaling quantities inside instruction text ─────────────────────────────
+// Scales numbers like "1½ lb", "¾ cup", "2–3 tbsp", "4 garlic cloves".
+// Leaves alone: times (minutes, hours), temperatures (°F), sizes ("1-inch", "6-oz"),
+// can sizes in parentheses "(15 oz)", "2 per sandwich", and pressure-cooker minimums ("at least 1 cup").
+const STEP_NUM = '(?:\\d+\\s+\\d+\\/\\d+|\\d+\\/\\d+|\\d+(?:\\.\\d+)?[½¼¾⅓⅔⅛⅜⅝⅞⅙⅚]?|[½¼¾⅓⅔⅛⅜⅝⅞⅙⅚])';
+const STEP_QTY_RE = new RegExp('(?<![\\w.\\/°])(' + STEP_NUM + ')(\\s*(?:–|—|-|to)\\s*)?(' + STEP_NUM + ')?(?![\\w\\/])', 'g');
+const STEP_SKIP_AFTER = /^\s*(?:-\s*[a-z]|°|º|degrees?\b|min\b|mins\b|minutes?\b|sec\b|secs\b|seconds?\b|hours?\b|hrs?\b|days?\b|weeks?\b|inch(?:es)?\b|in\.|"|%|percent\b|times?\b|batch(?:es)?\b|steps?\b|x\b|(?:additional|more|extra)\s+(?:min|minutes?|seconds?|hours?)\b|(?:\w+\s+)?per\s+(?:serving|sandwich|person|portion|pita|taco|bowl)\b)/i;
+const STEP_UNIT_AFTER = /^\s*(lbs?|pounds?|oz|ounces?|cups?|cans?|cloves?|tbsp|tsp)\b/i;
+
+function fmtStepQty(v, unit) {
+  if (unit === 'lb') return fmtLb(v);
+  if (unit === 'oz') return v >= 4 ? String(Math.round(v)) : fmtFrac(v);
+  return fmtFrac(v);
+}
+
+function scaleStepHtml(text, factor) {
+  const raw = String(text || '');
+  if (Math.abs(factor - 1) < 1e-9) return escHtml(raw);
+  const OPEN = '\u0001', CLOSE = '\u0002';
+  const out = raw.replace(STEP_QTY_RE, (m, a, sep, b, offset) => {
+    if (sep && !b) return m;                       // "2-" followed by a word: not a range
+    const before = raw.slice(0, offset);
+    const after  = raw.slice(offset + m.length);
+    if (/at least\s*$/i.test(before)) return m;     // appliance minimum liquid
+    if (/(?:step|#)\s*$/i.test(before)) return m;
+    if (STEP_SKIP_AFTER.test(after)) return m;
+    const um = after.match(STEP_UNIT_AFTER);
+    const unit = um ? (/^(lbs?|pounds?)$/i.test(um[1]) ? 'lb' : /^(oz|ounces?)$/i.test(um[1]) ? 'oz' : 'other') : '';
+    // Inside parentheses, leave can/package sizes like "(15 oz)" alone
+    if (unit === 'oz' && (before.match(/\(/g) || []).length > (before.match(/\)/g) || []).length) return m;
+    const va = parseQty(a);
+    if (va == null) return m;
+    let s = fmtStepQty(va * factor, unit);
+    if (b) {
+      const vb = parseQty(b);
+      if (vb != null) s += sep.trim() === 'to' ? ' to ' : '–' + fmtStepQty(vb * factor, unit);
+    }
+    return OPEN + s + CLOSE;
+  });
+  // Fix singular/plural for cup/can/clove after a scaled number
+  const fixed = out.replace(/\u0001([^\u0002]+)\u0002(\s*)(cups?|cans?|cloves?)\b/gi, (m, q, sp, word) => {
+    const last = q.split(/–| to /).pop();
+    const n = parseQty(last);
+    const base = word.toLowerCase().replace(/s$/, '');
+    return '\u0001' + q + '\u0002' + sp + (n != null && n > 1 ? base + 's' : base);
+  });
+  return escHtml(fixed).replace(/\u0001/g, '<b class="scaled">').replace(/\u0002/g, '</b>');
+}
 function unitLabel(unit, q) {
   if (!unit) return '';
   const plural = { cup:'cups', can:'cans', clove:'cloves', pinch:'pinches' };
   return q > 1 && plural[unit] ? plural[unit] : unit;
-}
-function packSuggestion(lbs) {
-  const parts = [];
-  let rem = lbs;
-  while (rem > PACK_SIZES[PACK_SIZES.length - 1] + PACK_TOLERANCE) { parts.push(3); rem -= 3; }
-  if (rem > PACK_TOLERANCE || parts.length === 0) {
-    parts.push(PACK_SIZES.find(p => p >= rem - PACK_TOLERANCE) || 3);
-  }
-  return parts.length === 1
-    ? `Buy a ${parts[0]} lb pack`
-    : `Buy ${parts.map(p => p + ' lb').join(' + ')} packs`;
 }
 
 // Paste parser: "1 1/2 lb ground beef" → { qty:1.5, unit:'lb', name:'ground beef' }
@@ -2020,6 +2053,7 @@ function mergePlanner(local, cloud) {
 function mergeIndex(local, cloud) {
   const merged = defaultIndex();
   merged.seededAt = Math.max(local.seededAt || 0, cloud.seededAt || 0);
+  merged.namesAlignedAt = Math.max(local.namesAlignedAt || 0, cloud.namesAlignedAt || 0);
 
   const tombKeys = new Set([...Object.keys(local.deletedAt || {}), ...Object.keys(cloud.deletedAt || {})]);
   tombKeys.forEach(k => {
@@ -2095,6 +2129,103 @@ async function importTakeoutIfNeeded() {
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ONE-TIME ALIGNMENT WITH THE GROCERY APP'S MENU
+// 1. Renames recipes back to the meal names used in the grocery app
+// 2. Uses the grocery app's category for every meal whose name matches
+// 3. Adds grocery meals that have no recipe yet (shown with a "no recipe" tag)
+// Reads the grocery app (never writes to it). Runs once, then is inert.
+// ─────────────────────────────────────────────────────────────────────────────
+const RENAME_MAP = {
+  'Renaissance of Tuna Casserole (Tuna Fettuccine)': 'Tuna and Sundried Tomato Pasta',
+  'Beef Pizzaiola (Ninja Foodi Pressure Cooker)': 'Beef Pizzaiola',
+  'Beef Stroganoff (Ninja Foodi Pressure Cooker)': 'Beef Stroganoff',
+  'Minestrone Soup with Pasta, Beans and Vegetables (Ninja Foodi)': 'Minestrone',
+  'Prosciutto & Green Pea Risotto': 'Risotto with Prosciutto and Peas',
+  'Korean Ground Beef Rice Bowls with Bok Choy': 'Korean Beef Rice Bowls',
+  'Patty Melts with Caramelized Onions': 'Patty Melts',
+  'Pan-Seared Pork Chops': 'Pork chops',
+  'Beef Barley Soup': 'Beef barley soup',
+  'Corn Chowder with Coconut Milk': 'Corn Chowder',
+  'BBQ Chicken Lavash Flatbread': 'BBQ Chicken Flatbread',
+  'Chicken Schnitzel with Warm Potato & Pea Salad': 'Chicken Schnitzel with Warm Potato and Pea Salad',
+  'Skillet Chicken Enchiladas with Roasted Hatch Green Chiles': 'Chicken Enchilada Skillet',
+  'Ginger-Sesame Chicken with Bok Choy & Noodles': 'Ginger-Sesame Chicken with Bok Choy',
+  'Turkey Kofta with Rice, Yogurt Sauce & Cucumber-Tomato Salad': 'Turkey Kofta',
+  'Mujadara (Lentils, Rice & Caramelized Onions)': 'Mujadara Lentils',
+  'Black Bean & Sweet Potato Tacos with Roasted Hatch Green Chiles': 'Black Bean & Sweet Potato Tacos',
+  'Southwestern Falafel Patties with Avocado Spread': 'Southwest Falafel',
+  'Swiss Chard, White Bean & Parmesan Skillet with Rice': 'Swiss Chard, White Bean & Parmesan Skillet w/ Rice',
+  'Chicken Shawarma': 'Chicken Schwarma',
+  'Crispy Tofu & Chicken with Tatsoi and Peanut Sauce': 'Crispy Tofu & Chicken with Tatsoi, Rice and Peanut Sauce',
+  'Pork Pozole Verde with Roasted Hatch Green Chiles': 'Pork Pozole',
+  'Crispy Halloumi Pitas': 'Fried Halloumi',
+  'Crispy Gnocchi with Prosciutto, Peas & Parmesan Sauce': 'Gnocchi with Prosciutto',
+  'Sausage and White Bean Soup with Escarole': 'Escarole, White Bean and Sausage Soup',
+};
+// Grocery menu names that refer to a recipe under a different name (so they aren't imported twice)
+const GROCERY_ALIASES = {
+  'Gnocchi with Pancetta': 'Gnocchi with Prosciutto',
+};
+const normName = s => String(s || '').trim().toLowerCase();
+
+async function alignWithGroceryMenuIfNeeded() {
+  const now = Date.now();
+  await runTransaction(db, async tx => {
+    // All reads first (Firestore transaction rule)
+    const iSnap = await tx.get(INDEX_REF);
+    if (!iSnap.exists() || iSnap.data().namesAlignedAt) return;   // already done: inert
+    const gSnap = await tx.get(GROCERY_REF);
+    const data  = iSnap.data();
+    const meals = { ...(data.meals || {}) };
+
+    // Grocery menu: { name: {category} } (older versions stored an array)
+    let gMenu = gSnap.exists() ? (gSnap.data().dinnerMenu || {}) : {};
+    if (Array.isArray(gMenu)) {
+      const o = {}; gMenu.forEach(e => { if (e && e.name) o[e.name] = { category: e.category }; }); gMenu = o;
+    }
+    const gCats = {};
+    Object.entries(gMenu).forEach(([n, v]) => {
+      const target = GROCERY_ALIASES[n] || n;
+      gCats[normName(target)] = normCat(v && v.category);
+    });
+
+    // Work out renames/category changes, and read the recipe docs we'll touch
+    const changes = [];
+    Object.entries(meals).forEach(([id, m]) => {
+      const newName = RENAME_MAP[m.name] || m.name;
+      const newCat  = gCats[normName(newName)] || normCat(m.category);
+      if (newName !== m.name || newCat !== m.category) changes.push({ id, m, newName, newCat });
+    });
+    const recipeSnaps = {};
+    for (const c of changes) {
+      if (c.m.hasRecipe) recipeSnaps[c.id] = await tx.get(recipeRef(c.id));
+    }
+
+    // Writes
+    changes.forEach(({ id, m, newName, newCat }) => {
+      meals[id] = { ...m, name: newName, category: newCat, updatedAt: now };
+      if (recipeSnaps[id] && recipeSnaps[id].exists()) {
+        tx.set(recipeRef(id), { ...recipeSnaps[id].data(), name: newName, category: newCat, updatedAt: now });
+      }
+    });
+
+    const have = new Set(Object.values(meals).map(m => normName(m.name)));
+    const usedIds = new Set([...Object.keys(meals), ...Object.keys(data.deletedAt || {})]);
+    Object.entries(gMenu).forEach(([n, v]) => {
+      const target = GROCERY_ALIASES[n] || n;
+      if (have.has(normName(target))) return;
+      let id = slugify(target);
+      while (usedIds.has(id)) id = slugify(target) + '-' + shortId();
+      usedIds.add(id);
+      have.add(normName(target));
+      meals[id] = { name: target.trim(), category: normCat(v && v.category), hasRecipe: false, updatedAt: now };
+    });
+
+    tx.set(INDEX_REF, { ...data, meals, namesAlignedAt: now });
+  });
+}
+
 async function loadFromCloud() {
   setSyncStatus('saving', '● Loading…');
   try {
@@ -2103,6 +2234,11 @@ async function loadFromCloud() {
     if (!iSnap.exists() || !iSnap.data().seededAt) {
       setSyncStatus('saving', '● Setting up…');
       await runSeedIfNeeded();
+      iSnap = await getDoc(INDEX_REF);
+    }
+    if (iSnap.exists() && !iSnap.data().namesAlignedAt) {
+      setSyncStatus('saving', '● Updating…');
+      await alignWithGroceryMenuIfNeeded();
       iSnap = await getDoc(INDEX_REF);
     }
     if (!pSnap.exists() || !pSnap.data().takeoutImportedAt) {
@@ -2623,11 +2759,11 @@ function ingredientHtml(ing, factor) {
   if (ing.qty == null || ing.qty === '') {
     return `<li class="ing" onclick="this.classList.toggle('got')"><span class="ing-name">${name}</span></li>`;
   }
-  const q = ing.qty * factor;
-  let qtyText, pack = '';
+  // Pressure-cooker minimum liquid: never scale below the amount written
+  const q = (/minimum/i.test(ing.name) && factor < 1) ? ing.qty : ing.qty * factor;
+  let qtyText;
   if (ing.unit === 'lb') {
     qtyText = `${fmtLb(q)} lb`;
-    if (PROTEIN_RE.test(ing.name)) pack = packSuggestion(q);
   } else if (ing.unit === 'oz') {
     qtyText = `${q >= 4 ? Math.round(q) : fmtFrac(q)} oz`;
   } else {
@@ -2635,7 +2771,6 @@ function ingredientHtml(ing, factor) {
   }
   return `<li class="ing" onclick="this.classList.toggle('got')">
     <span class="ing-qty">${escHtml(qtyText)}</span> <span class="ing-name">${name}</span>
-    ${pack ? `<div><span class="ing-pack">🛒 ${escHtml(pack)}</span></div>` : ''}
   </li>`;
 }
 
@@ -2655,8 +2790,11 @@ function recipeBodyHtml(r) {
     </div>
   </div>`;
 
-  html += `<div class="rv-card">
-    <div class="rv-card-head"><span>Ingredients</span><span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.8;">tap to check off</span></div>
+  html += `<div class="rv-card collapsible${ingredientsOpen ? ' open' : ''}" id="ing-card">
+    <div class="rv-card-head" onclick="toggleIngredients()">
+      <span>Ingredients${ings.length ? ` <span class="cat-count">${ings.length}</span>` : ''}</span>
+      <span class="menu-cat-chevron">▼</span>
+    </div>
     <div class="rv-card-body">
       ${ings.length ? `<ul class="ing-list">${ings.map(i => ingredientHtml(i, factor)).join('')}</ul>` : '<div class="empty-msg">No ingredients listed.</div>'}
     </div>
@@ -2665,8 +2803,7 @@ function recipeBodyHtml(r) {
   html += `<div class="rv-card">
     <div class="rv-card-head"><span>Instructions</span></div>
     <div class="rv-card-body">
-      ${servings !== base && steps.length ? `<div class="scale-note">Amounts in these steps are for ${base} servings. Use the ingredient list for ${servings}.</div>` : ''}
-      ${steps.length ? `<ol class="step-list">${steps.map(s => `<li>${escHtml(s)}</li>`).join('')}</ol>` : '<div class="empty-msg">No instructions yet.</div>'}
+      ${steps.length ? `<ol class="step-list">${steps.map(s => `<li>${scaleStepHtml(s, factor)}</li>`).join('')}</ol>` : '<div class="empty-msg">No instructions yet.</div>'}
     </div>
   </div>`;
 
@@ -2678,6 +2815,14 @@ function recipeBodyHtml(r) {
   }
   return html;
 }
+
+let ingredientsOpen = (() => { try { return localStorage.getItem('dinners.ingOpen') !== '0'; } catch (e) { return true; } })();
+function toggleIngredients() {
+  ingredientsOpen = !ingredientsOpen;
+  try { localStorage.setItem('dinners.ingOpen', ingredientsOpen ? '1' : '0'); } catch (e) {}
+  document.getElementById('ing-card')?.classList.toggle('open', ingredientsOpen);
+}
+window.toggleIngredients = toggleIngredients;
 
 function setServings(n) {
   servings = n;
@@ -3096,7 +3241,7 @@ requestAnimationFrame(() => requestAnimationFrame(renderHeader));
 window.addEventListener('resize', renderHeader);
 
 // Exposed only for automated testing
-window.__dinners = { parseQty, fmtFrac, packSuggestion, parseIngredientLine, mergeIndex, mergePlanner, fmtQtyInput, parseSteps };
+window.__dinners = { parseQty, fmtFrac, scaleStepHtml, fmtLb, parseIngredientLine, mergeIndex, mergePlanner, fmtQtyInput, parseSteps };
 </script>
 </body>
 </html>
