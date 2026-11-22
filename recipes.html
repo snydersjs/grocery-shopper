@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Dinners (recipes.html) v8 (compact recipe header) - companion to Grocery Shopper. Firestore collection: recipes -->
+<!-- Dinners (recipes.html) v9 (tap ✓ to remove from grocery list) - companion to Grocery Shopper. Firestore collection: recipes -->
 <html lang="en" style="overflow-x: hidden; max-width: 100vw;">
 <head>
 <meta charset="UTF-8">
@@ -2394,7 +2394,7 @@ async function fetchRecipe(id) {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     loadFromCloud();
-    if (currentView.v === 'recipe') requestWakeLock();
+    if (currentView.v === 'recipe') { requestWakeLock(); refreshCartIcons(); }   // ✓ marks follow the grocery list
   }
 });
 
@@ -3472,7 +3472,7 @@ async function refreshCartIcons() {
       const on = isOnGroceryList(matchIngredient(ing.name, catalog), gState);
       btn.classList.toggle('on', on);
       btn.textContent = on ? '✓' : '🛒';
-      btn.title = on ? 'Already on the grocery list' : 'Add to grocery list';
+      btn.title = on ? 'On the grocery list (tap to remove)' : 'Add to grocery list';
     });
   } catch (e) { console.warn('Grocery list check failed:', e); }
 }
@@ -3498,10 +3498,18 @@ async function openGroceryAdd(k) {
   const { catalog, gState } = groceryCtx;
   const match = matchIngredient(ing.name, catalog);
 
-  if (isOnGroceryList(match, gState)) {
-    box.innerHTML = `<div class="modal-title">Already on the list</div>
-      <div class="modal-body"><b>${escHtml(match.kind === 'item' ? match.label : match.text)}</b> is already on the grocery list.</div>
-      <div class="modal-actions"><button class="modal-confirm" onclick="closeModal('modal-grocery')">OK</button></div>`;
+  // Already on the list (the ✓): offer to remove it, after a quick confirm
+  const found = findGroceryEntries(match, gState);
+  if (found.refs.length) {
+    groceryRemoveTarget = match;
+    box.innerHTML = `<div class="modal-title">Remove from grocery list?</div>
+      <div class="modal-body">Remove <b>${escHtml(found.label)}${found.qty > 1 ? ` (×${found.qty})` : ''}</b> from the grocery list?
+        ${found.inCart ? '<div class="grocery-warn" style="margin-top:10px;margin-bottom:0;">🛒 This is already checked off in the cart.</div>' : ''}
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal('modal-grocery')">Cancel</button>
+        <button class="modal-confirm danger" id="grocery-remove-btn" onclick="confirmGroceryRemove()">Remove</button>
+      </div>`;
     return;
   }
 
@@ -3569,6 +3577,79 @@ async function confirmGroceryAdd() {
   refreshCartIcons();
 }
 window.confirmGroceryAdd = confirmGroceryAdd;
+
+
+// ─── Removing (tap the ✓) ───────────────────────────────────────────────────
+let groceryRemoveTarget = null;
+
+// Find what's on the grocery list for this match: item keys and/or Other entries
+function findGroceryEntries(target, gState) {
+  const items = gState.items || {}, cart = gState.cart || {}, notes = gState.notes || {};
+  const refs = []; let qty = 0, inCart = false;
+  if (target.kind === 'item') {
+    const key = groceryKey(target);
+    if ((items[key]?.qty || 0) > 0) { refs.push({ type: 'item', key }); qty += items[key].qty; inCart = !!cart[key]; }
+    return { refs, qty, inCart, label: target.label.split(' › ').slice(1).join(' › ') || target.label };
+  }
+  const n = normName(target.text);
+  Object.entries(gState.freeform || {}).forEach(([ffKey, list]) => (list || []).forEach(e => {
+    if (normName(e.text) === n) { refs.push({ type: 'ff', ffKey, id: e.id }); qty += e.qty || 1; if (cart[`ff:${ffKey}:${e.id}`]) inCart = true; }
+  }));
+  Object.keys(items).forEach(k => {
+    if (k.includes(':Other:') && (items[k]?.qty || 0) > 0 && normName(notes['__label_' + k]) === n) {
+      refs.push({ type: 'item', key: k }); qty += items[k].qty; if (cart[k]) inCart = true;
+    }
+  });
+  return { refs, qty, inCart, label: target.text };
+}
+
+async function confirmGroceryRemove() {
+  const btn = document.getElementById('grocery-remove-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Removing…'; }
+  try { await removeFromGroceryList(groceryRemoveTarget); }
+  catch (e) {
+    console.error('Grocery remove error:', e);
+    if (btn) { btn.disabled = false; btn.textContent = 'Remove'; }
+    toast('Couldn\'t remove it. Check your connection and try again.');
+    return;
+  }
+  closeModal('modal-grocery');
+  toast('Removed from the grocery list');
+  refreshCartIcons();
+}
+window.confirmGroceryRemove = confirmGroceryRemove;
+
+// Removes using the grocery app's own delete rules (deletion marker, cart and note cleared)
+async function removeFromGroceryList(target) {
+  await runTransaction(db, async tx => {
+    const snap = await tx.get(GROCERY_REF);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const now = Date.now();
+    const { refs } = findGroceryEntries(target, data);
+    if (!refs.length) return;
+    const items = { ...(data.items || {}) }, deletedAt = { ...(data.deletedAt || {}) };
+    const cart = { ...(data.cart || {}) }, notes = { ...(data.notes || {}) };
+    const freeform = { ...(data.freeform || {}) };
+    let ffChanged = false;
+    refs.forEach(r => {
+      if (r.type === 'item') {
+        delete items[r.key];
+        deletedAt[r.key] = now;
+        delete cart[r.key];
+        delete notes[r.key];
+        delete notes['__label_' + r.key];
+      } else {
+        freeform[r.ffKey] = (freeform[r.ffKey] || []).filter(e => e.id !== r.id);
+        delete cart[`ff:${r.ffKey}:${r.id}`];
+        ffChanged = true;
+      }
+    });
+    const next = { ...data, items, deletedAt, cart, notes, freeform };
+    if (ffChanged) next.freeformAt = now;
+    tx.set(GROCERY_REF, next);
+  });
+}
 
 // Adds one item inside a transaction, so nothing else on the grocery list is touched
 async function addToGroceryList(t) {
